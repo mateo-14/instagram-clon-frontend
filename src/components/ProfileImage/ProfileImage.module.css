@@ -1,0 +1,9 @@
+.imageWrapper {
+  position: relative;
+  height: 1.6rem;
+  width: 1.6rem;
+}
+
+.image {
+  border-radius: 100%;
+}

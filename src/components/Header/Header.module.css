@@ -1,0 +1,30 @@
+.header {
+  border-bottom: 1px solid rgb(var(--border-color));
+}
+
+.container {
+  margin: 0 auto;
+  padding: 0 1rem;
+  max-width: var(--main-max-width);
+  height: 3.6rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.logoWrapper {
+  height: 75%;
+  position: relative;
+  aspect-ratio: 53/23;
+}
+
+.navbar {
+  display: flex;
+  gap: 1.3rem;
+  position: relative;
+}
+
+.navbarIcon {
+  height: 1.5rem;
+  width: 1.5rem;
+}
