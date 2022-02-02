@@ -1,28 +1,87 @@
-import Image from 'next/image';
-import styles from './Header.module.css';
-import instagramLogo from '../../../public/instagram-logo.svg';
 import CreatePostIcon from 'components/common/Icons/CreatePostIcon';
 import OutlineHomeIcon from 'components/common/Icons/OutlineHomeIcon';
-import NavbarButton from 'components/NavbarButton';
-import NavbarProfile from 'components/NavbarProfile';
+import ProfileIcon from 'components/common/Icons/ProfileIcon';
+import SettingsIcon from 'components/common/Icons/SettingsIcon';
+import ProfileImage from 'components/ProfileImage';
+import useAuth from 'hooks/useAuth';
+import useOnClickOutside from 'hooks/useOnClickOutside';
+import Image from 'next/image';
+import Link from 'next/link';
+import { useRef, useState } from 'react';
+import instagramLogo from '../../../public/instagram-logo.svg';
+import testImage from '../../../public/test_profile.jpg';
+import styles from './Header.module.css';
 
 export default function Header() {
   return (
     <header className={styles.header}>
       <div className={styles.container}>
-        <div className={styles.logoWrapper}>
-          <Image src={instagramLogo} alt="Instagram" layout="fill" />
-        </div>
+        <Link href="/">
+          <a>
+            <div className={styles.logoWrapper}>
+              <Image src={instagramLogo} alt="Instagram" layout="fill" />
+            </div>
+          </a>
+        </Link>
+
         <nav className={styles.navbar}>
-          <NavbarButton>
+          <button className={styles.navbarButton}>
             <OutlineHomeIcon className={styles.navbarIcon} />
-          </NavbarButton>
-          <NavbarButton>
+          </button>
+          <button className={styles.navbarButton}>
             <CreatePostIcon className={styles.navbarIcon} />
-          </NavbarButton>
+          </button>
           <NavbarProfile />
         </nav>
       </div>
     </header>
+  );
+}
+
+function NavbarProfile() {
+  const auth = useAuth();
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const handleProfileClick = () => setIsMenuOpen(!isMenuOpen);
+
+  return (
+    <>
+      <button
+        className={`${styles.navbarButton} ${styles.profileButton} ${
+          isMenuOpen ? styles.active : ''
+        }`}
+        onClick={handleProfileClick}
+      >
+        <ProfileImage src={testImage} />
+      </button>
+
+      <ProfileMenu isOpen={isMenuOpen} onClose={handleProfileClick} />
+    </>
+  );
+}
+
+function ProfileMenu({ isOpen, onClose }) {
+  const ref = useRef();
+  useOnClickOutside(ref, onClose);
+
+  return (
+    isOpen && (
+      <div className={styles.profileMenu} ref={ref}>
+        <Link href="/profile">
+          <a className={styles.menuButton}>
+            <ProfileIcon />
+            Profile
+          </a>
+        </Link>
+        <Link href="/settings">
+          <a className={styles.menuButton}>
+            <SettingsIcon />
+            Settings
+          </a>
+        </Link>
+        <Link href="/logout">
+          <a className={`${styles.menuButton} ${styles.logoutButton}`}>Log Out</a>
+        </Link>
+      </div>
+    )
   );
 }
