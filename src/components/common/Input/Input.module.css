@@ -1,0 +1,14 @@
+.input {
+  outline: 0;
+  padding: 0.75rem 0.6rem;
+  border: 1px solid rgb(var(--border-color));
+  border-radius: 3px;
+}
+
+.input::placeholder {
+  color: rgb(var(--light-text-color));
+}
+
+.input:focus {
+  border-color: rgb(var(--light-text-color));
+}

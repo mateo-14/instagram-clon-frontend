@@ -1,0 +1,46 @@
+.container {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  align-items: center;
+  justify-content: center;
+}
+
+.main {
+  width: 100%;
+  max-width: 350px;
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+}
+
+.mainSection {
+  padding: 1.8rem 1.2rem;
+}
+
+.extraSection {
+  padding: 1.2rem 1.2rem;
+}
+
+.header {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 2rem;
+}
+
+.logoWrapper {
+  height: 3rem;
+  position: relative;
+  aspect-ratio: 60/17;
+}
+
+
+@media (min-width: 500px) {
+  .mainSection,
+  .extraSection {
+    border: 1px solid rgb(var(--border-color));
+    border-radius: 2px;
+    padding-left: 2.6rem;
+    padding-right: 2.6rem;
+  }
+}
