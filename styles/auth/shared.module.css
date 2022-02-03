@@ -18,3 +18,15 @@
 .button {
   margin-top: 0.5rem;
 }
+
+.inputWrapper {
+  display: flex;
+  flex-direction: column;
+}
+
+.errorText {
+  color: red;
+  font-size: 0.9rem;
+  margin: 0 0 0 5px;
+  font-weight: 500;
+}
