@@ -17,23 +17,23 @@
 }
 
 .logoWrapper {
-  height: 2.5rem;
+  height: 1.8rem;
   position: relative;
-  aspect-ratio: 53/23;
+  aspect-ratio: 60/17;
 }
 
-.navbar {
+.rightMenu {
   display: flex;
   gap: 1.3rem;
   position: relative;
 }
 
-.navbarIcon {
+.rightMenuIcon {
   height: 1.5rem;
   width: 1.5rem;
 }
 
-.navbarButton {
+.rightMenuButton {
   padding: 0;
   border: 0;
   display: inline-flex;
@@ -48,6 +48,7 @@
   border-radius: 100%;
   padding: 1px;
   border: 1px solid transparent;
+  cursor: pointer;
 }
 
 .profileButton.active {

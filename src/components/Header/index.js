@@ -15,25 +15,25 @@ import styles from './Header.module.css';
 export default function Header() {
   return (
     <header className={styles.header}>
-      <div className={styles.container}>
+      <nav className={styles.container}>
         <Link href="/">
-          <a>
+          <a aria-label="Instagram logo">
             <div className={styles.logoWrapper}>
               <Image src={instagramLogo} alt="Instagram" layout="fill" />
             </div>
           </a>
         </Link>
 
-        <nav className={styles.navbar}>
-          <button className={styles.navbarButton}>
-            <OutlineHomeIcon className={styles.navbarIcon} />
+        <div className={styles.rightMenu}>
+          <button className={styles.rightMenuButton}>
+            <OutlineHomeIcon className={styles.rightMenuIcon} />
           </button>
-          <button className={styles.navbarButton}>
-            <CreatePostIcon className={styles.navbarIcon} />
+          <button className={styles.rightMenuButton}>
+            <CreatePostIcon className={styles.rightMenuIcon} />
           </button>
           <NavbarProfile />
-        </nav>
-      </div>
+        </div>
+      </nav>
     </header>
   );
 }
