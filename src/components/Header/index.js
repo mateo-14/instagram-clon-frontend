@@ -9,7 +9,6 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { useRef, useState } from 'react';
 import instagramLogo from '../../../public/instagram-logo.svg';
-import testImage from '../../../public/test_profile.jpg';
 import styles from './Header.module.css';
 
 export default function Header() {
@@ -39,7 +38,7 @@ export default function Header() {
 }
 
 function NavbarProfile() {
-  const auth = useAuth();
+  const { data } = useAuth();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const handleProfileClick = () => setIsMenuOpen(!isMenuOpen);
 
@@ -51,10 +50,10 @@ function NavbarProfile() {
         }`}
         onClick={handleProfileClick}
       >
-        <ProfileImage src={testImage} />
+        <ProfileImage src={data?.profileImage}  />
       </button>
 
-      <ProfileMenu isOpen={isMenuOpen} onClose={handleProfileClick} />
+      <ProfileMenu isOpen={isMenuOpen} onClose={handleProfileClick} user={data} />
     </>
   );
 }
