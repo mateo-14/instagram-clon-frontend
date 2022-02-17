@@ -1,15 +1,35 @@
 .button {
   border: 0;
   outline: 0;
-  border-radius: 4px;
-  background-color: rgb(var(--primary-color));;
-  color: white;
   font-weight: 500;
-  padding: 0.45rem;
   cursor: pointer;
+  padding: 0;
 }
 
 .button:disabled {
   cursor: default;
+}
+
+.solid {
+  padding: 0.45rem;
+  border-radius: 4px;
+  background-color: rgb(var(--primary-color));
+  color: white;
+}
+
+.solid:disabled {
   opacity: 0.35;
+}
+
+.text {
+  color: rgb(var(--primary-color));
+  cursor: pointer;
+  font-weight: 600;
+  color: rgb(var(--primary-color));
+  font-size: 0.9rem;
+}
+
+.text:disabled {
+  color: rgba(var(--primary-color), 0.5);
+  cursor: default;
 }
