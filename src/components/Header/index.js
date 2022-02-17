@@ -2,6 +2,7 @@ import CreatePostIcon from 'components/common/Icons/CreatePostIcon';
 import OutlineHomeIcon from 'components/common/Icons/OutlineHomeIcon';
 import ProfileIcon from 'components/common/Icons/ProfileIcon';
 import SettingsIcon from 'components/common/Icons/SettingsIcon';
+import NewPostModal from 'components/NewPostModal';
 import ProfileImage from 'components/ProfileImage';
 import useAuth from 'hooks/useAuth';
 import useOnClickOutside from 'hooks/useOnClickOutside';
@@ -12,6 +13,17 @@ import instagramLogo from '../../../public/instagram-logo.svg';
 import styles from './Header.module.css';
 
 export default function Header() {
+  const [isModalVisible, setIsModalVisible] = useState(false);
+
+  const handleModalClose = (post) => {
+    setIsModalVisible(false);
+
+    if (post) {
+      // TODO Show toast
+      console.log(post)
+    }
+  }
+
   return (
     <header className={styles.header}>
       <nav className={styles.container}>
@@ -27,10 +39,11 @@ export default function Header() {
           <button className={styles.rightMenuButton}>
             <OutlineHomeIcon className={styles.rightMenuIcon} />
           </button>
-          <button className={styles.rightMenuButton}>
+          <button className={styles.rightMenuButton} onClick={() => setIsModalVisible(true)}>
             <CreatePostIcon className={styles.rightMenuIcon} />
           </button>
           <NavbarProfile />
+          {isModalVisible && <NewPostModal onClose={handleModalClose} />}
         </div>
       </nav>
     </header>
@@ -50,7 +63,7 @@ function NavbarProfile() {
         }`}
         onClick={handleProfileClick}
       >
-        <ProfileImage src={data?.profileImage}  />
+        <ProfileImage src={data?.profileImage} />
       </button>
 
       <ProfileMenu isOpen={isMenuOpen} onClose={handleProfileClick} user={data} />

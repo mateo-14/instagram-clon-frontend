@@ -1,0 +1,28 @@
+.background {
+  position: fixed;
+  top: 0;
+  left: 0;
+  background: rgba(0, 0, 0, 0.85);
+  width: 100%;
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.modal {
+  background: #fff;
+  border-radius: 0.8rem;
+}
+
+.closeButton{
+  position: absolute;
+  background: 0;
+  border: 0;
+  color: rgb(207, 207, 207);
+  height: 2.4rem;
+  width: 2.4rem;
+  cursor: pointer;
+  top: 0.6rem;
+  right: 0.6rem;
+}
