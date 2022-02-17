@@ -30,6 +30,6 @@ export function auth() {
     return axios
       .get(`${ENDPOINT}`, { headers: { authorization: `Bearer ${token}` } })
       .then(({ data }) => resolve(data))
-      .catch(({ response }) => reject({ error: response.data }));
+      .catch(({ response }) => reject({ error: response?.data }));
   });
 }
