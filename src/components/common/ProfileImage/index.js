@@ -1,6 +1,6 @@
 import Image from 'next/image';
 import styles from './ProfileImage.module.css';
-import defaultProfile from '../../../public/default_profile.jpg'
+import defaultProfile from '../../../../public/default_profile.jpg'
 
 const ProfileImage = ({ src, className, alt = 'Profile Image' }) => (
   <div className={`${styles.imageWrapper} ${className ? className : ''}`}>
