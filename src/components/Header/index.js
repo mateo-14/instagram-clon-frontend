@@ -3,7 +3,7 @@ import OutlineHomeIcon from 'components/common/Icons/OutlineHomeIcon';
 import ProfileIcon from 'components/common/Icons/ProfileIcon';
 import SettingsIcon from 'components/common/Icons/SettingsIcon';
 import NewPostModal from 'components/NewPostModal';
-import ProfileImage from 'components/ProfileImage';
+import ProfileImage from 'components/common/ProfileImage';
 import useAuth from 'hooks/useAuth';
 import useOnClickOutside from 'hooks/useOnClickOutside';
 import Image from 'next/image';
