@@ -1,0 +1,33 @@
+.posts {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.modalContainer {
+  margin: 4rem 0;
+  max-width: 1200px;
+  background: 0;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  width: 90%;
+}
+
+.modalContainer > :first-child {
+  border: 0;
+  border-radius: 0.3rem;
+}
+
+@media (min-width: 768px) {
+  .posts {
+    width: 70%;
+    margin: auto;
+  }
+
+  .modalContainer {
+    margin: 3rem 0;
+    flex: 0;
+  }
+}
