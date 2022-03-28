@@ -23,16 +23,18 @@ export function signUp(data) {
 }
 
 export function auth() {
-  const token = getToken();
+  return new Promise((resolve, reject) => {
+    const token = getToken();
+    if (!token) return reject({ error: 'Not token' });
 
-  return axios
-    .get(`${ENDPOINT}`, { headers: { authorization: `Bearer ${token}` } })
-    .then(({ data }) => data)
-    .catch(({ response }) => ({ error: response?.data }));
+    axios
+      .get(`${ENDPOINT}`, { headers: { authorization: `Bearer ${token}` } })
+      .then(({ data }) => resolve(data))
+      .catch(({ response }) => reject({ error: response?.data }));
+  });
 }
 
 export function getToken() {
   const token = localStorage.getItem('token');
-  if (!token) throw new Error('Token not found');
   return token;
 }
