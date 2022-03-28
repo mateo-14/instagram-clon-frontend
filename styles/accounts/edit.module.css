@@ -1,0 +1,31 @@
+.section {
+  border: 1px solid rgb(var(--border-color));
+  padding: 1rem 1.5rem;
+}
+
+.form {
+  display: grid;
+  grid-template-columns: 1fr 2fr;
+  padding: 1rem;
+  gap: 1rem 2rem;
+}
+
+.label {
+  place-self: start end;
+  font-weight: 500;
+  margin-top: 5px;
+}
+
+.textarea {
+  resize: vertical;
+  width: 100%;
+}
+
+.form .input {
+  padding: 0.4rem 0.5rem;
+  font-size: 1rem;
+}
+.submit {
+  grid-column: 2;
+  place-self: start;
+}
