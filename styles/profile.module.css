@@ -1,0 +1,105 @@
+.profileInfo {
+  display: flex;
+  gap: 1.5rem;
+  padding-bottom: 2rem;
+  border-bottom: 1px solid rgb(var(--border-color));
+}
+
+.imageContainer {
+  flex: 1;
+}
+
+.image {
+  height: 9rem;
+  width: 9rem;
+  margin: auto;
+}
+
+.userInfo {
+  flex: 2;
+  display: flex;
+  gap: 1rem;
+  flex-direction: column;
+}
+
+.userInfoCount {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  gap: 1rem;
+}
+
+.infoNumber {
+  font-weight: 500;
+}
+
+.displayName {
+  font-weight: 500;
+  margin: 0;
+}
+
+.username {
+  font-weight: 300;
+  font-size: 1.8rem;
+}
+
+.posts {
+  margin-top: 2rem;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 2px;
+}
+
+.post {
+  aspect-ratio: 1/1;
+  cursor: pointer;
+}
+
+.postImage {
+  position: relative;
+  width: 100%;
+  height: 100%;
+}
+
+.postInfo {
+  display: none;
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.3);
+  align-items: center;
+  justify-content: center;
+  color: white;
+  font-size: 1rem;
+  font-weight: 500;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  gap: 2rem;
+}
+
+.postInfo svg {
+  height: 1.4rem;
+  width: 1.4rem;
+}
+
+.postInfo path {
+  fill: white;
+}
+
+.postInfo li {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+@media (min-width: 768px) {
+  .posts {
+    gap: 1.8rem;
+  }
+
+  .post:hover .postInfo {
+    display: flex;
+  }
+}
