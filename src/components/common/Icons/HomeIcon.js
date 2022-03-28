@@ -1,4 +1,4 @@
-const OutlineHomeIcon = ({ className }) => (
+const HomeIcon = ({ className }) => (
   <svg
     aria-label="Home"
     className={className}
@@ -17,4 +17,4 @@ const OutlineHomeIcon = ({ className }) => (
   </svg>
 );
 
-export default OutlineHomeIcon;
+export default HomeIcon;
