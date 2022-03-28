@@ -23,5 +23,11 @@ const getTimeAgo = (timestamp) => {
   return rtf.format(value, unit);
 };
 
-export default getTimeAgo;
+const getShortTimeAgo = (timestamp) => {
+  const secondsElapsed = getSecondsDiff(timestamp);
+  const { value, unit } = getUnitAndValueDate(secondsElapsed);
+  return `${value * -1}${unit[0]}`;
+};
+
+export { getTimeAgo, getShortTimeAgo };
 // Source https://midu.dev/como-crear-un-time-ago-sin-dependencias-intl-relativeformat/
