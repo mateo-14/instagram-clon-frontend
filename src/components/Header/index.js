@@ -1,5 +1,5 @@
 import CreatePostIcon from 'components/common/Icons/CreatePostIcon';
-import OutlineHomeIcon from 'components/common/Icons/OutlineHomeIcon';
+import OutlineHomeIcon from 'components/common/Icons/HomeIcon';
 import ProfileIcon from 'components/common/Icons/ProfileIcon';
 import SettingsIcon from 'components/common/Icons/SettingsIcon';
 import NewPostModal from 'components/NewPostModal';
@@ -71,26 +71,26 @@ function NavbarProfile() {
   );
 }
 
-function ProfileMenu({ isOpen, onClose }) {
+function ProfileMenu({ isOpen, onClose, user }) {
   const ref = useRef();
   useOnClickOutside(ref, onClose);
 
   return (
     isOpen && (
       <div className={styles.profileMenu} ref={ref}>
-        <Link href="/profile">
+        <Link href={`/${user.username}`}>
           <a className={styles.menuButton}>
             <ProfileIcon />
             Profile
           </a>
         </Link>
-        <Link href="/settings">
+        <Link href="/accounts/edit">
           <a className={styles.menuButton}>
             <SettingsIcon />
             Settings
           </a>
         </Link>
-        <Link href="/logout">
+        <Link href="/accounts/logout">
           <a className={`${styles.menuButton} ${styles.logoutButton}`}>Log Out</a>
         </Link>
       </div>
