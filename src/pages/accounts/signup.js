@@ -1,14 +1,15 @@
-import sharedStyles from 'styles/auth/shared.module.css';
+import sharedStyles from 'styles/accounts/shared.module.css';
 import Link from 'next/link';
 import Input from 'components/common/Input';
 import Button from 'components/common/Button';
 import AuthPage from 'components/AuthPage';
-import styles from 'styles/auth/Signup.module.css';
+import styles from 'styles/accounts/Signup.module.css';
 import { useForm } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
 import * as yup from 'yup';
 import useAuth from 'hooks/useAuth';
 import { useRouter } from 'next/router';
+import { useEffect } from "react";
 
 const schema = yup
   .object({

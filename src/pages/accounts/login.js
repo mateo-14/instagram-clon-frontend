@@ -1,4 +1,4 @@
-import sharedStyles from 'styles/auth/shared.module.css';
+import sharedStyles from 'styles/accounts/shared.module.css';
 import Link from 'next/link';
 import Input from 'components/common/Input';
 import Button from 'components/common/Button';
