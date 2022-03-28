@@ -2,96 +2,120 @@ import classNames from 'classnames';
 import Button from 'components/common/Button';
 import CommentIcon from 'components/common/Icons/CommentIcon';
 import HeartIcon from 'components/common/Icons/HeartIcon';
+import LoadMore from 'components/common/Icons/LoadMore';
+import OutlineHeartIcon from 'components/common/Icons/OutlineHeartIcon';
 import ProfileImage from 'components/common/ProfileImage';
 import TextArea from 'components/common/TextArea';
+import { useCommentMutations } from 'hooks/useCommentMutations';
+import { usePostMutations } from 'hooks/usePostMutations';
 import Image from 'next/image';
 import Link from 'next/link';
-import getTimeAgo from 'src/utils/getTimeAgo';
+import { useState } from 'react';
+import { useInfiniteQuery } from 'react-query';
+import { getComments } from 'services/commentsService';
+import { getShortTimeAgo, getTimeAgo } from 'src/utils/getTimeAgo';
 import styles from './Post.module.css';
 
-export default function Post({ post, isFullPost, onClickCommentAction }) {
-  const date = new Date(post.createdAt);
+export default function Post({
+  data,
+  isFullPost = false,
+  onRequestOpenModal,
+  onLikeSuccess,
+  onCommentSuccess,
+}) {
+  const date = data && new Date(data.createdAt);
+  const { like, addComment } = usePostMutations(data, { onLikeSuccess, onCommentSuccess });
 
-  const handleCommentAction = () => {
-    if (onClickCommentAction) onClickCommentAction(post.id);
+  const handleLikeAction = () => like();
+
+  const requestOpenModal = () => {
+    if (onRequestOpenModal) onRequestOpenModal(data);
   };
+
+  const handleCommentSubmit = (value) => addComment({ text: value });
 
   return (
     <article className={classNames(styles.container, { [styles.fullPost]: isFullPost })}>
       <header className={styles.header}>
         <div className={styles.userInfo}>
-          <Link href={`/${post.author.username}`}>
+          <Link href={`/${data.author.username}`}>
             <a>
-              <ProfileImage src={post.author.profileImage} className={styles.userImage} />
+              <ProfileImage src={data.author.profileImage} className={styles.userImage} />
             </a>
           </Link>
-          <Link href={`/${post.author.username}`}>
-            <a className={styles.userName}>{post.author.username}</a>
+          <Link href={`/${data.author.username}`}>
+            <a className={styles.userName}>{data.author.username}</a>
           </Link>
         </div>
       </header>
 
-      <div className={styles.image}>
-        <Image
-          src={post.images[0]}
-          layout="fill"
-          alt="Post image"
-          objectFit="cover"
+      <div className={styles.imageContainer}>
+        <div
           className={styles.image}
-        />
+          onDoubleClick={() => !data.hasClientLike && handleLikeAction()}
+        >
+          <Image src={data.images[0]} layout="fill" alt="Post image" objectFit="cover" />
+        </div>
       </div>
-
       <section className={styles.actions}>
-        <button className={styles.action}>
-          <HeartIcon />
+        <button
+          className={classNames(styles.action, { [styles.liked]: data.hasClientLike })}
+          onClick={handleLikeAction}
+        >
+          {data.hasClientLike ? <HeartIcon /> : <OutlineHeartIcon />}
         </button>
-        <button className={styles.action} onClick={handleCommentAction}>
+        <button className={styles.action} onClick={requestOpenModal}>
           <CommentIcon />
         </button>
       </section>
 
       <section className={styles.likesSection}>
-        <button className={styles.likes}>{post._count.likes} likes</button>
+        <button className={styles.likes}>{data._count.likes} likes</button>
       </section>
 
-      {/* Only feed post */}
+      {/* Only feed data */}
       <section className={styles.comments}>
-        {!isFullPost ? (
+        {isFullPost ? (
           <>
-            <PostText author={post.author.username} text={post.text} showLess={true} />
-            {post._count.comments > 0 && <span>View all 36 comments</span>}
+            <PostComment
+              comment={{ author: data.author, text: data.text, createdAt: data.createdAt }}
+              isPostCaption={true}
+            />
+            <PostComments postId={data.id} />
           </>
         ) : (
-          <div className={styles.comment}>
-            <ProfileImage src={post.author.profileImage} className={styles.commentAvatar} />
-            <PostText author={post.author.username} text={post.text} showLess={true} />
-            {/* Map all comments*/}
-          </div>
+          <>
+            <PostText author={data.author.username} text={data.text} showLess={true} />
+            {data._count.comments > 0 && (
+              <button className={styles.viewAllCommentsBtn} onClick={requestOpenModal}>
+                View all {data._count.comments} comments
+              </button>
+            )}
+          </>
         )}
       </section>
-      {/* Only feed post */}
+      {/* Only feed data */}
 
-      <section className={styles.date}>
-        <Link href="/post">
+      <section className={styles.dateSection}>
+        <Link href={`/posts/${data.id}`}>
           <a>
-            <time dateTime={date.toLocaleString()} title={date.toLocaleString()}>
+            <time
+              dateTime={date.toLocaleString()}
+              title={date.toLocaleString()}
+              className={styles.date}
+            >
               {getTimeAgo(date.getTime()).toUpperCase()}
             </time>
           </a>
         </Link>
       </section>
 
-      <form className={styles.commentForm}>
-        <TextArea placeholder="Add a comment..." />
-        <Button disabled={true} type="text">
-          Post
-        </Button>
-      </form>
+      <CommentForm postId={data.id} onSubmit={handleCommentSubmit} />
     </article>
   );
 }
 
-const PostText = ({ author, text, showLess }) => (
+const PostText = ({ author, text }) => (
   <p className={styles.text}>
     <Link href={author}>
       <a className={styles.author}>{`${author} `}</a>
@@ -99,3 +123,93 @@ const PostText = ({ author, text, showLess }) => (
     {text}
   </p>
 );
+
+function PostComments({ postId }) {
+  const { data, hasNextPage, fetchNextPage } = useInfiniteQuery(
+    ['posts', postId, 'comments'],
+    ({ pageParam }) => getComments(postId, pageParam),
+    {
+      getNextPageParam: (lastPage) => {
+        if (lastPage.length < 5) return;
+        return lastPage[lastPage.length - 1].id;
+      },
+    }
+  );
+
+  return (
+    <>
+      {data?.pages.flat().map((comment) => (
+        <PostComment comment={comment} key={comment.id} />
+      ))}
+      {hasNextPage && (
+        <button onClick={fetchNextPage} className={styles.loadMoreBtn}>
+          <LoadMore />
+        </button>
+      )}
+    </>
+  );
+}
+
+const PostComment = ({ comment, isPostCaption = false }) => {
+  const date = new Date(comment.createdAt);
+  const { like } = useCommentMutations(comment);
+
+  const handleLikeClick = () => like();
+
+  return (
+    <div className={styles.comment} onDoubleClick={handleLikeClick}>
+      <ProfileImage src={comment.author.profileImage} className={styles.commentAvatar} />
+      <div>
+        <PostText author={comment.author.username} text={comment.text} />
+        <div className={styles.commentInfo}>
+          <time
+            className={styles.commentDate}
+            dateTime={date.toLocaleString()}
+            title={date.toLocaleString()}
+          >
+            {getShortTimeAgo(date.getTime())}
+          </time>
+          {!isPostCaption && (
+            <span className={styles.commentLikes}>{comment._count.likes} likes</span>
+          )}
+        </div>
+      </div>
+      {!isPostCaption && (
+        <button
+          className={classNames(styles.action, styles.commentLikeBtn, {
+            [styles.liked]: comment.hasClientLike,
+          })}
+          onClick={handleLikeClick}
+        >
+          {comment.hasClientLike ? <HeartIcon /> : <OutlineHeartIcon />}
+        </button>
+      )}
+    </div>
+  );
+};
+
+function CommentForm({ onSubmit }) {
+  const [value, setValue] = useState('');
+  const isValid = value.trim().length > 0;
+
+  const handleChange = (e) => {
+    setValue(e.currentTarget.value);
+  };
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    if (isValid && onSubmit) {
+      onSubmit(value.trim());
+      setValue('');
+    }
+  };
+
+  return (
+    <form className={styles.commentForm} onSubmit={handleSubmit}>
+      <TextArea placeholder="Add a comment..." onChange={handleChange} value={value} />
+      <Button disabled={!isValid} type="text">
+        Post
+      </Button>
+    </form>
+  );
+}

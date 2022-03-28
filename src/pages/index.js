@@ -1,76 +1,89 @@
-import Layout from 'components/Layout';
-import styles from 'styles/index.module.css';
-import { getFeed } from 'services/postsServices';
-import { useState } from 'react';
-import { useInfiniteQuery } from 'react-query';
-import { queryClient } from './_app';
-import Link from 'next/link';
-import Post from 'components/Post';
-import { useRouter } from 'next/router';
 import Modal from 'components/common/Modal';
+import Layout from 'components/Layout';
+import Post from 'components/Post';
+import useFeedPosts from 'hooks/useFeedPosts';
+import Head from 'next/head';
+import { useRouter } from 'next/router';
+import { useEffect, useRef, useState } from 'react';
+import styles from 'styles/index.module.css';
 
-const fetchPosts = ({ pageParam }) => {
-  return getFeed(pageParam);
-};
 export default function Home() {
-  const { data, status, isFetchingNextPage, hasNextPage, fetchNextPage } = useInfiniteQuery(
-    'posts/feed',
-    fetchPosts,
-    {
-      getNextPageParam: (lastPage) => {
-        if (lastPage.length < 5) return;
-        return lastPage[lastPage.length - 1].id;
-      },
-      onSuccess: (data) => {
-        for (const page of data.pages) {
-          for (const post of page) {
-            if (!queryClient.getQueryData(['posts', post.id]))
-              queryClient.setQueryData(['posts', post.id], post);
-          }
-        }
-      },
-    }
-  );
   const [selectedPost, setSelectedPost] = useState(null);
+  const { posts, status, isFetchingNextPage, hasNextPage, fetchNextPage, handleLikeSuccess, handleCommentSuccess } =
+    useFeedPosts();
+  const intersectionRef = useRef();
 
-  const handleCommentAction = (postId) => {
-    window.history.pushState(null, null, `/posts/${postId}`);
-    setSelectedPost(postId);
-    console.log(data.pages.flat());
+  const handleRequestOpenModal = (post) => {
+    window.history.pushState({ postId: post.id }, null, `/posts/${post.id}`);
+    setSelectedPost(post);
   };
 
   const handlePostClose = () => {
     setSelectedPost(null);
     window.history.pushState(null, null, `/`);
-  }
+  };
+
+  useEffect(() => {
+    if (status !== 'success' || !hasNextPage || isFetchingNextPage) return;
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        if (entries[0].isIntersecting) {
+          fetchNextPage();
+        }
+      },
+      {
+        rootMargin: '0px',
+        threshold: 1.0,
+      }
+    );
+
+    observer.observe(intersectionRef.current);
+    return () => observer.disconnect();
+  }, [status, fetchNextPage, isFetchingNextPage, hasNextPage]);
+
+  useEffect(() => {
+    window.onpopstate = (event) => {
+      if (event.state?.postId)
+        setSelectedPost(posts.find((post) => post.id === event.state.postId));
+      else setSelectedPost(null);
+    };
+  }, [posts]);
 
   return (
     <Layout>
-      <button onClick={() => fetchNextPage()} disabled={!hasNextPage || isFetchingNextPage}>
-        {isFetchingNextPage
-          ? 'Loading more...'
-          : hasNextPage
-          ? 'Load More'
-          : 'Nothing more to load'}
-      </button>
+      <Head>
+        <title>
+          {selectedPost
+            ? `${selectedPost?.author?.username} on Instagram: "${selectedPost?.text}" `
+            : 'Instagram'}
+        </title>
+      </Head>
       <section className={styles.posts}>
-        {status === 'success' &&
-          data.pages.flat().map((post) => (
-            <div key={post.id}>
-              <Link href={`/posts/${post.id}`}>
-                <a>Open</a>
-              </Link>
-              <Post post={post} key={post.id} onClickCommentAction={handleCommentAction} />
-            </div>
-          ))}
-      </section>
-
-      <Modal showCloseButton={true} show={!!selectedPost} className={styles.modalContainer} onClose={handlePostClose}>
-          {selectedPost && (
+        {posts?.map((post) => (
           <Post
-            post={data.pages.flat().find((post) => post.id === selectedPost)}
-            inModal={true}
+            data={post}
+            key={post.id}
+            onRequestOpenModal={handleRequestOpenModal}
+            onLikeSuccess={handleLikeSuccess}
+            onCommentSuccess={handleCommentSuccess}
+          />
+        ))}
+      </section>
+      <div ref={intersectionRef}></div>
+
+      <Modal
+        showCloseButton={true}
+        show={!!selectedPost}
+        className={styles.modalContainer}
+        onClose={handlePostClose}
+      >
+        {selectedPost && (
+          <Post
+            data={selectedPost}
             isFullPost={true}
+            onLikeSuccess={handleLikeSuccess}
+            onCommentSuccess={handleCommentSuccess}
           />
         )}
       </Modal>
