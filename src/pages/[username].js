@@ -18,6 +18,7 @@ export default function Profile() {
     enabled: !!username,
   });
   const notFound = data?.error === 'Not Found';
+  const displayName = data?.displayName || data?.username;
 
   const { data: posts, status: postsStatus } = useQuery(
     ['users', username, 'posts'],
@@ -33,7 +34,7 @@ export default function Profile() {
             ? 'Loading...'
             : notFound
             ? 'Page Not Found - Instagram'
-            : `${data.displayName} (@${data.username}) - Instagram photos`}
+            : `${displayName} (@${data.username}) - Instagram photos`}
         </title>
       </Head>
       {notFound && (
@@ -66,7 +67,7 @@ export default function Profile() {
                 </li>
               </ul>
               <div>
-                <p className={styles.displayName}>{data.displayName}</p>
+                <p className={styles.displayName}>{displayName}</p>
                 {data.bio && <p className={styles.bio}>{data.bio}</p>}
               </div>
             </div>
