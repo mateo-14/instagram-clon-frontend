@@ -1,4 +1,5 @@
-import { createContext, useEffect, useReducer, useState } from 'react';
+import { useRouter } from 'next/router';
+import { createContext, useEffect, useReducer } from 'react';
 import { auth } from 'services/authService';
 
 export const AuthContext = createContext();
@@ -25,6 +26,7 @@ function reducer(state, action) {
 
 export default function AuthProvider({ children }) {
   const [state, dispatch] = useReducer(reducer, initialState);
+  const router = useRouter();
 
   const logout = () => {
     dispatch({ type: 'logout' });
@@ -43,7 +45,10 @@ export default function AuthProvider({ children }) {
 
         setAuthData(data);
       })
-      .catch(() => dispatch({ type: 'loading/disable' }));
+      .catch(() => {
+        router.push('/accounts/login');
+        dispatch({ type: 'loading/disable' });
+      });
   }, []);
 
   return (
