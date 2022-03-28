@@ -18,7 +18,7 @@ const schema = yup
   .required();
 
 export default function Signin() {
-  const { login, isLogged } = useAuth();
+  const { login, isLogged } = useAuth(false);
   const router = useRouter();
   const { register, handleSubmit, formState, setError } = useForm({
     resolver: yupResolver(schema),
@@ -28,20 +28,20 @@ export default function Signin() {
 
   const onSubmit = async (data) => {
     const res = await login(data);
-    if (!res.error) return;
 
     if (res.errors) {
       for (const field in res.errors) {
         setError(field, { message: res.errors[field] });
       }
-    } else setError('submit', { message: res.error });
+    }
   };
 
   useEffect(() => {
     if (isLogged) {
+      console.log(isLogged);
       if (formState.isSubmitted) router.push('/');
       else router.replace('/');
-    }   
+    }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isLogged, router]);
 
@@ -58,7 +58,7 @@ export default function Signin() {
             <p className={sharedStyles.errorText}>{errors?.password?.message}</p>
           </div>
 
-          <p className={sharedStyles.errorText}>{errors?.submit?.message}</p>
+          <p className={sharedStyles.errorText}>{errors?.error?.message}</p>
           <Button className={sharedStyles.button} disabled={!formState.isValid}>
             Log in
           </Button>
@@ -67,7 +67,7 @@ export default function Signin() {
       <AuthPage.ExtraSection>
         <p className={sharedStyles.text}>
           {`Don't have an account? `}
-          <Link href={'/auth/signup'}>
+          <Link href={'/accounts/signup'}>
             <a className={sharedStyles.link}>Sign up</a>
           </Link>
         </p>

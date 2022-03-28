@@ -9,7 +9,7 @@ import { yupResolver } from '@hookform/resolvers/yup';
 import * as yup from 'yup';
 import useAuth from 'hooks/useAuth';
 import { useRouter } from 'next/router';
-import { useEffect } from "react";
+import { useEffect } from 'react';
 
 const schema = yup
   .object({
@@ -30,7 +30,7 @@ const schema = yup
 
 export default function Signup() {
   const router = useRouter();
-  const { signUp, isLogged } = useAuth();
+  const { signUp, isLogged } = useAuth(false);
   const { register, handleSubmit, formState, setError } = useForm({
     resolver: yupResolver(schema),
     mode: 'onChange',
@@ -39,20 +39,19 @@ export default function Signup() {
 
   const onSubmit = async (data) => {
     const res = await signUp(data);
-    if (!res.error) return;
 
-    if (res.errors) {
+    if (res.errors && res.errors ) {
       for (const field in res.errors) {
         setError(field, { message: res.errors[field] });
       }
-    } else setError('submit', { message: res.error });
+    } 
   };
 
   useEffect(() => {
     if (isLogged) {
       if (formState.isSubmitted) router.push('/');
       else router.replace('/');
-    }   
+    }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isLogged, router]);
 
@@ -73,7 +72,7 @@ export default function Signup() {
             <Input placeholder="Password" {...register('password')} masked={true}></Input>
             <p className={sharedStyles.errorText}>{errors?.password?.message}</p>
           </div>
-          <p className={sharedStyles.errorText}>{errors?.submit?.message}</p>
+          <p className={sharedStyles.errorText}>{errors?.error?.message}</p>
 
           <Button className={sharedStyles.button} disabled={!formState.isValid}>
             Sign up
@@ -83,7 +82,7 @@ export default function Signup() {
       <AuthPage.ExtraSection>
         <p className={sharedStyles.text}>
           {`Have an account? `}
-          <Link href={'/auth/login'}>
+          <Link href={'/accounts/login'}>
             <a className={sharedStyles.link}>Log in</a>
           </Link>
         </p>

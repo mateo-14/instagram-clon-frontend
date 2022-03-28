@@ -8,7 +8,7 @@ export function login(data) {
     .then(({ data }) => data)
     .catch(({ response }) => {
       if (response.data.errors) return response.data;
-      return { error: response.data };
+      return { errors: { error: response.data } };
     });
 }
 
