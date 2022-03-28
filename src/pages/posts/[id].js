@@ -1,5 +1,6 @@
 import Layout from 'components/Layout';
 import PostComponent from 'components/Post';
+import Head from 'next/head';
 import { useRouter } from 'next/router';
 import { useQuery } from 'react-query';
 import { getPost } from 'services/postsServices';
@@ -14,8 +15,15 @@ export default function Post() {
 
   return (
     <Layout>
+      <Head>
+        <title>
+          {status === 'success' && data
+            ? `${data?.author?.username} on Instagram: "${data?.text}" `
+            : 'Loading...'}
+        </title>
+      </Head>
       <div className={styles.container}>
-        {status === 'success' && <PostComponent post={data} isFullPost={true}></PostComponent>}
+        {status === 'success' && <PostComponent data={data} isFullPost={true}></PostComponent>}
       </div>
     </Layout>
   );
