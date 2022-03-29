@@ -15,6 +15,7 @@ export default function NewPostModal({ onClose }) {
   const [file, setFile] = useState(null);
   const [isUploading, setIsUploading] = useState(false);
   const [hasError, setHasError] = useState(false);
+  const [caption, setCaption] = useState('');
 
   const handleDrop = (e) => {
     e.preventDefault();
@@ -40,7 +41,7 @@ export default function NewPostModal({ onClose }) {
     if (!file) return;
 
     setIsUploading(true);
-    createPost(file, 'anashe')
+    createPost(file, caption)
       .then((post) => {
         onClose(post);
       })
@@ -98,7 +99,7 @@ export default function NewPostModal({ onClose }) {
         )}
 
         <form
-          className={`${styles.captionSection} ${hasError || isUploading ? styles.hidden : ''}`}
+          className={styles.captionSection}
           onSubmit={handleSubmit}
         >
           <TextArea
@@ -106,6 +107,7 @@ export default function NewPostModal({ onClose }) {
             className={styles.captionTextarea}
             maxRows={4}
             disabled={isUploading}
+            onChange={(e) => setCaption(e.target.value)}
           />
           <Button type="text" disabled={!file || isUploading}>
             Share
