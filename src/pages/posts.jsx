@@ -1,27 +1,25 @@
 import Layout from 'components/Layout';
 import PostComponent from 'components/Post';
-import Head from 'next/head';
-import { useRouter } from 'next/router';
 import { useQuery } from 'react-query';
+import { useParams } from 'react-router';
 import { getPost } from 'services/postsServices';
-import styles from 'styles/post.module.css';
+import styles from 'styles/posts.module.css';
 
-export default function Post() {
-  const router = useRouter();
-  const id = parseInt(router.query.id);
+export default function Posts() {
+  let { id } = useParams();
+  id = parseInt(id);
   const { data, status } = useQuery(['posts', id], () => getPost(id), {
     enabled: !!id,
   });
 
   return (
-    <Layout>
-      <Head>
-        <title>
-          {status === 'success' && data
-            ? `${data?.author?.username} on Instagram: "${data?.text}" `
-            : 'Loading...'}
-        </title>
-      </Head>
+    <Layout
+      title={
+        status === 'success' && data
+          ? `${data?.author?.username} on Instagram: "${data?.text}" `
+          : 'Loading...'
+      }
+    >
       <div className={styles.container}>
         {status === 'success' && <PostComponent data={data} isFullPost={true}></PostComponent>}
       </div>

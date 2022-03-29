@@ -1,7 +1,7 @@
 import axios from 'axios';
 import { getToken } from "./authService";
 
-const ENDPOINT = `${process.env.NEXT_PUBLIC_API_URL}/users`;
+const ENDPOINT = `${import.meta.env.VITE_API_URL}/users`;
 
 export function getUserByUsername(username) {
   return axios

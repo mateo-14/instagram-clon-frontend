@@ -8,10 +8,9 @@ import ProfileImage from 'components/common/ProfileImage';
 import TextArea from 'components/common/TextArea';
 import { useCommentMutations } from 'hooks/useCommentMutations';
 import { usePostMutations } from 'hooks/usePostMutations';
-import Image from 'next/image';
-import Link from 'next/link';
 import { useState } from 'react';
 import { useInfiniteQuery } from 'react-query';
+import { Link } from 'react-router-dom';
 import { getComments } from 'services/commentsService';
 import { getShortTimeAgo, getTimeAgo } from 'src/utils/getTimeAgo';
 import styles from './Post.module.css';
@@ -38,13 +37,11 @@ export default function Post({
     <article className={classNames(styles.container, { [styles.fullPost]: isFullPost })}>
       <header className={styles.header}>
         <div className={styles.userInfo}>
-          <Link href={`/${data.author.username}`}>
-            <a>
-              <ProfileImage src={data.author.profileImage} className={styles.userImage} />
-            </a>
+          <Link to={`/${data.author.username}`}>
+            <ProfileImage src={data.author.profileImage} className={styles.userImage} />
           </Link>
-          <Link href={`/${data.author.username}`}>
-            <a className={styles.userName}>{data.author.username}</a>
+          <Link to={`/${data.author.username}`} className={styles.userName}>
+            {data.author.username}
           </Link>
         </div>
       </header>
@@ -54,7 +51,7 @@ export default function Post({
           className={styles.image}
           onDoubleClick={() => !data.hasClientLike && handleLikeAction()}
         >
-          <Image src={data.images[0]} layout="fill" alt="Post image" objectFit="cover" />
+          <img src={data.images[0]} />
         </div>
       </div>
       <section className={styles.actions}>
@@ -97,16 +94,14 @@ export default function Post({
       {/* Only feed data */}
 
       <section className={styles.dateSection}>
-        <Link href={`/posts/${data.id}`}>
-          <a>
-            <time
-              dateTime={date.toLocaleString()}
-              title={date.toLocaleString()}
-              className={styles.date}
-            >
-              {getTimeAgo(date.getTime()).toUpperCase()}
-            </time>
-          </a>
+        <Link to={`/posts/${data.id}`}>
+          <time
+            dateTime={date.toLocaleString()}
+            title={date.toLocaleString()}
+            className={styles.date}
+          >
+            {getTimeAgo(date.getTime()).toUpperCase()}
+          </time>
         </Link>
       </section>
 
@@ -117,8 +112,8 @@ export default function Post({
 
 const PostText = ({ author, text }) => (
   <p className={styles.text}>
-    <Link href={author}>
-      <a className={styles.author}>{`${author} `}</a>
+    <Link to={author} className={styles.author}>
+      {`${author} `}
     </Link>
     {text}
   </p>

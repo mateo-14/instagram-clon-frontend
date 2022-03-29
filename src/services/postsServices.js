@@ -1,6 +1,6 @@
 import axios from 'axios';
 import { getToken } from './authService';
-const ENDPOINT = `${process.env.NEXT_PUBLIC_API_URL}/posts`;
+const ENDPOINT = `${import.meta.env.VITE_API_URL}/posts`;
 
 export function createPost(file, caption) {
   return new Promise((resolve, reject) => {

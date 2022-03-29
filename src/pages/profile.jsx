@@ -2,18 +2,15 @@ import CommentIcon from 'components/common/Icons/CommentIcon';
 import HeartIcon from 'components/common/Icons/HeartIcon';
 import ProfileImage from 'components/common/ProfileImage';
 import Layout from 'components/Layout';
-import Head from 'next/head';
-import Image from 'next/image';
-import Link from 'next/link';
-import { useRouter } from 'next/router';
 import { useQuery } from 'react-query';
+import { useParams } from 'react-router';
+import { Link } from 'react-router-dom';
 import { getUserByUsername, getUserPosts } from 'services/usersService';
 import styles from 'styles/profile.module.css';
 
+
 export default function Profile() {
-  const {
-    query: { username },
-  } = useRouter();
+  const { username } = useParams();
   const { data, status } = useQuery(['users', username], () => getUserByUsername(username), {
     enabled: !!username,
   });
@@ -26,17 +23,14 @@ export default function Profile() {
     { enabled: status === 'success' && !!data }
   );
 
+  const title = !data
+    ? 'Loading...'
+    : notFound
+    ? 'Page Not Found - Instagram'
+    : `${displayName} (@${data.username}) - Instagram photos`;
+
   return (
-    <Layout>
-      <Head>
-        <title>
-          {!data
-            ? 'Loading...'
-            : notFound
-            ? 'Page Not Found - Instagram'
-            : `${displayName} (@${data.username}) - Instagram photos`}
-        </title>
-      </Head>
+    <Layout title={title}>
       {notFound && (
         <div>
           <h1>{`Sorry, this page isn't available.`}</h1>
@@ -75,16 +69,10 @@ export default function Profile() {
           <section className={styles.posts}>
             {postsStatus === 'success' &&
               posts.map((post) => (
-                <Link href={`posts/${post.id}`} key={post.id}>
-                  <a>
+                <Link to={`/posts/${post.id}`} key={post.id}>
                     <div key={post.id} className={styles.post}>
                       <div className={styles.postImage}>
-                        <Image
-                          src={post.images[0]}
-                          layout="fill"
-                          alt="Post image"
-                          objectFit="cover"
-                        />
+                        <img src={post.images[0]} alt="Post image" />
                         <ul className={styles.postInfo}>
                           <li>
                             <HeartIcon /> {post._count.likes}
@@ -95,7 +83,6 @@ export default function Profile() {
                         </ul>
                       </div>
                     </div>
-                  </a>
                 </Link>
               ))}
           </section>

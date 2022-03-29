@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-const ENDPOINT = `${process.env.NEXT_PUBLIC_API_URL}/auth`;
+const ENDPOINT = `${import.meta.env.VITE_API_URL}/auth`;
 
 export function login(data) {
   return axios

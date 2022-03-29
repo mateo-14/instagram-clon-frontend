@@ -60,14 +60,19 @@ div.userImage {
   background: black;
   display: flex;
   align-items: center;
-
 }
 
 .image {
-  position: relative;
   aspect-ratio: 1/1;
   width: 100%;
   max-height: 100%;
+  overflow: hidden;
+}
+
+.image img {
+  height: 100%;
+  width: 100%;
+  object-fit: cover;
 }
 
 /* Actions */

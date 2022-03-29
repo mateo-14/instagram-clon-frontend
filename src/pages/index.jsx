@@ -2,15 +2,20 @@ import Modal from 'components/common/Modal';
 import Layout from 'components/Layout';
 import Post from 'components/Post';
 import useFeedPosts from 'hooks/useFeedPosts';
-import Head from 'next/head';
-import { useRouter } from 'next/router';
 import { useEffect, useRef, useState } from 'react';
 import styles from 'styles/index.module.css';
 
 export default function Home() {
   const [selectedPost, setSelectedPost] = useState(null);
-  const { posts, status, isFetchingNextPage, hasNextPage, fetchNextPage, handleLikeSuccess, handleCommentSuccess } =
-    useFeedPosts();
+  const {
+    posts,
+    status,
+    isFetchingNextPage,
+    hasNextPage,
+    fetchNextPage,
+    handleLikeSuccess,
+    handleCommentSuccess,
+  } = useFeedPosts();
   const intersectionRef = useRef();
 
   const handleRequestOpenModal = (post) => {
@@ -51,14 +56,13 @@ export default function Home() {
   }, [posts]);
 
   return (
-    <Layout>
-      <Head>
-        <title>
-          {selectedPost
-            ? `${selectedPost?.author?.username} on Instagram: "${selectedPost?.text}" `
-            : 'Instagram'}
-        </title>
-      </Head>
+    <Layout
+      title={
+        selectedPost
+          ? `${selectedPost?.author?.username} on Instagram: "${selectedPost?.text}" `
+          : 'Instagram'
+      }
+    >
       <section className={styles.posts}>
         {posts?.map((post) => (
           <Post

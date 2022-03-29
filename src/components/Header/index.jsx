@@ -6,11 +6,10 @@ import NewPostModal from 'components/NewPostModal';
 import ProfileImage from 'components/common/ProfileImage';
 import useAuth from 'hooks/useAuth';
 import useOnClickOutside from 'hooks/useOnClickOutside';
-import Image from 'next/image';
-import Link from 'next/link';
 import { useRef, useState } from 'react';
-import instagramLogo from '../../../public/instagram-logo.svg';
+import instagramLogo from '/instagram-logo.svg';
 import styles from './Header.module.css';
+import { Link } from 'react-router-dom';
 
 export default function Header() {
   const [isModalVisible, setIsModalVisible] = useState(false);
@@ -20,19 +19,17 @@ export default function Header() {
 
     if (post) {
       // TODO Show toast
-      console.log(post)
+      console.log(post);
     }
-  }
+  };
 
   return (
     <header className={styles.header}>
       <nav className={styles.container}>
-        <Link href="/">
-          <a aria-label="Instagram logo">
-            <div className={styles.logoWrapper}>
-              <Image src={instagramLogo} alt="Instagram" layout="fill" />
-            </div>
-          </a>
+        <Link to="/" aria-label="Instagram logo">
+          <div className={styles.logoWrapper}>
+            <img src={instagramLogo} alt="Instagram" />
+          </div>
         </Link>
 
         <div className={styles.rightMenu}>
@@ -78,19 +75,19 @@ function ProfileMenu({ isOpen, onClose, user }) {
   return (
     isOpen && (
       <div className={styles.profileMenu} ref={ref}>
-        <Link href={`/${user.username}`}>
+        <Link to={`/${user.username}`}>
           <a className={styles.menuButton}>
             <ProfileIcon />
             Profile
           </a>
         </Link>
-        <Link href="/accounts/edit">
+        <Link to="/accounts/edit">
           <a className={styles.menuButton}>
             <SettingsIcon />
             Settings
           </a>
         </Link>
-        <Link href="/accounts/logout">
+        <Link to="/accounts/logout">
           <a className={`${styles.menuButton} ${styles.logoutButton}`}>Log Out</a>
         </Link>
       </div>

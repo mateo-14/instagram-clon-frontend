@@ -1,9 +1,10 @@
 .imageWrapper {
-  position: relative;
   height: 1.6rem;
   width: 1.6rem;
 }
 
-.image {
+.imageWrapper img {
   border-radius: 100%;
+  width: 100%;
+  object-fit: cover;
 }

@@ -1,18 +1,24 @@
+import React from 'react';
+import ReactDOM from 'react-dom';
+import App from './App';
+import 'styles/globals.css';
+import { BrowserRouter } from 'react-router-dom';
 import AuthProvider from 'context/AuthContext';
 import { QueryClient, QueryClientProvider } from 'react-query';
-import '../../styles/globals.css';
 import { ReactQueryDevtools } from 'react-query/devtools';
 
 export const queryClient = new QueryClient();
-function MyApp({ Component, pageProps }) {
-  return (
+
+ReactDOM.render(
+  <React.StrictMode>
     <QueryClientProvider client={queryClient}>
       <AuthProvider>
-        <Component {...pageProps} />
+        <BrowserRouter>
+          <App />
+        </BrowserRouter>
       </AuthProvider>
       <ReactQueryDevtools />
     </QueryClientProvider>
-  );
-}
-
-export default MyApp;
+  </React.StrictMode>,
+  document.getElementById('root')
+);

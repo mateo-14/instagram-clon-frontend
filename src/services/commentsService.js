@@ -1,6 +1,6 @@
 import axios from 'axios';
 import { getToken } from './authService';
-const ENDPOINT = `${process.env.NEXT_PUBLIC_API_URL}/comments`;
+const ENDPOINT = `${import.meta.env.VITE_API_URL}/comments`;
 
 export function getComments(post, last, replied) {
   return new Promise((resolve, reject) => {
