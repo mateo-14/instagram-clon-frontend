@@ -1,32 +1,26 @@
-import Modal from 'components/common/Modal';
 import Layout from 'components/Layout';
 import Post from 'components/Post';
-import useFeedPosts from 'hooks/useFeedPosts';
-import { useEffect, useRef, useState } from 'react';
+import PostModal from 'components/PostModal';
+import usePostModal from 'hooks/usePostModal';
+import usePostsQuerySetters from 'hooks/usePostsQuerySetters';
+import { useEffect, useRef } from 'react';
+import { useInfiniteQuery } from 'react-query';
+import { getFeed } from "services/postsServices";
 import styles from 'styles/index.module.css';
 
-export default function Home() {
-  const [selectedPost, setSelectedPost] = useState(null);
-  const {
-    posts,
-    status,
-    isFetchingNextPage,
-    hasNextPage,
-    fetchNextPage,
-    handleLikeSuccess,
-    handleCommentSuccess,
-  } = useFeedPosts();
+function useFeedPosts() {
   const intersectionRef = useRef();
 
-  const handleRequestOpenModal = (post) => {
-    window.history.pushState({ postId: post.id }, null, `/posts/${post.id}`);
-    setSelectedPost(post);
-  };
-
-  const handlePostClose = () => {
-    setSelectedPost(null);
-    window.history.pushState(null, null, `/`);
-  };
+  const { data, status, isFetchingNextPage, hasNextPage, fetchNextPage } = useInfiniteQuery(
+    ['posts', 'feed'],
+    ({ pageParam }) => getFeed(pageParam),
+    {
+      getNextPageParam: (lastPage) => {
+        if (lastPage.length < 5) return;
+        return lastPage[lastPage.length - 1].id;
+      },
+    }
+  );
 
   useEffect(() => {
     if (status !== 'success' || !hasNextPage || isFetchingNextPage) return;
@@ -47,13 +41,13 @@ export default function Home() {
     return () => observer.disconnect();
   }, [status, fetchNextPage, isFetchingNextPage, hasNextPage]);
 
-  useEffect(() => {
-    window.onpopstate = (event) => {
-      if (event.state?.postId)
-        setSelectedPost(posts.find((post) => post.id === event.state.postId));
-      else setSelectedPost(null);
-    };
-  }, [posts]);
+  return { posts: data?.pages?.flat(), status, isFetchingNextPage, intersectionRef };
+}
+
+export default function Home() {
+  const { posts, intersectionRef } = useFeedPosts();
+  const { handleCommentSuccess, handleLikeSuccess } = usePostsQuerySetters(['posts', 'feed']);
+  const { selectedPost, handleRequestOpenModal, handlePostClose } = usePostModal(posts);
 
   return (
     <Layout
@@ -76,21 +70,12 @@ export default function Home() {
       </section>
       <div ref={intersectionRef}></div>
 
-      <Modal
-        showCloseButton={true}
-        show={!!selectedPost}
-        className={styles.modalContainer}
+      <PostModal
+        post={selectedPost}
         onClose={handlePostClose}
-      >
-        {selectedPost && (
-          <Post
-            data={selectedPost}
-            isFullPost={true}
-            onLikeSuccess={handleLikeSuccess}
-            onCommentSuccess={handleCommentSuccess}
-          />
-        )}
-      </Modal>
+        onCommentSuccess={handleCommentSuccess}
+        onLikeSuccess={handleLikeSuccess}
+      />
     </Layout>
   );
 }
