@@ -1,11 +1,16 @@
-import classNames from 'classnames';
 import useOnClickOutside from 'hooks/useOnClickOutside';
 import { useRef } from 'react';
+import { useEffect } from 'react';
 import styles from './Modal.module.css';
 
 export default function Modal({ children, className, show, onClose, showCloseButton }) {
   const ref = useRef();
   useOnClickOutside(ref, onClose);
+
+  useEffect(() => {
+    document.body.style.overflow = show ? 'hidden' : 'auto';
+  }, [show]);
+
   return show ? (
     <div className={styles.background}>
       <div className={className} ref={ref}>
