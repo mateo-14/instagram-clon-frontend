@@ -10,6 +10,7 @@ import { useRef, useState } from 'react';
 import instagramLogo from '/instagram-logo.svg';
 import styles from './Header.module.css';
 import { Link } from 'react-router-dom';
+import classNames from 'classnames';
 
 export default function Header() {
   const [isModalVisible, setIsModalVisible] = useState(false);
@@ -75,20 +76,16 @@ function ProfileMenu({ isOpen, onClose, user }) {
   return (
     isOpen && (
       <div className={styles.profileMenu} ref={ref}>
-        <Link to={`/${user.username}`}>
-          <a className={styles.menuButton}>
-            <ProfileIcon />
-            Profile
-          </a>
+        <Link to={`/${user.username}`} className={styles.menuButton}>
+          <ProfileIcon />
+          Profile
         </Link>
-        <Link to="/accounts/edit">
-          <a className={styles.menuButton}>
-            <SettingsIcon />
-            Settings
-          </a>
+        <Link to="/accounts/edit" className={styles.menuButton}>
+          <SettingsIcon />
+          Settings
         </Link>
-        <Link to="/accounts/logout">
-          <a className={`${styles.menuButton} ${styles.logoutButton}`}>Log Out</a>
+        <Link to="/accounts/logout" className={classNames(styles.menuButton, styles.logoutButton)}>
+          Log Out
         </Link>
       </div>
     )
