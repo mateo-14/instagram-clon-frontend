@@ -1,5 +1,5 @@
 import axios from 'axios';
-import { getToken } from "./authService";
+import { getToken } from './authService';
 
 const ENDPOINT = `${import.meta.env.VITE_API_URL}/users`;
 
@@ -10,9 +10,9 @@ export function getUserByUsername(username) {
     .catch(({ response }) => ({ error: response?.data }));
 }
 
-export function getUserPosts(id) {
+export function getUserPosts(id, last) {
   return axios
-    .get(`${ENDPOINT}/${id}/posts`)
+    .get(`${ENDPOINT}/${id}/posts${last ? '?last=' + last : ''}`)
     .then(({ data }) => data)
     .catch(({ response }) => ({ error: response?.data }));
 }
