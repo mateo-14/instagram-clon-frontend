@@ -1,5 +1,6 @@
 import Layout from 'components/Layout';
 import PostComponent from 'components/Post';
+import useTitle from 'hooks/useTitle';
 import { useQuery } from 'react-query';
 import { useParams } from 'react-router';
 import { getPost } from 'services/postsServices';
@@ -12,14 +13,14 @@ export default function Posts() {
     enabled: !!id,
   });
 
+  useTitle(
+    status === 'success' && data
+      ? `${data?.author?.username} on Instagram: "${data?.text}" `
+      : 'Loading...'
+  );
+
   return (
-    <Layout
-      title={
-        status === 'success' && data
-          ? `${data?.author?.username} on Instagram: "${data?.text}" `
-          : 'Loading...'
-      }
-    >
+    <Layout>
       <div className={styles.container}>
         {status === 'success' && <PostComponent data={data} isFullPost={true}></PostComponent>}
       </div>

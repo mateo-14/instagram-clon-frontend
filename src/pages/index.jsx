@@ -3,9 +3,10 @@ import Post from 'components/Post';
 import PostModal from 'components/PostModal';
 import usePostModal from 'hooks/usePostModal';
 import usePostsQuerySetters from 'hooks/usePostsQuerySetters';
+import useTitle from 'hooks/useTitle';
 import { useEffect, useRef } from 'react';
 import { useInfiniteQuery } from 'react-query';
-import { getFeed } from "services/postsServices";
+import { getFeed } from 'services/postsServices';
 import styles from 'styles/index.module.css';
 
 function useFeedPosts() {
@@ -48,15 +49,14 @@ export default function Home() {
   const { posts, intersectionRef } = useFeedPosts();
   const { handleCommentSuccess, handleLikeSuccess } = usePostsQuerySetters(['posts', 'feed']);
   const { selectedPost, handleRequestOpenModal, handlePostClose } = usePostModal(posts);
+  useTitle(
+    selectedPost
+      ? `${selectedPost?.author?.username} on Instagram: "${selectedPost?.text}" `
+      : 'Instagram'
+  );
 
   return (
-    <Layout
-      title={
-        selectedPost
-          ? `${selectedPost?.author?.username} on Instagram: "${selectedPost?.text}" `
-          : 'Instagram'
-      }
-    >
+    <Layout>
       <section className={styles.posts}>
         {posts?.map((post) => (
           <Post
