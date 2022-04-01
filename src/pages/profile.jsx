@@ -4,7 +4,8 @@ import ProfileImage from 'components/common/ProfileImage';
 import Layout from 'components/Layout';
 import PostModal from 'components/PostModal';
 import usePostModal from 'hooks/usePostModal';
-import usePostsQuerySetters from "hooks/usePostsQuerySetters";
+import usePostsQuerySetters from 'hooks/usePostsQuerySetters';
+import useTitle from 'hooks/useTitle';
 import { useRef, useEffect } from 'react';
 import { useInfiniteQuery, useQuery } from 'react-query';
 import { useParams } from 'react-router';
@@ -69,13 +70,15 @@ export default function Profile() {
     ? 'Page Not Found - Instagram'
     : `${displayName} (@${data.username}) - Instagram photos`;
 
+  useTitle(title);
+
   const handlePostClick = (e, post) => {
     e.preventDefault();
     handleRequestOpenModal(post);
   };
 
   return (
-    <Layout title={title}>
+    <Layout>
       {notFound && (
         <div>
           <h1>{`Sorry, this page isn't available.`}</h1>

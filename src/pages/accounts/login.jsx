@@ -1,36 +1,26 @@
 import sharedStyles from 'styles/accounts/shared.module.css';
-import Link from 'next/link';
 import Input from 'components/common/Input';
 import Button from 'components/common/Button';
 import AuthPage from 'components/AuthPage';
-import styles from 'styles/accounts/Signup.module.css';
 import { useForm } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
 import * as yup from 'yup';
 import useAuth from 'hooks/useAuth';
-import { useRouter } from 'next/router';
 import { useEffect } from 'react';
+import useTitle from 'hooks/useTitle';
+import { Link, useNavigate } from 'react-router-dom';
 
 const schema = yup
   .object({
-    username: yup
-      .string()
-      .trim()
-      .required('Username is required')
-      .max(25, 'Username must be 3 to 25 characters long')
-      .min(3, 'Username must be 3 to 25 characters long'),
-    displayName: yup.string().trim().optional().max(30, 'Name must be less than 30 characters'),
-    password: yup
-      .string()
-      .required('Password is required')
-      .max(30, 'Password must be 4 to 25 characters long')
-      .min(4, 'Password must be 4 to 25 characters long'),
+    username: yup.string().required('Username is required').trim(),
+    password: yup.string().required('Password is required'),
   })
   .required();
 
-export default function Signup() {
-  const router = useRouter();
-  const { signUp, isLogged } = useAuth(false);
+export default function Login() {
+  const { login, isLogged } = useAuth(false);
+  const navigate = useNavigate();
+
   const { register, handleSubmit, formState, setError } = useForm({
     resolver: yupResolver(schema),
     mode: 'onChange',
@@ -38,52 +28,48 @@ export default function Signup() {
   const { errors } = formState;
 
   const onSubmit = async (data) => {
-    const res = await signUp(data);
+    const res = await login(data);
 
-    if (res.errors && res.errors ) {
+    if (res.errors) {
       for (const field in res.errors) {
         setError(field, { message: res.errors[field] });
       }
-    } 
+    }
   };
 
   useEffect(() => {
     if (isLogged) {
-      if (formState.isSubmitted) router.push('/');
-      else router.replace('/');
+      if (formState.isSubmitted) navigate('/');
+      else navigate('/', { replace: true });
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [isLogged, router]);
+  }, [isLogged, navigate]);
 
+  useTitle('Login - Instagram');
   return (
-    <AuthPage.Layout title={'Login'}>
+    <AuthPage.Layout>
       <AuthPage.MainSection>
-        <p className={styles.infoText}>Sign up to see photos and videos from your friends.</p>
         <form className={sharedStyles.form} onSubmit={handleSubmit(onSubmit)}>
           <div className={sharedStyles.inputWrapper}>
             <Input placeholder="Username" {...register('username')}></Input>
             <p className={sharedStyles.errorText}>{errors?.username?.message}</p>
           </div>
           <div className={sharedStyles.inputWrapper}>
-            <Input placeholder={'Full name'} {...register('displayName')}></Input>
-            <p className={sharedStyles.errorText}>{errors?.displayName?.message}</p>
-          </div>
-          <div className={sharedStyles.inputWrapper}>
             <Input placeholder="Password" {...register('password')} masked={true}></Input>
             <p className={sharedStyles.errorText}>{errors?.password?.message}</p>
           </div>
-          <p className={sharedStyles.errorText}>{errors?.error?.message}</p>
 
+          <p className={sharedStyles.errorText}>{errors?.error?.message}</p>
           <Button className={sharedStyles.button} disabled={!formState.isValid}>
-            Sign up
+            Log in
           </Button>
         </form>
       </AuthPage.MainSection>
       <AuthPage.ExtraSection>
         <p className={sharedStyles.text}>
-          {`Have an account? `}
-          <Link href={'/accounts/login'}>
-            <a className={sharedStyles.link}>Log in</a>
+          {`Don't have an account? `}
+          <Link to={'/accounts/signup'} className={sharedStyles.link}>
+            Sign up
           </Link>
         </p>
       </AuthPage.ExtraSection>

@@ -1,7 +1,7 @@
 import styles from './AuthPage.module.css';
 import instagramLogo from '/instagram-logo.svg';
 
-const Layout = ({ title, children }) => (
+const Layout = ({ children }) => (
   <main className={styles.container}>
     <article className={styles.main}>{children}</article>
   </main>
