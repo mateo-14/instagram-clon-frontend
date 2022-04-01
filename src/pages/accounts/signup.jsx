@@ -75,7 +75,10 @@ export default function Signup() {
           </div>
           <p className={sharedStyles.errorText}>{errors?.error?.message}</p>
 
-          <Button className={sharedStyles.button} disabled={!formState.isValid}>
+          <Button
+            className={sharedStyles.button}
+            disabled={!formState.isValid || formState.isSubmitting}
+          >
             Sign up
           </Button>
         </form>

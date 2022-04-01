@@ -60,7 +60,7 @@ export default function Login() {
           </div>
 
           <p className={sharedStyles.errorText}>{errors?.error?.message}</p>
-          <Button className={sharedStyles.button} disabled={!formState.isValid}>
+          <Button className={sharedStyles.button} disabled={!formState.isValid || formState.isSubmitting}>
             Log in
           </Button>
         </form>
