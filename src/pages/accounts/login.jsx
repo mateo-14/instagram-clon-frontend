@@ -6,7 +6,7 @@ import { useForm } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
 import * as yup from 'yup';
 import useAuth from 'hooks/useAuth';
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import useTitle from 'hooks/useTitle';
 import { Link, useNavigate } from 'react-router-dom';
 
@@ -18,13 +18,15 @@ const schema = yup
   .required();
 
 export default function Login() {
-  const { login, isLogged } = useAuth(false);
+  const { login, isLogged, loginWithATestAccount } = useAuth(false);
   const navigate = useNavigate();
+  const [isTestLoginLoading, setIsTestLoginLoading] = useState(false);
 
   const { register, handleSubmit, formState, setError } = useForm({
     resolver: yupResolver(schema),
     mode: 'onChange',
   });
+
   const { errors } = formState;
 
   const onSubmit = async (data) => {
@@ -45,6 +47,15 @@ export default function Login() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isLogged, navigate]);
 
+  const loginTestAccount = async () => {
+    setIsTestLoginLoading(true);
+    const res = await loginWithATestAccount();
+    if (res.errors) {
+      setIsTestLoginLoading(false);
+      setError('error', { message: res.errors.error });
+    }
+  };
+
   useTitle('Login - Instagram');
   return (
     <AuthPage.Layout>
@@ -60,8 +71,18 @@ export default function Login() {
           </div>
 
           <p className={sharedStyles.errorText}>{errors?.error?.message}</p>
-          <Button className={sharedStyles.button} disabled={!formState.isValid || formState.isSubmitting}>
+          <Button
+            className={sharedStyles.button}
+            disabled={!formState.isValid || formState.isSubmitting || isTestLoginLoading}
+          >
             Log in
+          </Button>
+          <Button
+            type="button"
+            onClick={loginTestAccount}
+            disabled={isTestLoginLoading || formState.isSubmitting}
+          >
+            Login with a test account
           </Button>
         </form>
       </AuthPage.MainSection>

@@ -27,6 +27,7 @@ export default function AuthProvider({ children }) {
   const [state, dispatch] = useReducer(reducer, initialState);
 
   const logout = () => {
+    localStorage.removeItem('token');
     dispatch({ type: 'logout' });
   };
 

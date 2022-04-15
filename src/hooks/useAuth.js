@@ -1,10 +1,10 @@
 import { AuthContext } from 'context/AuthContext';
 import { useContext, useEffect } from 'react';
 import * as authService from 'services/authService';
-import {useNavigate} from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 
 export default function useAuth(redirect = true) {
-  const { state, setAuthData, logout: _logout } = useContext(AuthContext);
+  const { state, setAuthData, logout } = useContext(AuthContext);
   const { data, isLogged, isLoading } = state;
   const navigate = useNavigate();
 
@@ -20,11 +20,15 @@ export default function useAuth(redirect = true) {
     return res;
   };
 
-  const logout = () => _logout();
+  const loginWithATestAccount = async () => {
+    const res = await authService.loginWithATestAccount();
+    if (!res.errors) setAuthData(res);
+    return res;
+  };
 
   useEffect(() => {
     if (redirect && !isLoading && !isLogged) navigate('/accounts/login');
   }, [redirect, isLogged, isLoading, navigate]);
 
-  return { data, isLogged, isLoading, login, signUp, logout };
+  return { data, isLogged, isLoading, login, signUp, logout, loginWithATestAccount };
 }

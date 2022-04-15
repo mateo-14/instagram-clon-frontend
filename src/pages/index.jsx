@@ -1,11 +1,14 @@
+import ProfileImage from 'components/common/ProfileImage';
 import Layout from 'components/Layout';
 import Post from 'components/Post';
 import PostModal from 'components/PostModal';
+import useAuth from 'hooks/useAuth';
 import usePostModal from 'hooks/usePostModal';
 import usePostsQuerySetters from 'hooks/usePostsQuerySetters';
 import useTitle from 'hooks/useTitle';
 import { useEffect, useRef } from 'react';
 import { useInfiniteQuery } from 'react-query';
+import { Link } from 'react-router-dom';
 import { getFeed } from 'services/postsServices';
 import styles from 'styles/index.module.css';
 
@@ -47,6 +50,7 @@ function useFeedPosts() {
 
 export default function Home() {
   const { posts, intersectionRef } = useFeedPosts();
+  const { data: loggedUser } = useAuth();
   const { handleCommentSuccess, handleLikeSuccess } = usePostsQuerySetters(['posts', 'feed']);
   const { selectedPost, handleRequestOpenModal, handlePostClose } = usePostModal(posts);
   useTitle(
@@ -57,25 +61,48 @@ export default function Home() {
 
   return (
     <Layout>
-      <section className={styles.posts}>
-        {posts?.map((post) => (
-          <Post
-            data={post}
-            key={post.id}
-            onRequestOpenModal={handleRequestOpenModal}
-            onLikeSuccess={handleLikeSuccess}
-            onCommentSuccess={handleCommentSuccess}
-          />
-        ))}
-      </section>
-      <div ref={intersectionRef}></div>
+      <div className={styles.content}>
+        <section className={styles.posts}>
+          {posts?.map((post) => (
+            <Post
+              data={post}
+              key={post.id}
+              onRequestOpenModal={handleRequestOpenModal}
+              onLikeSuccess={handleLikeSuccess}
+              onCommentSuccess={handleCommentSuccess}
+            />
+          ))}
+          <div ref={intersectionRef}></div>
+        </section>
 
-      <PostModal
-        post={selectedPost}
-        onClose={handlePostClose}
-        onCommentSuccess={handleCommentSuccess}
-        onLikeSuccess={handleLikeSuccess}
-      />
+        <PostModal
+          post={selectedPost}
+          onClose={handlePostClose}
+          onCommentSuccess={handleCommentSuccess}
+          onLikeSuccess={handleLikeSuccess}
+        />
+        <aside className={styles.aside}>
+          <div className={styles.userCard}>
+            <Link to={`/${loggedUser?.username}`}>
+              <ProfileImage
+                src={loggedUser?.profileImage}
+                className={styles.profileImage}
+              ></ProfileImage>
+            </Link>
+            <div>
+              <Link to={`/${loggedUser?.username}`} className={styles.username}>
+                {loggedUser?.username}
+              </Link>
+              {loggedUser?.displayName && (
+                <span className={styles.displayName}>{loggedUser?.displayName}</span>
+              )}
+            </div>
+          </div>
+          <section className={styles.suggestedUsers}>
+            <h1>Suggestions For You</h1>
+          </section>
+        </aside>
+      </div>
     </Layout>
   );
 }

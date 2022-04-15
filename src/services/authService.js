@@ -8,7 +8,7 @@ export function login(data) {
     .then(({ data }) => data)
     .catch(({ response }) => {
       if (response.data.errors) return response.data;
-      return { errors: { error: response.data } };
+      return { error: response.data };
     });
 }
 
@@ -37,4 +37,14 @@ export function auth() {
 export function getToken() {
   const token = localStorage.getItem('token');
   return token;
+}
+
+export function loginWithATestAccount() {
+  return axios
+    .get(`${ENDPOINT}/testAccount`)
+    .then(({ data }) => data)
+    .catch(({ response }) => {
+      if (response.data.errors) return response.data;
+      return { errors: { error: response.data } };
+    });
 }
