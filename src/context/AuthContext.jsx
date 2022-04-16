@@ -1,5 +1,5 @@
 import { createContext, useEffect, useReducer } from 'react';
-import { auth } from 'services/authService';
+import { auth, deleteToken, setToken } from 'services/authService';
 
 export const AuthContext = createContext();
 
@@ -27,26 +27,20 @@ export default function AuthProvider({ children }) {
   const [state, dispatch] = useReducer(reducer, initialState);
 
   const logout = () => {
-    localStorage.removeItem('token');
+    deleteToken();
     dispatch({ type: 'logout' });
   };
 
   const setAuthData = (data) => {
-    localStorage.setItem('token', data.token);
+    setToken(data.token);
     dispatch({ type: 'login', payload: data });
   };
 
   useEffect(() => {
     dispatch({ type: 'loading/enable' });
     auth()
-      .then((data) => {
-        if (data.errors) return;
-
-        setAuthData(data);
-      })
-      .catch(() => {
-        dispatch({ type: 'loading/disable' });
-      });
+      .then(setAuthData)
+      .catch(() => dispatch({ type: 'loading/disable' }));
   }, []);
 
   return (

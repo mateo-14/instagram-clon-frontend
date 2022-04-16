@@ -10,6 +10,7 @@ import useAuth from 'hooks/useAuth';
 import { useEffect } from 'react';
 import useTitle from 'hooks/useTitle';
 import { Link, useNavigate } from 'react-router-dom';
+import useFormErrorHandling from 'hooks/useFormErrorHandling';
 
 const schema = yup
   .object({
@@ -37,13 +38,13 @@ export default function Signup() {
   });
   const { errors } = formState;
 
-  const onSubmit = async (data) => {
-    const res = await signUp(data);
+  const handleError = useFormErrorHandling(setError);
 
-    if (res.errors && res.errors) {
-      for (const field in res.errors) {
-        setError(field, { message: res.errors[field] });
-      }
+  const onSubmit = async (data) => {
+    try {
+      await signUp(data);
+    } catch (err) {
+      handleError(err);
     }
   };
 

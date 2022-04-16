@@ -9,6 +9,7 @@ import useAuth from 'hooks/useAuth';
 import { useEffect, useState } from 'react';
 import useTitle from 'hooks/useTitle';
 import { Link, useNavigate } from 'react-router-dom';
+import useFormErrorHandling from 'hooks/useFormErrorHandling';
 
 const schema = yup
   .object({
@@ -27,15 +28,15 @@ export default function Login() {
     mode: 'onChange',
   });
 
+  const handleErrorr = useFormErrorHandling(setError);
+
   const { errors } = formState;
 
   const onSubmit = async (data) => {
-    const res = await login(data);
-
-    if (res.errors) {
-      for (const field in res.errors) {
-        setError(field, { message: res.errors[field] });
-      }
+    try {
+      await login(data);
+    } catch (err) {
+      handleErrorr(err);
     }
   };
 
@@ -44,15 +45,15 @@ export default function Login() {
       if (formState.isSubmitted) navigate('/');
       else navigate('/', { replace: true });
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isLogged, navigate]);
 
   const loginTestAccount = async () => {
     setIsTestLoginLoading(true);
-    const res = await loginWithATestAccount();
-    if (res.errors) {
+    try {
+      await loginWithATestAccount();
+    } catch (err) {
       setIsTestLoginLoading(false);
-      setError('error', { message: res.errors.error });
+      handleErrorr(err);
     }
   };
 
