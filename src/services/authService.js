@@ -5,7 +5,7 @@ export function login(data) {
 }
 
 export function signUp(data) {
-  return restService.post('signup', data);
+  return restService.post('auth/signup', data);
 }
 
 export async function auth() {
