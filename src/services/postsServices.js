@@ -1,76 +1,46 @@
-import axios from 'axios';
-import { getToken } from './authService';
-const ENDPOINT = `${import.meta.env.VITE_API_URL}/posts`;
+import { getTokenWithReject } from './authService';
+import restService from './restService';
 
-export function createPost(file, caption) {
-  return new Promise((resolve, reject) => {
-    const token = getToken();
-    if (!token) return reject({ error: 'Not token' });
+export async function createPost(file, caption) {
+  const token = await getTokenWithReject();
 
-    const formData = new FormData();
-    formData.set('images', file);
-    formData.set('text', caption);
-    axios
-      .post(ENDPOINT, formData, {
-        headers: { authorization: `Bearer ${token}`, 'Content-Type': 'multipart/form-data' },
-      })
-      .then(({ data }) => resolve(data))
-      .catch(({ response }) => reject({ error: response?.data }));
+  const formData = new FormData();
+  formData.set('images', file);
+  formData.set('text', caption);
+
+  return restService.post('posts', formData, {
+    headers: { authorization: `Bearer ${token}`, 'Content-Type': 'multipart/form-data' },
   });
 }
 
-export function getFeed(last) {
-  return new Promise((resolve, reject) => {
-    const token = getToken();
-    if (!token) return reject({ error: 'Not token' });
+export async function getFeed(last) {
+  const token = await getTokenWithReject();
 
-    axios
-      .get(`${ENDPOINT}/feed${last ? '?last=' + last : ''}`, {
-        headers: { authorization: `Bearer ${token}` },
-      })
-      .then(({ data }) => resolve(data))
-      .catch(({ response }) => reject({ error: response?.data }));
+  return restService.get(`posts/feed${last ? '?last=' + last : ''}`, {
+    headers: { authorization: `Bearer ${token}` },
   });
 }
 
-export function getPost(id) {
-  return new Promise((resolve, reject) => {
-    const token = getToken();
-    if (!token) return reject({ error: 'Not token' });
+export async function getPost(id) {
+  const token = await getTokenWithReject();
 
-    axios
-      .get(`${ENDPOINT}/${id}`, {
-        headers: { authorization: `Bearer ${token}` },
-      })
-      .then(({ data }) => resolve(data))
-      .catch(({ response }) => reject({ error: response?.data }));
+  return restService.get(`${ENDPOINT}/${id}`, {
+    headers: { authorization: `Bearer ${token}` },
   });
 }
 
-export function addLike(id) {
-  return new Promise((resolve, reject) => {
-    const token = getToken();
-    if (!token) return reject({ error: 'Not token' });
+export async function addLike(id) {
+  const token = await getTokenWithReject();
 
-    axios
-      .put(`${ENDPOINT}/${id}/likes`, null, {
-        headers: { authorization: `Bearer ${token}` },
-      })
-      .then(({ data }) => resolve(data))
-      .catch(({ response }) => reject({ error: response?.data }));
+  return restService.put(`posts/${id}/likes`, null, {
+    headers: { authorization: `Bearer ${token}` },
   });
 }
 
-export function removeLike(id) {
-  return new Promise((resolve, reject) => {
-    const token = getToken();
-    if (!token) return reject({ error: 'Not token' });
+export async function removeLike(id) {
+  const token = await getTokenWithReject();
 
-    axios
-      .delete(`${ENDPOINT}/${id}/likes`, {
-        headers: { authorization: `Bearer ${token}` },
-      })
-      .then(({ data }) => resolve(data))
-      .catch(({ response }) => reject({ error: response?.data }));
+  return restService.delete(`posts/${id}/likes`, {
+    headers: { authorization: `Bearer ${token}` },
   });
 }

@@ -1,37 +1,26 @@
-import axios from 'axios';
-
-const ENDPOINT = `${import.meta.env.VITE_API_URL}/auth`;
+import restService from './restService';
 
 export function login(data) {
-  return axios
-    .post(`${ENDPOINT}/login`, data)
-    .then(({ data }) => data)
-    .catch(({ response }) => {
-      if (response.data.errors) return response.data;
-      return { error: response.data };
-    });
+  return restService.post('auth/login', data);
 }
 
 export function signUp(data) {
-  return axios
-    .post(`${ENDPOINT}/signup`, data)
-    .then(({ data }) => data)
-    .catch(({ response }) => {
-      if (response.data.errors) return response.data;
-      return { error: response.data };
-    });
+  return restService.post('signup', data);
 }
 
-export function auth() {
-  return new Promise((resolve, reject) => {
-    const token = getToken();
-    if (!token) return reject({ error: 'Not token' });
+export async function auth() {
+  const token = await getTokenWithReject();
 
-    axios
-      .get(`${ENDPOINT}`, { headers: { authorization: `Bearer ${token}` } })
-      .then(({ data }) => resolve(data))
-      .catch(({ response }) => reject({ error: response?.data }));
+  return restService.get('auth', { headers: { authorization: `Bearer ${token}` } }).catch((err) => {
+    if (err.status === 401) {
+      deleteToken();
+    }
+    return Promise.reject(err);
   });
+}
+
+export function loginWithATestAccount() {
+  return restService.get('auth/testAccount');
 }
 
 export function getToken() {
@@ -39,12 +28,17 @@ export function getToken() {
   return token;
 }
 
-export function loginWithATestAccount() {
-  return axios
-    .get(`${ENDPOINT}/testAccount`)
-    .then(({ data }) => data)
-    .catch(({ response }) => {
-      if (response.data.errors) return response.data;
-      return { errors: { error: response.data } };
-    });
+export function deleteToken() {
+  localStorage.removeItem('token');
+}
+
+export function setToken(token) {
+  localStorage.setItem('token', token);
+}
+
+export function getTokenWithReject() {
+  const token = getToken();
+  if (!token) return Promise.reject({ error: 'Not token' });
+
+  return token;
 }

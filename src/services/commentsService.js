@@ -1,66 +1,41 @@
-import axios from 'axios';
-import { getToken } from './authService';
-const ENDPOINT = `${import.meta.env.VITE_API_URL}/comments`;
+import restService from './restService';
+import { getTokenWithReject } from './authService';
 
-export function getComments(post, last, replied) {
-  return new Promise((resolve, reject) => {
-    const token = getToken();
-    if (!token) return reject({ error: 'Not token' });
+export async function getComments(post, last, replied) {
+  const token = await getTokenWithReject();
 
-    const query = new URLSearchParams();
-    query.set('post', post);
-    if (last) query.set('last', last);
-    if (replied) query.set('replied', replied);
+  const query = new URLSearchParams();
+  query.set('post', post);
+  if (last) query.set('last', last);
+  if (replied) query.set('replied', replied);
 
-    axios
-      .get(`${ENDPOINT}?${query.toString()}`, {
-        headers: { authorization: `Bearer ${token}` },
-      })
-      .then(({ data }) => resolve(data))
-      .catch(({ response }) => reject({ error: response?.data }));
+  return restService.get(`comments?${query.toString()}`, {
+    headers: { authorization: `Bearer ${token}` },
   });
 }
 
-export function addComment(postId, text, commentRepliedId) {
-  return new Promise((resolve, reject) => {
-    const token = getToken();
-    if (!token) return reject({ error: 'Not token' });
+export async function addComment(postId, text, commentRepliedId) {
+  const token = await getTokenWithReject();
 
-    axios
-      .post(
-        `${ENDPOINT}`,
-        { postId, text, commentRepliedId },
-        { headers: { authorization: `Bearer ${token}` } }
-      )
-      .then(({ data }) => resolve(data))
-      .catch(({ response }) => reject({ error: response?.data }));
+  return restService.post(
+    `comments`,
+    { postId, text, commentRepliedId },
+    { headers: { authorization: `Bearer ${token}` } }
+  );
+}
+
+export async function addLike(id) {
+  const token = await getTokenWithReject();
+
+  return restService.put(`comments/${id}/likes`, null, {
+    headers: { authorization: `Bearer ${token}` },
   });
 }
 
-export function addLike(id) {
-  return new Promise((resolve, reject) => {
-    const token = getToken();
-    if (!token) return reject({ error: 'Not token' });
+export async function removeLike(id) {
+  const token = await getTokenWithReject();
 
-    axios
-      .put(`${ENDPOINT}/${id}/likes`, null, {
-        headers: { authorization: `Bearer ${token}` },
-      })
-      .then(({ data }) => resolve(data))
-      .catch(({ response }) => reject({ error: response?.data }));
-  });
-}
-
-export function removeLike(id) {
-  return new Promise((resolve, reject) => {
-    const token = getToken();
-    if (!token) return reject({ error: 'Not token' });
-
-    axios
-      .delete(`${ENDPOINT}/${id}/likes`, {
-        headers: { authorization: `Bearer ${token}` },
-      })
-      .then(({ data }) => resolve(data))
-      .catch(({ response }) => reject({ error: response?.data }));
+  return restService.delete(`comments/${id}/likes`, {
+    headers: { authorization: `Bearer ${token}` },
   });
 }

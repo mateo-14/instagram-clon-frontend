@@ -1,30 +1,16 @@
-import axios from 'axios';
-import { getToken } from './authService';
-
-const ENDPOINT = `${import.meta.env.VITE_API_URL}/users`;
+import { getTokenWithReject } from './authService';
+import restService from './restService';
 
 export function getUserByUsername(username) {
-  return axios
-    .get(`${ENDPOINT}/profiles/${username}`)
-    .then(({ data }) => data)
-    .catch(({ response }) => ({ error: response?.data }));
+  return restService.get(`users/profiles/${username}`);
 }
 
 export function getUserPosts(id, last) {
-  return axios
-    .get(`${ENDPOINT}/${id}/posts${last ? '?last=' + last : ''}`)
-    .then(({ data }) => data)
-    .catch(({ response }) => ({ error: response?.data }));
+  return restService.get(`users/${id}/posts${last ? '?last=' + last : ''}`);
 }
 
-export function getUserById(id) {
-  return new Promise((resolve, reject) => {
-    const token = getToken();
-    if (!token) return reject({ error: 'Not token' });
+export async function getUserById(id) {
+  const token = await getTokenWithReject();
 
-    axios
-      .get(`${ENDPOINT}/${id}`, { headers: { Authorization: `Bearer ${token}` } })
-      .then(({ data }) => resolve(data))
-      .catch(({ response }) => reject({ error: response?.data }));
-  });
+  return restService.get(`users/${id}`, { headers: { Authorization: `Bearer ${token}` } });
 }
