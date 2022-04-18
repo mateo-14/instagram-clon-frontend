@@ -111,3 +111,10 @@
     display: flex;
   }
 }
+
+
+.infoHeader {
+  display: flex;
+  align-items: flex-end;
+  gap: 2rem;
+}

@@ -1,15 +1,18 @@
+import Button from 'components/common/Button';
 import CommentIcon from 'components/common/Icons/CommentIcon';
 import HeartIcon from 'components/common/Icons/HeartIcon';
 import ProfileImage from 'components/common/ProfileImage';
 import Layout from 'components/Layout';
 import PostModal from 'components/PostModal';
+import useAuth from 'hooks/useAuth';
 import usePostModal from 'hooks/usePostModal';
 import usePostsQuerySetters from 'hooks/usePostsQuerySetters';
 import useTitle from 'hooks/useTitle';
 import { useRef, useEffect } from 'react';
-import { useInfiniteQuery, useQuery } from 'react-query';
+import { useInfiniteQuery, useMutation, useQuery } from 'react-query';
 import { useParams } from 'react-router';
-import { getUserByUsername, getUserPosts } from 'services/usersService';
+import { Link } from 'react-router-dom';
+import { followUser, getUserByUsername, getUserPosts, unfollowUser } from 'services/usersService';
 import styles from 'styles/profile.module.css';
 
 function useProfilePosts(id) {
@@ -49,11 +52,37 @@ function useProfilePosts(id) {
   return { posts: data?.pages?.flat(), status, isFetchingNextPage, intersectionRef };
 }
 
-export default function Profile() {
-  const { username } = useParams();
-  const { data } = useQuery(['users', username], () => getUserByUsername(username), {
-    enabled: !!username,
+function useProfile(username) {
+  const { data, error, refetch } = useQuery(
+    ['users', username],
+    () => getUserByUsername(username),
+    {
+      enabled: !!username,
+    }
+  );
+
+  const displayName = data?.displayName || data?.username;
+  const notFound = error === 'Not Found';
+  const title = !data
+    ? 'Loading...'
+    : notFound
+    ? 'Page Not Found - Instagram'
+    : `${displayName} (@${data.username}) - Instagram photos`;
+
+  const followMutation = useMutation(async () => {
+    if (data.followedByClient) await unfollowUser(data.id);
+    else await followUser(data.id);
+    await refetch();
   });
+
+  return { notFound, error, title, followMutation, data: data ? { ...data, displayName } : null };
+}
+
+export default function Profile() {
+  const { data: client } = useAuth(false);
+  const { username } = useParams();
+  const { title, notFound, data, followMutation } = useProfile(username);
+  useTitle(title);
   const { posts, intersectionRef } = useProfilePosts(data?.id);
   const { selectedPost, handleRequestOpenModal, handlePostClose } = usePostModal(posts);
   const { handleCommentSuccess, handleLikeSuccess } = usePostsQuerySetters([
@@ -62,19 +91,13 @@ export default function Profile() {
     'posts',
   ]);
 
-  const notFound = data?.error === 'Not Found';
-  const displayName = data?.displayName || data?.username;
-  const title = !data
-    ? 'Loading...'
-    : notFound
-    ? 'Page Not Found - Instagram'
-    : `${displayName} (@${data.username}) - Instagram photos`;
-
-  useTitle(title);
-
   const handlePostClick = (e, post) => {
     e.preventDefault();
     handleRequestOpenModal(post);
+  };
+
+  const handleFollowClick = () => {
+    followMutation.mutate();
   };
 
   return (
@@ -96,7 +119,18 @@ export default function Profile() {
               <ProfileImage src={data.profileImage} className={styles.image}></ProfileImage>
             </div>
             <div className={styles.userInfo}>
-              <h2 className={styles.username}>{data.username}</h2>
+              <div className={styles.infoHeader}>
+                <h2 className={styles.username}>{data.username}</h2>
+                {client.id === data.id ? (
+                  <Button asLink={true} to={'/accounts/edit'}>
+                    Edit Profile
+                  </Button>
+                ) : (
+                  <Button onClick={handleFollowClick} disabled={followMutation.isLoading}>
+                    {data.followedByClient ? 'Unfollow' : 'Follow'}
+                  </Button>
+                )}
+              </div>
               <ul className={styles.userInfoCount}>
                 <li>
                   <span className={styles.infoNumber}>{data._count.posts}</span> posts
@@ -109,7 +143,7 @@ export default function Profile() {
                 </li>
               </ul>
               <div>
-                <p className={styles.displayName}>{displayName}</p>
+                <p className={styles.displayName}>{data.displayName}</p>
                 {data.bio && <p className={styles.bio}>{data.bio}</p>}
               </div>
             </div>
