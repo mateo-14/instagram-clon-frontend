@@ -11,6 +11,7 @@ import { useEffect } from 'react';
 import useTitle from 'hooks/useTitle';
 import { Link, useNavigate } from 'react-router-dom';
 import useFormErrorHandling from 'hooks/useFormErrorHandling';
+import { signUp } from 'services/authService';
 
 const schema = yup
   .object({
@@ -31,7 +32,7 @@ const schema = yup
 
 export default function Signup() {
   const navigate = useNavigate();
-  const { signUp, isLogged } = useAuth(false);
+  const { login, isLogged } = useAuth(false);
   const { register, handleSubmit, formState, setError } = useForm({
     resolver: yupResolver(schema),
     mode: 'onChange',
@@ -42,7 +43,8 @@ export default function Signup() {
 
   const onSubmit = async (data) => {
     try {
-      await signUp(data);
+      const resData = await signUp(data);
+      login(resData);
     } catch (err) {
       handleError(err);
     }

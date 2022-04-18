@@ -11,7 +11,7 @@ const initialState = {
 function reducer(state, action) {
   switch (action.type) {
     case 'login':
-      return { isLogged: true, isLoading: false, data: action.payload };
+      return { isLogged: true, isLoading: false, userId: action.payload.userId };
     case 'logout':
       return { isLogged: false, isLoading: false };
     case 'loading/enable':
@@ -31,20 +31,20 @@ export default function AuthProvider({ children }) {
     dispatch({ type: 'logout' });
   };
 
-  const setAuthData = (data) => {
+  const login = (data) => {
     setToken(data.token);
-    dispatch({ type: 'login', payload: data });
+    dispatch({ type: 'login', payload: { userId: data.id } });
   };
 
   useEffect(() => {
     dispatch({ type: 'loading/enable' });
     auth()
-      .then(setAuthData)
-      .catch(() => dispatch({ type: 'loading/disable' }));
+      .then((data) => login(data))
+      .finally(() => dispatch({ type: 'loading/disable' }));
   }, []);
 
   return (
-    <AuthContext.Provider value={{ state, setAuthData, logout }}>
+    <AuthContext.Provider value={{ state, login, logout }}>
       {state.isLoading ? (
         <div
           style={{

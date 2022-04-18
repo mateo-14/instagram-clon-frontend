@@ -10,6 +10,7 @@ import { useEffect, useState } from 'react';
 import useTitle from 'hooks/useTitle';
 import { Link, useNavigate } from 'react-router-dom';
 import useFormErrorHandling from 'hooks/useFormErrorHandling';
+import * as authService from 'services/authService';
 
 const schema = yup
   .object({
@@ -19,7 +20,7 @@ const schema = yup
   .required();
 
 export default function Login() {
-  const { login, isLogged, loginWithATestAccount } = useAuth(false);
+  const { isLogged, login } = useAuth(false);
   const navigate = useNavigate();
   const [isTestLoginLoading, setIsTestLoginLoading] = useState(false);
 
@@ -34,7 +35,8 @@ export default function Login() {
 
   const onSubmit = async (data) => {
     try {
-      await login(data);
+      const resData = await authService.login(data);
+      await login(resData);
     } catch (err) {
       handleErrorr(err);
     }
@@ -50,7 +52,8 @@ export default function Login() {
   const loginTestAccount = async () => {
     setIsTestLoginLoading(true);
     try {
-      await loginWithATestAccount();
+      const data = await authService.loginWithATestAccount();
+      login(data);
     } catch (err) {
       setIsTestLoginLoading(false);
       handleErrorr(err);
