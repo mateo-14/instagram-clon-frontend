@@ -9,6 +9,7 @@ export default function Modal({ children, className, show, onClose, showCloseBut
 
   useEffect(() => {
     document.body.style.overflow = show ? 'hidden' : 'auto';
+    return () => document.body.style.overflow = 'auto';
   }, [show]);
 
   return show ? (
