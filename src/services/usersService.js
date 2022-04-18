@@ -34,3 +34,21 @@ export async function unfollowUser(id) {
     headers: { Authorization: `Bearer ${token}` },
   });
 }
+
+export async function uploadPhoto(file) {
+  const token = await getTokenWithReject();
+
+  const formData = new FormData();
+  formData.set('image', file);
+  return restService.put(`users/me/photo`, formData, {
+    headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'multipart/form-data' },
+  });
+}
+
+export async function editProfile(data) {
+  const token = await getTokenWithReject();
+
+  return restService.patch(`users/me`, data, {
+    headers: { Authorization: `Bearer ${token}` },
+  });
+}

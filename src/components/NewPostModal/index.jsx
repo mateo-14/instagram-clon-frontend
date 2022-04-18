@@ -6,9 +6,8 @@ import Modal from 'components/common/Modal';
 import TextArea from 'components/common/TextArea';
 import { useRef, useState } from 'react';
 import { createPost } from 'services/postsServices';
+import validateImageFile from "src/utils/validateImageFile";
 import styles from './NewPostModal.module.css';
-
-const validateFile = (file) => /image\/jpeg|png/.test(file.type);
 
 export default function NewPostModal({ onClose }) {
   const fileInputRef = useRef();
@@ -20,7 +19,7 @@ export default function NewPostModal({ onClose }) {
   const handleDrop = (e) => {
     e.preventDefault();
     const [file] = e.dataTransfer.files;
-    if (validateFile(file)) setFile(file);
+    if (validateImageFile(file)) setFile(file);
   };
 
   const handleFileClick = () => {
@@ -29,7 +28,7 @@ export default function NewPostModal({ onClose }) {
 
   const handleFileChange = (e) => {
     const [file] = e.target.files;
-    if (validateFile(file)) setFile(file);
+    if (validateImageFile(file)) setFile(file);
   };
 
   const handleDiscard = () => {
@@ -98,10 +97,7 @@ export default function NewPostModal({ onClose }) {
           </div>
         )}
 
-        <form
-          className={styles.captionSection}
-          onSubmit={handleSubmit}
-        >
+        <form className={styles.captionSection} onSubmit={handleSubmit}>
           <TextArea
             placeholder="Write a caption..."
             className={styles.captionTextarea}
