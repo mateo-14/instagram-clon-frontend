@@ -1,9 +1,9 @@
-import { useQueryClient } from "react-query";
+import { useQueryClient } from 'react-query';
 
 export default function usePostsQuerySetters(key) {
   const queryClient = useQueryClient();
 
-  const handleLikeSuccess = (postId, newLikes, hasClientLike) => {
+  const handleLikeSuccess = ({ postId, likesCount, hasClientLike }) => {
     queryClient.setQueryData(key, (data) => ({
       ...data,
       pages: data.pages.map((page) =>
@@ -11,7 +11,7 @@ export default function usePostsQuerySetters(key) {
           post.id === postId
             ? {
                 ...post,
-                _count: { ...post._count, likes: newLikes },
+                _count: { ...post._count, likes: likesCount },
                 hasClientLike,
               }
             : post
@@ -20,7 +20,7 @@ export default function usePostsQuerySetters(key) {
     }));
   };
 
-  const handleCommentSuccess = (postId, newComments) => {
+  const handleCommentSuccess = ({ postId, commentsCount }) => {
     queryClient.setQueryData(key, (data) => ({
       ...data,
       pages: data.pages.map((page) =>
@@ -28,7 +28,7 @@ export default function usePostsQuerySetters(key) {
           post.id === postId
             ? {
                 ...post,
-                _count: { ...post._count, comments: newComments },
+                _count: { ...post._count, comments: commentsCount },
               }
             : post
         )

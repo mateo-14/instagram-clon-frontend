@@ -5,15 +5,36 @@ export function useCommentMutations(comment) {
   const queryClient = useQueryClient();
 
   const likeMutation = useMutation(
-    () => (comment.hasClientLike ? removeLike(comment.id) : addLike(comment.id)),
+    () => {
+      if (comment.hasClientLike) removeLike(comment.id);
+      else addLike(comment.id);
+    },
     {
       onSuccess: () => {
-        queryClient.invalidateQueries(['posts', comment.postId, 'comments']);
+        queryClient.setQueryData(['posts', comment.postId, 'comments'], (postComments) => {
+          console.log(
+            postComments.pages.map((c) =>
+              c.id === comment.id ? { ...c, hasClientLike: !c.hasClientLike } : c
+            )
+          );
+          return {
+            ...postComments,
+            pages: postComments.pages.map((page) =>
+              page.map((c) =>
+                c.id === comment.id
+                  ? {
+                      ...c,
+                      hasClientLike: !c.hasClientLike,
+                      _count: { ...c, likes: c._count.likes + (c.hasClientLike ? -1 : 1) },
+                    }
+                  : c
+              )
+            ),
+          };
+        });
       },
     }
   );
 
-  const like = () => likeMutation.mutate();
-
-  return { like };
+  return { likeMutation };
 }

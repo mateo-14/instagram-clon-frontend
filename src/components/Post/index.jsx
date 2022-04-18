@@ -23,15 +23,17 @@ export default function Post({
   onCommentSuccess,
 }) {
   const date = data && new Date(data.createdAt);
-  const { like, addComment } = usePostMutations(data, { onLikeSuccess, onCommentSuccess });
+  const { likeMutation, commentMutation } = usePostMutations(data);
 
-  const handleLikeAction = () => like();
+  const handleLikeAction = () => {
+    likeMutation.mutate(null, {
+      onSuccess: onLikeSuccess,
+    });
+  };
 
   const requestOpenModal = () => {
     if (onRequestOpenModal) onRequestOpenModal(data);
   };
-
-  const handleCommentSubmit = (value) => addComment({ text: value });
 
   return (
     <article className={classNames(styles.container, { [styles.fullPost]: isFullPost })}>
@@ -56,7 +58,9 @@ export default function Post({
       </div>
       <section className={styles.actions}>
         <button
-          className={classNames(styles.action, { [styles.liked]: data.hasClientLike })}
+          className={classNames(styles.action, {
+            [styles.liked]: data.hasClientLike,
+          })}
           onClick={handleLikeAction}
         >
           {data.hasClientLike ? <HeartIcon /> : <OutlineHeartIcon />}
@@ -67,7 +71,9 @@ export default function Post({
       </section>
 
       <section className={styles.likesSection}>
-        <button className={styles.likes}>{data._count.likes} likes</button>
+        <button className={styles.likes}>
+          {data._count.likes + (likeMutation.isLoading ? (data.hasClientLike ? -1 : 1) : 0)} likes
+        </button>
       </section>
 
       {/* Only feed data */}
@@ -105,7 +111,11 @@ export default function Post({
         </Link>
       </section>
 
-      <CommentForm postId={data.id} onSubmit={handleCommentSubmit} />
+      <CommentForm
+        postId={data.id}
+        commentMutation={commentMutation}
+        onCommentSuccess={onCommentSuccess}
+      />
     </article>
   );
 }
@@ -147,12 +157,12 @@ function PostComments({ postId }) {
 
 const PostComment = ({ comment, isPostCaption = false }) => {
   const date = new Date(comment.createdAt);
-  const { like } = useCommentMutations(comment);
+  const { likeMutation } = useCommentMutations(comment);
 
-  const handleLikeClick = () => like();
+  const handleLikeClick = () => likeMutation.mutate();
 
   return (
-    <div className={styles.comment} onDoubleClick={handleLikeClick}>
+    <div className={styles.comment} onDoubleClick={() => !comment.hasClientLike && handleLikeClick}>
       <ProfileImage src={comment.author.profileImage} className={styles.commentAvatar} />
       <div>
         <PostText author={comment.author.username} text={comment.text} />
@@ -183,7 +193,7 @@ const PostComment = ({ comment, isPostCaption = false }) => {
   );
 };
 
-function CommentForm({ onSubmit }) {
+function CommentForm({ commentMutation, onCommentSuccess }) {
   const [value, setValue] = useState('');
   const isValid = value.trim().length > 0;
 
@@ -191,18 +201,22 @@ function CommentForm({ onSubmit }) {
     setValue(e.currentTarget.value);
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    if (isValid && onSubmit) {
-      onSubmit(value.trim());
-      setValue('');
+
+    if (isValid && !commentMutation.isLoading) {
+      try {
+        const data = await commentMutation.mutateAsync({ text: value.trim() });
+        setValue('');
+        onCommentSuccess(data);
+      } catch {}
     }
   };
 
   return (
     <form className={styles.commentForm} onSubmit={handleSubmit}>
       <TextArea placeholder="Add a comment..." onChange={handleChange} value={value} />
-      <Button disabled={!isValid} style="text">
+      <Button disabled={!isValid || commentMutation.isLoading} style="text">
         Post
       </Button>
     </form>

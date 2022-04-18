@@ -2,54 +2,51 @@ import { useMutation, useQueryClient } from 'react-query';
 import { addLike, removeLike } from 'services/postsServices';
 import { addComment as addPostComment } from 'services/commentsService';
 
-export function usePostMutations(post, { onLikeSuccess, onCommentSuccess } = {}) {
+export function usePostMutations(post = {}) {
   const queryClient = useQueryClient();
   const likeMutation = useMutation(
     () => {
       if (post.hasClientLike) removeLike(post.id);
       else addLike(post.id);
+
+      return {
+        hasClientLike: !post.hasClientLike,
+        likesCount: post._count.likes + (post.hasClientLike ? -1 : 1),
+        postId: post.id,
+      };
     },
     {
-      onSuccess: () => {
-        const hasClientLike = !post.hasClientLike;
-        const newLikes = post._count.likes + (post.hasClientLike ? -1 : 1);
-        queryClient.setQueryData(['posts', post.id], (data) => {
-          data = data || post;
+      onSuccess: (data) => {
+        queryClient.setQueryData(['posts', data.postId], (cachedPost) => {
+          cachedPost = cachedPost || post;
           return {
-            ...data,
-            _count: { ...data._count, likes: newLikes },
-            hasClientLike,
+            ...cachedPost,
+            _count: { ...cachedPost._count, likes: data.likesCount },
+            hasClientLike: data.hasClientLike,
           };
         });
-
-        if (onLikeSuccess) onLikeSuccess(post.id, newLikes, hasClientLike);
       },
     }
   );
 
   const commentMutation = useMutation(
-    ({ text, commentRepliedId }) => addPostComment(post.id, text, commentRepliedId),
+    async ({ text, commentRepliedId }) => {
+      const comment = await addPostComment(post.id, text, commentRepliedId)
+      return {postId: post.id, commentsCount: post._count.comments + 1, comment};
+    },
     {
       onSuccess: (data) => {
-        if (onCommentSuccess) onCommentSuccess(post.id, post._count.comments + 1);
         if (!queryClient.getQueryData(['posts', data.postId, 'comments'])) return;
+
         queryClient.setQueryData(['posts', data.postId, 'comments'], ({ pages, pageParams }) => {
           return {
             pageParams,
-            pages: pages.map((page, i) => (i === 0 ? [data, ...page] : page)),
+            pages: pages.map((page, i) => (i === 0 ? [data.comment, ...page] : page)),
           };
         });
       },
     }
   );
 
-  const like = () => {
-    likeMutation.mutate();
-  };
-
-  const addComment = (data) => {
-    commentMutation.mutate(data);
-  };
-
-  return { like, addComment };
+  return { commentMutation, likeMutation };
 }
