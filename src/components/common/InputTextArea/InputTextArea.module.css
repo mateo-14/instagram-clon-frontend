@@ -5,3 +5,16 @@
   border-radius: 3px;
   font-size: 1rem;
 }
+
+.textarea::placeholder {
+  color: rgb(var(--light-text-color));
+}
+
+.textarea:focus {
+  border-color: rgb(var(--light-text-color));
+}
+
+.textarea:disabled {
+  color: rgb(var(--light-text-color));
+  border-color: rgb(var(--border-color), 0.8);
+}

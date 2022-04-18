@@ -12,3 +12,8 @@
 .input:focus {
   border-color: rgb(var(--light-text-color));
 }
+
+.input:disabled {
+  color: rgb(var(--light-text-color));
+  border-color: rgb(var(--border-color), 0.8);
+}

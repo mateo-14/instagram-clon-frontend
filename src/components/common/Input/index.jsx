@@ -5,7 +5,7 @@ import styles from './Input.module.css';
 /**
  * @type React.ForwardRefRenderFunction<React.FunctionComponent, InputPropTypes>
  */
-const Input = forwardRef(({ masked, placeholder, value, onChange, className, name, id }, ref) => (
+const Input = forwardRef(({ masked, placeholder, value, onChange, className, name, id, disabled }, ref) => (
   <input
     className={classNames(styles.input, className)}
     placeholder={placeholder}
@@ -15,6 +15,7 @@ const Input = forwardRef(({ masked, placeholder, value, onChange, className, nam
     type={masked ? 'password' : 'text'}
     name={name}
     id={id}
+    disabled={disabled}
   ></input>
 ));
 
