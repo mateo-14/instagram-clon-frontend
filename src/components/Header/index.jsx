@@ -20,7 +20,6 @@ export default function Header() {
 
     if (post) {
       // TODO Show toast
-      console.log(post);
     }
   };
 
