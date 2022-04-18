@@ -24,7 +24,7 @@ export async function getFeed(last) {
 export async function getPost(id) {
   const token = await getTokenWithReject();
 
-  return restService.get(`${ENDPOINT}/${id}`, {
+  return restService.get(`posts/${id}`, {
     headers: { authorization: `Bearer ${token}` },
   });
 }
