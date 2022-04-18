@@ -122,7 +122,7 @@ export default function Profile() {
             <div className={styles.userInfo}>
               <div className={styles.infoHeader}>
                 <h2 className={styles.username}>{data.username}</h2>
-                {client.id === data.id ? (
+                {client?.id === data?.id ? (
                   <Button asLink={true} to={'/accounts/edit'}>
                     Edit Profile
                   </Button>
