@@ -26,7 +26,7 @@ const getTimeAgo = (timestamp) => {
 const getShortTimeAgo = (timestamp) => {
   const secondsElapsed = getSecondsDiff(timestamp);
   const { value, unit } = getUnitAndValueDate(secondsElapsed);
-  return `${value * -1}${unit[0]}`;
+  return `${Math.max(0, value * -1)}${unit[0]}`;
 };
 
 export { getTimeAgo, getShortTimeAgo };

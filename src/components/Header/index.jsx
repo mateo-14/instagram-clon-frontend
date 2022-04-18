@@ -33,10 +33,10 @@ export default function Header() {
         </Link>
 
         <div className={styles.rightMenu}>
-          <button className={styles.rightMenuButton}>
+          <button className={styles.rightMenuButton} type="button">
             <OutlineHomeIcon className={styles.rightMenuIcon} />
           </button>
-          <button className={styles.rightMenuButton} onClick={() => setIsModalVisible(true)}>
+          <button className={styles.rightMenuButton} onClick={() => setIsModalVisible(true)} type="button">
             <CreatePostIcon className={styles.rightMenuIcon} />
           </button>
           <NavbarProfile />
@@ -50,7 +50,7 @@ export default function Header() {
 function NavbarProfile() {
   const { data } = useAuth();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
-  const handleProfileClick = () => setIsMenuOpen(!isMenuOpen);
+  const profileRef = useRef();
 
   return (
     <>
@@ -58,12 +58,22 @@ function NavbarProfile() {
         className={`${styles.navbarButton} ${styles.profileButton} ${
           isMenuOpen ? styles.active : ''
         }`}
-        onClick={handleProfileClick}
+        onClick={() => setIsMenuOpen(!isMenuOpen)}
+        ref={profileRef}
+        type="button"
       >
         <ProfileImage src={data?.profileImage} />
       </button>
 
-      <ProfileMenu isOpen={isMenuOpen} onClose={handleProfileClick} user={data} />
+      <ProfileMenu
+        isOpen={isMenuOpen}
+        onClose={(e) => {
+          if (profileRef.current !== e.target && !profileRef.current.contains(e.target)) {
+            setIsMenuOpen(false);
+          }
+        }}
+        user={data}
+      />
     </>
   );
 }
