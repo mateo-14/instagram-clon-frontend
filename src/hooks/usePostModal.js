@@ -15,8 +15,8 @@ export default function usePostModal(posts) {
 
   useEffect(() => {
     window.onpopstate = (event) => {
-      if (event.state?.postId) setSelectedPost(event.state?.postId);
-      else setSelectedPost(null);
+      if (event.state?.postId) setSelectedPostId(event.state?.postId);
+      else setSelectedPostId(null);
     };
   }, [posts]);
 
