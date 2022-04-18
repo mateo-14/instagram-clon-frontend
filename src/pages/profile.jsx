@@ -11,7 +11,6 @@ import useTitle from 'hooks/useTitle';
 import { useRef, useEffect } from 'react';
 import { useInfiniteQuery, useMutation, useQuery } from 'react-query';
 import { useParams } from 'react-router';
-import { Link } from 'react-router-dom';
 import { followUser, getUserByUsername, getUserPosts, unfollowUser } from 'services/usersService';
 import styles from 'styles/profile.module.css';
 
@@ -69,11 +68,13 @@ function useProfile(username) {
     ? 'Page Not Found - Instagram'
     : `${displayName} (@${data.username}) - Instagram photos`;
 
-  const followMutation = useMutation(async () => {
-    if (data.followedByClient) await unfollowUser(data.id);
-    else await followUser(data.id);
-    await refetch();
-  });
+  const followMutation = useMutation(
+    async () => {
+      if (data.followedByClient) await unfollowUser(data.id);
+      else await followUser(data.id);
+    },
+    { onSuccess: refetch }
+  );
 
   return { notFound, error, title, followMutation, data: data ? { ...data, displayName } : null };
 }
