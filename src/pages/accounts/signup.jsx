@@ -81,6 +81,7 @@ export default function Signup() {
           <Button
             className={sharedStyles.button}
             disabled={!formState.isValid || formState.isSubmitting}
+            type="submit"
           >
             Sign up
           </Button>

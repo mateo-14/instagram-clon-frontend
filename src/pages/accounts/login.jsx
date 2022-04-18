@@ -36,7 +36,7 @@ export default function Login() {
   const onSubmit = async (data) => {
     try {
       const resData = await authService.login(data);
-      await login(resData);
+      login(resData);
     } catch (err) {
       handleErrorr(err);
     }
@@ -78,6 +78,7 @@ export default function Login() {
           <Button
             className={sharedStyles.button}
             disabled={!formState.isValid || formState.isSubmitting || isTestLoginLoading}
+            type='submit'
           >
             Log in
           </Button>

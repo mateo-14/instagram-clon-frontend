@@ -40,6 +40,7 @@ export default function AuthProvider({ children }) {
     dispatch({ type: 'loading/enable' });
     auth()
       .then((data) => login(data))
+      .catch(() => {})
       .finally(() => dispatch({ type: 'loading/disable' }));
   }, []);
 

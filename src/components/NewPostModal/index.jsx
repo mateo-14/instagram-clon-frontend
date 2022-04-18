@@ -6,7 +6,7 @@ import Modal from 'components/common/Modal';
 import TextArea from 'components/common/TextArea';
 import { useRef, useState } from 'react';
 import { createPost } from 'services/postsServices';
-import validateImageFile from "src/utils/validateImageFile";
+import validateImageFile from 'src/utils/validateImageFile';
 import styles from './NewPostModal.module.css';
 
 export default function NewPostModal({ onClose }) {
@@ -105,7 +105,7 @@ export default function NewPostModal({ onClose }) {
             disabled={isUploading}
             onChange={(e) => setCaption(e.target.value)}
           />
-          <Button type="text" disabled={!file || isUploading}>
+          <Button style="text" type="submit" disabled={!file || isUploading}>
             Share
           </Button>
         </form>

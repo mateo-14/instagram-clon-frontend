@@ -216,7 +216,7 @@ function CommentForm({ commentMutation, onCommentSuccess }) {
   return (
     <form className={styles.commentForm} onSubmit={handleSubmit}>
       <TextArea placeholder="Add a comment..." onChange={handleChange} value={value} />
-      <Button disabled={!isValid || commentMutation.isLoading} style="text">
+      <Button disabled={!isValid || commentMutation.isLoading} style="text" type="submit">
         Post
       </Button>
     </form>
