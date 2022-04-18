@@ -202,7 +202,7 @@ function CommentForm({ onSubmit }) {
   return (
     <form className={styles.commentForm} onSubmit={handleSubmit}>
       <TextArea placeholder="Add a comment..." onChange={handleChange} value={value} />
-      <Button disabled={!isValid} type="text">
+      <Button disabled={!isValid} style="text">
         Post
       </Button>
     </form>
