@@ -6,7 +6,7 @@ function Button({
   className,
   onClick,
   disabled = false,
-  type,
+  type = 'button',
   style = 'solid',
   asLink = false,
   to,
