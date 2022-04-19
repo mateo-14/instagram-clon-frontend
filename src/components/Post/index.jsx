@@ -6,14 +6,38 @@ import LoadMore from 'components/common/Icons/LoadMore';
 import OutlineHeartIcon from 'components/common/Icons/OutlineHeartIcon';
 import ProfileImage from 'components/common/ProfileImage';
 import TextArea from 'components/common/TextArea';
-import { useCommentMutations } from 'hooks/useCommentMutations';
-import { usePostMutations } from 'hooks/usePostMutations';
 import { useState } from 'react';
-import { useInfiniteQuery } from 'react-query';
+import { useInfiniteQuery, useMutation, useQueryClient } from 'react-query';
 import { Link } from 'react-router-dom';
-import { getComments } from 'services/commentsService';
+import * as commentsService from 'services/commentsService';
+import { removeLike, addLike } from 'services/postsServices';
 import { getShortTimeAgo, getTimeAgo } from 'src/utils/getTimeAgo';
 import styles from './Post.module.css';
+
+function usePostLikeAction(post) {
+  const queryClient = useQueryClient();
+
+  return (onSuccess) => {
+    try {
+      if (post.hasClientLike) removeLike(post.id);
+      else addLike(post.id);
+
+      const likesCount = post._count.likes + (post.hasClientLike ? -1 : 1);
+
+      queryClient.setQueryData(['posts', post.id], (cachedPost) => {
+        cachedPost = cachedPost || post;
+        return {
+          ...cachedPost,
+          _count: { ...cachedPost._count, likes: likesCount },
+          hasClientLike: !post.hasClientLike,
+        };
+      });
+
+      if (typeof onSuccess === 'function')
+        onSuccess({ postId: post.id, likesCount, hasClientLike: !post.hasClientLike });
+    } catch {}
+  };
+}
 
 export default function Post({
   data,
@@ -23,13 +47,9 @@ export default function Post({
   onCommentSuccess,
 }) {
   const date = data && new Date(data.createdAt);
-  const { likeMutation, commentMutation } = usePostMutations(data);
+  const likeAction = usePostLikeAction(data);
 
-  const handleLikeAction = () => {
-    likeMutation.mutate(null, {
-      onSuccess: onLikeSuccess,
-    });
-  };
+  const handleLikeAction = () => likeAction(onLikeSuccess);
 
   const requestOpenModal = () => {
     if (onRequestOpenModal) onRequestOpenModal(data);
@@ -71,9 +91,7 @@ export default function Post({
       </section>
 
       <section className={styles.likesSection}>
-        <button className={styles.likes}>
-          {data._count.likes + (likeMutation.isLoading ? (data.hasClientLike ? -1 : 1) : 0)} likes
-        </button>
+        <button className={styles.likes}>{data._count.likes} likes</button>
       </section>
 
       {/* Only feed data */}
@@ -111,11 +129,7 @@ export default function Post({
         </Link>
       </section>
 
-      <CommentForm
-        postId={data.id}
-        commentMutation={commentMutation}
-        onCommentSuccess={onCommentSuccess}
-      />
+      <CommentForm post={data} onCommentSuccess={onCommentSuccess} />
     </article>
   );
 }
@@ -132,7 +146,7 @@ const PostText = ({ author, text }) => (
 function PostComments({ postId }) {
   const { data, hasNextPage, fetchNextPage } = useInfiniteQuery(
     ['posts', postId, 'comments'],
-    ({ pageParam }) => getComments(postId, pageParam),
+    ({ pageParam }) => commentsService.getComments(postId, pageParam),
     {
       getNextPageParam: (lastPage) => {
         if (lastPage.length < 5) return;
@@ -155,14 +169,41 @@ function PostComments({ postId }) {
   );
 }
 
-const PostComment = ({ comment, isPostCaption = false }) => {
-  const date = new Date(comment.createdAt);
-  const { likeMutation } = useCommentMutations(comment);
+function useCommentLikeAction(comment) {
+  const queryClient = useQueryClient();
 
-  const handleLikeClick = () => likeMutation.mutate();
+  return () => {
+    try {
+      if (comment.hasClientLike) commentsService.removeLike(comment.id);
+      else commentsService.addLike(comment.id);
+
+      queryClient.setQueryData(['posts', comment.postId, 'comments'], (comments) => ({
+        ...comments,
+        pages: comments.pages.map((page) =>
+          page.map((c) =>
+            c.id === comment.id
+              ? {
+                  ...c,
+                  hasClientLike: !c.hasClientLike,
+                  _count: { ...c, likes: c._count.likes + (c.hasClientLike ? -1 : 1) },
+                }
+              : c
+          )
+        ),
+      }));
+    } catch (err) {}
+  };
+}
+
+function PostComment({ comment, isPostCaption = false }) {
+  const commentLikeAction = useCommentLikeAction(comment);
+  const date = new Date(comment.createdAt);
 
   return (
-    <div className={styles.comment} onDoubleClick={() => !comment.hasClientLike && handleLikeClick}>
+    <div
+      className={styles.comment}
+      onDoubleClick={() => !comment.hasClientLike && commentLikeAction()}
+    >
       <ProfileImage src={comment.author.profileImage} className={styles.commentAvatar} />
       <div>
         <PostText author={comment.author.username} text={comment.text} />
@@ -184,39 +225,65 @@ const PostComment = ({ comment, isPostCaption = false }) => {
           className={classNames(styles.action, styles.commentLikeBtn, {
             [styles.liked]: comment.hasClientLike,
           })}
-          onClick={handleLikeClick}
+          onClick={commentLikeAction}
         >
           {comment.hasClientLike ? <HeartIcon /> : <OutlineHeartIcon />}
         </button>
       )}
     </div>
   );
-};
+}
 
-function CommentForm({ commentMutation, onCommentSuccess }) {
+function useAddCommentMutation(post) {
+  const queryClient = useQueryClient();
+  return useMutation(
+    async ({ text, commentRepliedId }) => {
+      const comment = await commentsService.addComment(post.id, text, commentRepliedId);
+      return { postId: post.id, commentsCount: post._count.comments + 1, comment };
+    },
+    {
+      onSuccess: (data) => {
+        if (!queryClient.getQueryData(['posts', data.postId, 'comments'])) return;
+
+        queryClient.setQueryData(['posts', data.postId, 'comments'], ({ pages, pageParams }) => {
+          return {
+            pageParams,
+            pages: pages.map((page, i) => (i === 0 ? [data.comment, ...page] : page)),
+          };
+        });
+      },
+    }
+  );
+}
+
+function CommentForm({ onCommentSuccess, post }) {
   const [value, setValue] = useState('');
   const isValid = value.trim().length > 0;
+  const addCommentMutation = useAddCommentMutation(post);
 
-  const handleChange = (e) => {
-    setValue(e.currentTarget.value);
-  };
-
-  const handleSubmit = async (e) => {
+  const handleSubmit = (e) => {
     e.preventDefault();
 
-    if (isValid && !commentMutation.isLoading) {
-      try {
-        const data = await commentMutation.mutateAsync({ text: value.trim() });
-        setValue('');
-        onCommentSuccess(data);
-      } catch {}
-    }
+    if (isValid && !addCommentMutation.isLoading)
+      addCommentMutation.mutate(
+        { text: value.trim() },
+        {
+          onSuccess: (data) => {
+            if (typeof onCommentSuccess === 'function') onCommentSuccess(data);
+            setValue('');
+          },
+        }
+      );
   };
 
   return (
     <form className={styles.commentForm} onSubmit={handleSubmit}>
-      <TextArea placeholder="Add a comment..." onChange={handleChange} value={value} />
-      <Button disabled={!isValid || commentMutation.isLoading} style="text" type="submit">
+      <TextArea
+        placeholder="Add a comment..."
+        onChange={(e) => setValue(e.currentTarget.value)}
+        value={value}
+      />
+      <Button disabled={!isValid || addCommentMutation.isLoading} style="text" type="submit">
         Post
       </Button>
     </form>
