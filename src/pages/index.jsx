@@ -98,9 +98,6 @@ export default function Home() {
               )}
             </div>
           </div>
-          <section className={styles.suggestedUsers}>
-            <h1>Suggestions For You</h1>
-          </section>
         </aside>
       </div>
     </Layout>

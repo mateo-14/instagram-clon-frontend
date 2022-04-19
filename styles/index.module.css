@@ -11,6 +11,7 @@
 }
 
 .aside {
+  display: none;
   position: sticky;
   flex: 1;
   top: calc(3.6rem + 1.5rem);
@@ -40,4 +41,10 @@
 }
 
 .suggestedUsers {
+}
+
+@media (min-width: 768px) {
+  .aside {
+    display: initial;
+  }
 }
