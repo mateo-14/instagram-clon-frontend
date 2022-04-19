@@ -15,14 +15,6 @@ import classNames from 'classnames';
 export default function Header() {
   const [isModalVisible, setIsModalVisible] = useState(false);
 
-  const handleModalClose = (post) => {
-    setIsModalVisible(false);
-
-    if (post) {
-      // TODO Show toast
-    }
-  };
-
   return (
     <header className={styles.header}>
       <nav className={styles.container}>
@@ -36,11 +28,15 @@ export default function Header() {
           <button className={styles.rightMenuButton} type="button">
             <OutlineHomeIcon className={styles.rightMenuIcon} />
           </button>
-          <button className={styles.rightMenuButton} onClick={() => setIsModalVisible(true)} type="button">
+          <button
+            className={styles.rightMenuButton}
+            onClick={() => setIsModalVisible(true)}
+            type="button"
+          >
             <CreatePostIcon className={styles.rightMenuIcon} />
           </button>
           <NavbarProfile />
-          {isModalVisible && <NewPostModal onClose={handleModalClose} />}
+          {isModalVisible && <NewPostModal onClose={() => setIsModalVisible(false)} />}
         </div>
       </nav>
     </header>

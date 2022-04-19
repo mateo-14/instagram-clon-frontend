@@ -4,7 +4,9 @@ import MediaIcon from 'components/common/Icons/MediaIcon';
 import Loader from 'components/common/Loader';
 import Modal from 'components/common/Modal';
 import TextArea from 'components/common/TextArea';
+import { show } from 'components/Toast';
 import { useRef, useState } from 'react';
+import { useMutation } from 'react-query';
 import { createPost } from 'services/postsServices';
 import validateImageFile from 'src/utils/validateImageFile';
 import styles from './NewPostModal.module.css';
@@ -12,8 +14,7 @@ import styles from './NewPostModal.module.css';
 export default function NewPostModal({ onClose }) {
   const fileInputRef = useRef();
   const [file, setFile] = useState(null);
-  const [isUploading, setIsUploading] = useState(false);
-  const [hasError, setHasError] = useState(false);
+  const createPostMutation = useMutation(() => createPost(file, caption));
   const [caption, setCaption] = useState('');
 
   const handleDrop = (e) => {
@@ -37,19 +38,14 @@ export default function NewPostModal({ onClose }) {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    if (!file) return;
+    if (!file || createPostMutation.isLoading) return;
 
-    setIsUploading(true);
-    createPost(file, caption)
-      .then((post) => {
-        onClose(post);
-      })
-      .catch(() => {
-        setHasError(true);
-      })
-      .finally(() => {
-        setIsUploading(false);
-      });
+    createPostMutation.mutate(null, {
+      onSuccess: () => {
+        onClose();
+        show('Post uploaded successfully.');
+      },
+    });
   };
 
   return (
@@ -59,13 +55,13 @@ export default function NewPostModal({ onClose }) {
       </div>
 
       <div className={styles.content}>
-        {hasError && (
+        {createPostMutation.error && (
           <div className={styles.error}>
             <ErrorIcon />
             <p className={styles.errorText}>Your post could not be shared. Please try again.</p>
           </div>
         )}
-        {!file && !hasError && (
+        {!file && !createPostMutation.error && (
           <div
             className={styles.uploadSection}
             onDrop={handleDrop}
@@ -83,13 +79,13 @@ export default function NewPostModal({ onClose }) {
             <Button onClick={handleFileClick}>Select from computer</Button>
           </div>
         )}
-        {file && !hasError && (
+        {file && !createPostMutation.error && (
           <div className={styles.imageWrapper}>
             <img src={URL.createObjectURL(file)} className={styles.image}></img>
             <button className={styles.discardBtn} onClick={handleDiscard}>
               Discard photo
             </button>
-            {isUploading && (
+            {createPostMutation.isLoading && (
               <div className={styles.uploading}>
                 <Loader />
               </div>
@@ -102,10 +98,10 @@ export default function NewPostModal({ onClose }) {
             placeholder="Write a caption..."
             className={styles.captionTextarea}
             maxRows={4}
-            disabled={isUploading}
+            disabled={createPostMutation.isLoading}
             onChange={(e) => setCaption(e.target.value)}
           />
-          <Button style="text" type="submit" disabled={!file || isUploading}>
+          <Button style="text" type="submit" disabled={!file || createPostMutation.isLoading}>
             Share
           </Button>
         </form>
