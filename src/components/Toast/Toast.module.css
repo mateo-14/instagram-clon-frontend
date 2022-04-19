@@ -1,0 +1,23 @@
+.toast {
+  position: fixed;
+  width: 100%;
+  background: #2c2c2c;
+  color: white;
+  font-size: 0.9rem;
+  padding: 0.8rem 1rem;
+  border-radius: 0.15rem 0.15rem 0 0;
+  transition: bottom 0.4s ease-out;
+  overflow-x: hidden;
+}
+
+.toast.from {
+  bottom: -4rem;
+}
+
+.toast.enter {
+  bottom: -1px;
+}
+
+.toast.leave {
+  bottom: -4rem;
+}

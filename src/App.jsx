@@ -1,3 +1,4 @@
+import { Toast } from 'components/Toast';
 import { Route, Routes } from 'react-router';
 import Home from './pages';
 import Edit from './pages/accounts/edit';
@@ -22,6 +23,7 @@ function App() {
           <Route path="edit" element={<Edit />} />
         </Route>
       </Routes>
+      <Toast />
     </>
   );
 }
