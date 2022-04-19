@@ -16,6 +16,7 @@ import { useRef } from 'react';
 import validateImageFile from 'src/utils/validateImageFile';
 import useFormErrorHandling from 'hooks/useFormErrorHandling';
 import sharedStyles from 'styles/accounts/shared.module.css';
+import { show } from 'components/Toast';
 
 const schema = yup
   .object({
@@ -54,6 +55,7 @@ export default function Edit() {
     try {
       const updated = await editProfileMutation.mutateAsync(data);
       queryClient.setQueryData(['users', user.id], updated);
+      show('Profile updated successfully.');
     } catch (err) {
       handleErrorr(err);
     }
@@ -67,7 +69,10 @@ export default function Edit() {
     const [file] = e.target.files;
     if (validateImageFile(file)) {
       updatePhotoMutation.mutate(file, {
-        onSuccess: () => queryClient.refetchQueries(['users', user.id]),
+        onSuccess: () => {
+          queryClient.refetchQueries(['users', user.id]);
+          show('Photo updated successfully.');
+        },
       });
     }
   };
@@ -148,6 +153,7 @@ export default function Edit() {
           <Button
             className={styles.submit}
             disabled={!formState.isValid || !formState.isDirty || formState.isSubmitting}
+            type="submit"
           >
             Submit
           </Button>
