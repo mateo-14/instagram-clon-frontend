@@ -63,20 +63,17 @@ function NavbarProfile() {
 
       <ProfileMenu
         isOpen={isMenuOpen}
-        onClose={(e) => {
-          if (profileRef.current !== e.target && !profileRef.current.contains(e.target)) {
-            setIsMenuOpen(false);
-          }
-        }}
+        onClose={() => setIsMenuOpen(false)}
+        exclude={profileRef}
         user={data}
       />
     </>
   );
 }
 
-function ProfileMenu({ isOpen, onClose, user }) {
+function ProfileMenu({ isOpen, onClose, user, exclude }) {
   const ref = useRef();
-  useOnClickOutside(ref, onClose);
+  useOnClickOutside(ref, onClose, [exclude]);
 
   return (
     isOpen && (
