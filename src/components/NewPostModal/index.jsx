@@ -6,9 +6,8 @@ import Loader from 'components/common/Loader';
 import Modal from 'components/common/Modal';
 import TextArea from 'components/common/TextArea';
 import { show } from 'components/Toast';
-import useImageDimensions from 'hooks/useImageDimensions';
 import useOnClickOutside from 'hooks/useOnClickOutside';
-import { useRef, useState, useCallback } from 'react';
+import { useRef, useState, useCallback, useEffect, useLayoutEffect } from 'react';
 import Cropper from 'react-easy-crop';
 import { useMutation } from 'react-query';
 import { createPost } from 'services/postsServices';
@@ -147,20 +146,32 @@ function ImageCropper({ hidden, image, croppedAreaPixels, onDiscard }) {
     y: 0,
   });
   const [zoom, setZoom] = useState(1);
+  const cropperRef = useRef();
   const [aspectRatio, setAspectRation] = useState(1 / 1);
-  const { width, height } = useImageDimensions(image);
+  const [objectFit, setObjectFit] = useState(null);
   const [isInteracting, setIsInteracting] = useState(false);
-
   const onCropComplete = useCallback((_, newCroppedAreaPixels) => {
     croppedAreaPixels.current = newCroppedAreaPixels;
   }, []);
-
 
   const handleAspectRatioChange = (newAspectRatio) => {
     if (newAspectRatio === 2) setAspectRation(4 / 5);
     else if (newAspectRatio === 3) setAspectRation(16 / 9);
     else setAspectRation(1);
   };
+
+  useLayoutEffect(() => {
+    const img = cropperRef.current?.imageRef;
+    if (img) {
+      img.onload = (e) => {
+        cropperRef.current.containerRef.style.visibility = 'hidden';
+        setObjectFit(img.naturalWidth > img.naturalHeight ? 'vertical-cover' : 'horizontal-cover');
+        cropperRef.current.imageRef.onload = null;
+        cropperRef.current.computeSizes();
+        setTimeout(() => (cropperRef.current.containerRef.style.visibility = null), 200);
+      };
+    }
+  }, [cropperRef]);
 
   if (!hidden)
     return (
@@ -176,14 +187,17 @@ function ImageCropper({ hidden, image, croppedAreaPixels, onDiscard }) {
           onZoomChange={setZoom}
           onInteractionStart={() => setIsInteracting(true)}
           onInteractionEnd={() => setIsInteracting(false)}
-          objectFit={width > height ? 'vertical-cover' : 'horizontal-cover'}
+          objectFit={objectFit}
+          ref={cropperRef}
           style={{
             mediaStyle: {
               transition: 'transform .15s',
+              opacity: objectFit ? '1' : '0.5',
+              transition: 'opacity 1s',
             },
             cropAreaStyle: {
               borderWidth: isInteracting ? '1px' : 0,
-              transition: 'width .3s, height .3s',
+              transition: 'width .2s, height .2s',
             },
           }}
           showGrid={isInteracting}
