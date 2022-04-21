@@ -191,9 +191,8 @@ function ImageCropper({ hidden, image, croppedAreaPixels, onDiscard }) {
           ref={cropperRef}
           style={{
             mediaStyle: {
-              transition: 'transform .15s',
+              transition: 'transform .15s, opacity 1s',
               opacity: objectFit ? '1' : '0.5',
-              transition: 'opacity 1s',
             },
             cropAreaStyle: {
               borderWidth: isInteracting ? '1px' : 0,
