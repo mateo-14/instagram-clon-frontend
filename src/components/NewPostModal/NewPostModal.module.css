@@ -2,32 +2,43 @@
   background: white;
   width: 90%;
   max-width: 700px;
-  aspect-ratio: 1 / 1;
   border-radius: 0.8rem;
   display: flex;
   flex-direction: column;
 }
 
 .header {
-  padding: 0.6rem;
+  padding: 0.6rem 1.2rem;
   border-bottom: 1px solid rgb(var(--border-color));
+  display: flex;
+  justify-content: center;
 }
 
 .title {
   font-size: 1rem;
   font-weight: 500;
   text-align: center;
+  margin: 0 auto;
+}
+
+.nextButton {
+  align-self: flex-end;
 }
 
 .content {
+  border-radius: 0 0 0.8rem 0.8rem;
+  overflow: hidden;
+}
+
+.imageSection {
+  aspect-ratio: 1 / 1;
   display: flex;
   flex-direction: column;
-  height: 100%;
   box-sizing: content-box;
   min-height: 0;
 }
 
-.uploadSection {
+.upload {
   flex: 1;
   display: flex;
   flex-direction: column;
@@ -53,32 +64,112 @@
 }
 
 .imageWrapper {
-  height: 100%;
-  overflow: hidden;
   position: relative;
   display: flex;
+  height: 100%;
 }
 
 .image {
+  object-fit: contain;
   width: 100%;
-  object-fit: cover;
-  object-position: center;
+}
+
+/* Crop Tools */
+.cropTools {
+  position: absolute;
+  bottom: 0;
+  padding: 1rem;
+  width: 100%;
+  display: flex;
+  gap: 0.8rem;
+}
+
+:is(.toolsButton, .discardBtn, .aspectRatioMenu button) {
+  border: 0;
+  outline: 0;
+  cursor: pointer;
+}
+
+:is(.toolsButton, .discardBtn) {
+  background: rgba(0, 0, 0, 0.6);
+  color: white;
+  transition: opacity 0.3s;
+  backdrop-filter: blur(4px);
+}
+
+.toolsButton {
+  border-radius: 999px;
+  padding: 0.5rem;
+  display: flex;
+}
+
+.toolsButton.active {
+  background: #fff;
+  color: black;
 }
 
 .discardBtn {
-  position: absolute;
-  bottom: 10px;
-  right: 10px;
-  backdrop-filter: blur(4px);
-  background: rgba(0, 0, 0, 0.6);
-  border: 0;
-  color: white;
   padding: 0.2rem 0.7rem;
-  outline: 0;
   border-radius: 0.6rem;
   font-weight: 500;
   cursor: pointer;
   font-size: 0.8rem;
+  margin-left: auto;
+}
+
+:is(.toolsButton, .discardBtn):hover {
+  opacity: 0.7;
+}
+
+.aspectRatioToolWrapper {
+  position: relative;
+}
+
+.aspectRatioMenu {
+  background: rgba(0, 0, 0, 0.6);
+  position: absolute;
+  margin: 0;
+  border-radius: 0.6rem;
+  padding: 0;
+  bottom: 140%;
+  list-style: none;
+}
+
+.aspectRatioMenu li {
+  color: white;
+}
+
+.aspectRatioMenu li:not(:last-child) {
+  border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.aspectRatioMenu button {
+  background: 0;
+  color: rgba(255, 255, 255, 0.6);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  gap: 2rem;
+  font-size: 0.9rem;
+  padding: 0;
+  padding: 0.7rem 0.8rem;
+}
+
+.aspectRatioMenu .selected {
+  color: #fff;
+}
+
+.zoomToolWrapper {
+  position: relative;
+}
+
+.zoomTool {
+  background: rgba(0, 0, 0, 0.6);
+  border-radius: 0.6rem;
+  padding: 0.5rem;
+  position: absolute;
+  bottom: 140%;
 }
 
 .uploading {
