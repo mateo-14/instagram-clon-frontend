@@ -69,12 +69,11 @@ export default function Post({
       </header>
 
       <div className={styles.imageContainer}>
-        <div
+        <img
           className={styles.image}
+          src={data.images[0]}
           onDoubleClick={() => !data.hasClientLike && handleLikeAction()}
-        >
-          <img src={data.images[0]} />
-        </div>
+        />
       </div>
       <section className={styles.actions}>
         <button
