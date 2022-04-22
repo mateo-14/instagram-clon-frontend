@@ -5,29 +5,6 @@
   flex-direction: column;
 }
 
-@media (min-width: 768px) {
-  .container {
-    border: 1px solid rgb(var(--border-color));
-  }
-
-  .fullPost {
-    max-height: 600px;
-  }
-
-  .fullPost {
-    display: grid;
-    grid-template-columns: 5fr minmax(300px, 3fr);
-    grid-template-rows: min-content 10fr repeat(4, min-content);
-    grid-template-areas:
-      'image header'
-      'image comments'
-      'image actions'
-      'image likes'
-      'image date'
-      'image comment-form';
-  }
-}
-
 /* Header */
 .header {
   padding: 0.85rem var(--post-horizontal-padding);
@@ -59,14 +36,13 @@ div.userImage {
   grid-area: image;
   background: black;
   display: flex;
-  align-items: center;
 }
 
 .image {
-  display: block;
   width: 100%;
+  display: block;
   max-height: 100%;
-  object-fit: cover;
+  object-fit: contain;
 }
 
 /* Actions */
@@ -191,7 +167,7 @@ div.userImage {
 /* Date section */
 .dateSection {
   padding: 0 var(--post-horizontal-padding);
-  grid: date;
+  grid-area: date;
 }
 
 /* Date */
@@ -227,4 +203,33 @@ div.userImage {
   outline: 0;
   padding: 0;
   cursor: pointer;
+}
+
+@media (min-width: 768px) {
+  .container {
+    border: 1px solid rgb(var(--border-color));
+  }
+
+  .fullPost {
+    display: grid;
+    grid-template-columns: auto minmax(max-content, 350px);
+    grid-template-rows: auto 10fr repeat(4, auto);
+    grid-template-areas:
+      'image header'
+      'image comments'
+      'image actions'
+      'image likes'
+      'image date'
+      'image comment-form';
+    max-width: 100%;
+  }
+}
+
+@media (max-width: 768px) {
+  .fullPost :is(.comments, .commentForm) {
+    display: none;
+  }
+  .fullPost.container {
+    padding-bottom: 1rem;
+  }
 }
