@@ -15,7 +15,7 @@ export default function Posts() {
 
   useTitle(
     status === 'success' && data
-      ? `${data?.author?.username} on Instagram: "${data?.text}" `
+      ? `${data?.author?.username} on InstagramClon: "${data?.text}" `
       : 'Loading...'
   );
 

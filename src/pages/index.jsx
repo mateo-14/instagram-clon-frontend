@@ -55,8 +55,8 @@ export default function Home() {
   const { selectedPost, handleRequestOpenModal, handlePostClose } = usePostModal(posts);
   useTitle(
     selectedPost
-      ? `${selectedPost?.author?.username} on Instagram: "${selectedPost?.text}" `
-      : 'Instagram'
+      ? `${selectedPost?.author?.username} on InstagramClon: "${selectedPost?.text}" `
+      : 'InstagramClon'
   );
 
   return (

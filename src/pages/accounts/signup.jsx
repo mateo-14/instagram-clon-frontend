@@ -57,7 +57,7 @@ export default function Signup() {
     }
   }, [isLogged, navigate]);
 
-  useTitle('Signup - Instagram');
+  useTitle('Signup - InstagramClon');
 
   return (
     <AuthPage.Layout>

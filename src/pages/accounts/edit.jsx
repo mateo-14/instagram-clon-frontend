@@ -29,7 +29,7 @@ const schema = yup
 export default function Edit() {
   const { data: user } = useAuth();
   const fileRef = useRef();
-  useTitle('Edit Profile - Instagram');
+  useTitle('Edit Profile - InstagramClon');
 
   const { register, handleSubmit, formState, setError, setValue, reset } = useForm({
     resolver: yupResolver(schema),

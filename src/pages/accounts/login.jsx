@@ -60,7 +60,7 @@ export default function Login() {
     }
   };
 
-  useTitle('Login - Instagram');
+  useTitle('Login - InstagramClon');
   return (
     <AuthPage.Layout>
       <AuthPage.MainSection>
