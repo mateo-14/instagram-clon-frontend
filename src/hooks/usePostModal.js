@@ -1,7 +1,9 @@
 import { useState, useEffect } from 'react';
+import { useLocation } from 'react-router-dom';
 
 export default function usePostModal(posts) {
   const [selectedPostId, setSelectedPostId] = useState(null);
+  const { pathname } = useLocation();
 
   const handleRequestOpenModal = (post) => {
     window.history.pushState({ postId: post.id }, null, `/posts/${post.id}`);
@@ -10,7 +12,7 @@ export default function usePostModal(posts) {
 
   const handlePostClose = () => {
     setSelectedPostId(null);
-    window.history.pushState(null, null, `/`);
+    window.history.pushState(null, null, pathname);
   };
 
   useEffect(() => {
