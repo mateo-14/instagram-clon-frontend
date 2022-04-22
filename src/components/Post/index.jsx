@@ -98,15 +98,20 @@ export default function Post({
       <section className={styles.comments}>
         {isFullPost ? (
           <>
-            <PostComment
-              comment={{ author: data.author, text: data.text, createdAt: data.createdAt }}
-              isPostCaption={true}
-            />
+            {data.text && (
+              <PostComment
+                comment={{ author: data.author, text: data.text, createdAt: data.createdAt }}
+                isPostCaption={true}
+              />
+            )}
             <PostComments postId={data.id} />
           </>
         ) : (
           <>
-            <PostText author={data.author.username} text={data.text} showLess={true} />
+            {data.text && (
+              <PostText author={data.author.username} text={data.text} showLess={true} />
+            )}
+
             {data._count.comments > 0 && (
               <button className={styles.viewAllCommentsBtn} onClick={requestOpenModal}>
                 View all {data._count.comments} comments
