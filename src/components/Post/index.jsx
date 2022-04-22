@@ -73,6 +73,7 @@ export default function Post({
           className={styles.image}
           src={data.images[0]}
           onDoubleClick={() => !data.hasClientLike && handleLikeAction()}
+          alt={`${data.author.username}'s post (${data.text})`}
         />
       </div>
       <section className={styles.actions}>
