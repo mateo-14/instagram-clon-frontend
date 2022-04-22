@@ -201,7 +201,7 @@ function AspectRatioTool({ onChange }) {
           </li>
           <li>
             <button
-              className={classNames({ [styles.selected]: aspectRatio === 2 })}
+              className={classNames({ [styles.selected]: aspectRatio === 4 / 5 })}
               onClick={() => changeAspectRatio(4 / 5)}
             >
               4:5
@@ -219,7 +219,7 @@ function AspectRatioTool({ onChange }) {
           </li>
           <li>
             <button
-              className={classNames({ [styles.selected]: aspectRatio === 3 })}
+              className={classNames({ [styles.selected]: aspectRatio === 16 / 9 })}
               onClick={() => changeAspectRatio(16 / 9)}
             >
               16:9
