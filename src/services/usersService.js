@@ -9,8 +9,12 @@ export async function getUserByUsername(username) {
   });
 }
 
-export function getUserPosts(id, last) {
-  return restService.get(`users/${id}/posts${last ? '?last=' + last : ''}`);
+export async function getUserPosts(id, last) {
+  const token = await getTokenWithReject();
+
+  return restService.get(`users/${id}/posts${last ? '?last=' + last : ''}`, {
+    headers: { Authorization: `Bearer ${token}` },
+  });
 }
 
 export async function getUserById(id) {
