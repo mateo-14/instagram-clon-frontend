@@ -52,21 +52,28 @@ function useProfilePosts(id) {
 }
 
 function useProfile(username) {
+  const refError = useRef();
+
   const { data, error, refetch } = useQuery(
     ['users', username],
     () => getUserByUsername(username),
     {
-      enabled: !!username,
+      enabled: !!username && !(refError.current?.status === 404),
+      retryOnMount: false,
+      retry: false,
     }
   );
 
+  refError.current = error;
+
   const displayName = data?.displayName || data?.username;
-  const notFound = error === 'Not Found';
-  const title = !data
-    ? 'Loading...'
-    : notFound
-    ? 'Page Not Found - Instagram'
-    : `${displayName} (@${data.username}) - Instagram photos`;
+  const title = data
+    ? `${displayName} (@${data.username}) - InstagramClon photos`
+    : error
+    ? error.status === 404
+      ? 'Page Not Found - InstagramClon'
+      : 'An error has ocurred - InstagramClon'
+    : 'Loading... - InstagramClon';
 
   const followMutation = useMutation(
     async () => {
@@ -76,13 +83,13 @@ function useProfile(username) {
     { onSuccess: refetch }
   );
 
-  return { notFound, error, title, followMutation, data: data ? { ...data, displayName } : null };
+  return { error, title, followMutation, data: data ? { ...data, displayName } : null };
 }
 
 export default function Profile() {
   const { data: client } = useAuth(false);
   const { username } = useParams();
-  const { title, notFound, data, followMutation } = useProfile(username);
+  const { title, error, data, followMutation } = useProfile(username);
   useTitle(title);
   const { posts, intersectionRef } = useProfilePosts(data?.id);
   const { selectedPost, handleRequestOpenModal, handlePostClose } = usePostModal(posts);
@@ -103,7 +110,7 @@ export default function Profile() {
 
   return (
     <Layout>
-      {notFound && (
+      {error?.status === 404 && (
         <div>
           <h1>{`Sorry, this page isn't available.`}</h1>
           <p>
@@ -113,7 +120,7 @@ export default function Profile() {
         </div>
       )}
 
-      {data && !notFound && (
+      {data && (
         <div>
           <section className={styles.profileInfo}>
             <div className={styles.imageContainer}>
