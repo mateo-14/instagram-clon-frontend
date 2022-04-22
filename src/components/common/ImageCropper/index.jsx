@@ -1,7 +1,7 @@
 import classNames from 'classnames';
 import { useEffect, useRef, useState } from 'react';
 import styles from './ImageCropper.module.css';
-import { Cropper } from './utils';
+import { Cropper } from './Cropper';
 
 export default function ImageCropper({
   zoom = 0,
@@ -37,7 +37,6 @@ export default function ImageCropper({
 
   useEffect(() => {
     if (!cropperRef.current) return;
-
     cropperRef.current.setAspectRatio(aspectRatio);
   }, [aspectRatio]);
 

@@ -33,30 +33,29 @@ export class Cropper {
   #boundHandleMouseMove;
   #boundHandleMouseUp;
   #externalListeners;
+  #cropperSize = { width: 0, height: 0 };
 
   constructor(img, cropper, aspectRatio, savedData, listeners) {
     this.#img = img;
     this.#cropper = cropper;
     this.#aspectRatio = aspectRatio;
+    this.#externalListeners = listeners;
 
     if (savedData) {
       this.#isMoved = false;
       this.#zoom = savedData.zoom;
     }
 
-    this.#externalListeners = listeners;
+    this.#updateCropperSize();
 
     this.#img.onload = () => {
       this.#resizeImageAfterChange();
       if (!this.#isMoved) this.#centerImage();
       if (savedData) {
-        this.#img.style.transition = 'none';
+        this.#tempDisableTransitions();
         this.#img.style.left = savedData.x + 'px';
         this.#img.style.top = savedData.y + 'px';
         this.#img.style.transform = `scale(${savedData.zoom})`;
-        setTimeout(() => {
-          this.#img.style.transition = null;
-        }, 10);
       }
     };
 
@@ -64,6 +63,23 @@ export class Cropper {
     cropper.addEventListener('mousedown', this.#boundHandleMouseDown);
   }
 
+  #tempDisableTransitions() {
+    this.#img.style.transition = 'none';
+
+    setTimeout(() => {
+      this.#img.style.transition = null;
+    }, 50);
+  }
+
+  #updateCropperSize() {
+    if (this.#aspectRatio < 1) {
+      this.#cropperSize.height = this.#cropper.parentNode.offsetWidth;
+      this.#cropperSize.width = this.#cropperSize.height * this.#aspectRatio;
+    } else {
+      this.#cropperSize.width = this.#cropper.parentNode.offsetWidth;
+      this.#cropperSize.height = this.#cropperSize.width / this.#aspectRatio;
+    }
+  }
   destroy() {
     // Clear listeners
     removeEventListener('mousedown', this.#boundHandleMouseDown);
@@ -107,8 +123,8 @@ export class Cropper {
           { x: e.clientX + offsetX, y: e.clientY + offsetY },
           { width: this.#img.offsetWidth, height: this.#img.offsetHeight },
           {
-            width: this.#cropper.offsetWidth,
-            height: this.#cropper.offsetHeight,
+            width: this.#cropperSize.width,
+            height: this.#cropperSize.height,
           },
           this.#zoom,
 
@@ -122,18 +138,20 @@ export class Cropper {
   }
 
   #centerImage() {
-    this.#img.style.left = this.#cropper.offsetWidth / 2 - this.#img.offsetWidth / 2 + 'px';
-    this.#img.style.top = this.#cropper.offsetHeight / 2 - this.#img.offsetHeight / 2 + 'px';
+    this.#img.style.left = this.#cropperSize.width / 2 - this.#img.offsetWidth / 2 + 'px';
+    this.#img.style.top = this.#cropperSize.height / 2 - this.#img.offsetHeight / 2 + 'px';
   }
 
   #resizeImageAfterChange() {
-    if (this.#aspectRatio > 1) {
-      this.#img.style.width = this.#img.naturalHeight < this.#img.naturalWidth ? '100%' : 'auto';
-      this.#img.style.height = this.#img.naturalWidth < this.#img.naturalHeight ? '100%' : 'auto';
-    } else {
-      this.#img.style.width = this.#img.naturalHeight > this.#img.naturalWidth ? '100%' : 'auto';
-      this.#img.style.height = this.#img.naturalWidth > this.#img.naturalHeight ? '100%' : 'auto';
-    }
+    const { width, height } = getObjectCoverSize(
+      this.#cropperSize.width,
+      this.#cropperSize.height,
+      this.#img.naturalWidth,
+      this.#img.naturalHeight
+    );
+
+    this.#img.style.width = width + 'px';
+    this.#img.style.height = height + 'px';
   }
 
   #adjustImage() {
@@ -141,8 +159,8 @@ export class Cropper {
       { x: this.#img.offsetLeft, y: this.#img.offsetTop },
       { width: this.#img.offsetWidth, height: this.#img.offsetHeight },
       {
-        width: this.#cropper.offsetWidth,
-        height: this.#cropper.offsetHeight,
+        width: this.#cropperSize.width,
+        height: this.#cropperSize.height,
       },
       this.#zoom
     );
@@ -164,10 +182,10 @@ export class Cropper {
     if (aspectRatio === this.#aspectRatio) return;
 
     this.#aspectRatio = aspectRatio;
+
+    this.#updateCropperSize();
     this.#resizeImageAfterChange();
-    setTimeout(() => {
-      this.#adjustImage();
-    }, 200);
+    this.#adjustImage();
   }
 
   getCropData() {
@@ -187,13 +205,14 @@ export class Cropper {
       x: x,
       y: y,
       zoom: this.#zoom,
-      cropHeight: this.#cropper.offsetHeight,
-      cropWidth: this.#cropper.offsetWidth,
+      cropHeight: this.#cropperSize.height,
+      cropWidth: this.#cropperSize.width,
       imgWidth: this.#img.offsetWidth,
       imgHeight: this.#img.offsetHeight,
     };
     return data;
   }
+
   getCroppedImage() {
     const cropData = this.getCropData();
     const canvas = document.createElement('canvas');
@@ -220,4 +239,24 @@ export class Cropper {
       canvas.toBlob((file) => resolve(file), 'image/jpeg');
     });
   }
+}
+
+function getObjectCoverSize(containerWidth, containerHeight, width, height) {
+  const objectRatio = width / height;
+  const containerRatio = containerWidth / containerHeight;
+  let targetWidth = 0;
+  let targetHeight = 0;
+
+  if (objectRatio < containerRatio) {
+    targetWidth = containerWidth;
+    targetHeight = targetWidth / objectRatio;
+  } else {
+    targetHeight = containerHeight;
+    targetWidth = targetHeight * objectRatio;
+  }
+
+  return {
+    width: targetWidth,
+    height: targetHeight,
+  };
 }
