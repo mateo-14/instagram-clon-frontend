@@ -7,13 +7,12 @@ import Modal from 'components/common/Modal';
 import TextArea from 'components/common/TextArea';
 import { show } from 'components/Toast';
 import useOnClickOutside from 'hooks/useOnClickOutside';
-import { useRef, useState, useCallback, useEffect, useLayoutEffect } from 'react';
-import Cropper from 'react-easy-crop';
+import { useRef, useState } from 'react';
 import { useMutation } from 'react-query';
 import { createPost } from 'services/postsServices';
-import getCroppedImg from 'src/utils/cropImage';
 import validateImageFile from 'src/utils/validateImageFile';
 import styles from './NewPostModal.module.css';
+import Cropper from 'components/common/ImageCropper';
 
 export default function NewPostModal({ onClose }) {
   const fileInputRef = useRef();
@@ -22,7 +21,7 @@ export default function NewPostModal({ onClose }) {
   const createPostMutation = useMutation(() => createPost(croppedFile, caption));
   const [caption, setCaption] = useState('');
   const [step, setStep] = useState(1);
-  const croppedAreaPixels = useRef(null);
+  const cropperRef = useRef(null);
 
   const handleDrop = (e) => {
     e.preventDefault();
@@ -54,10 +53,7 @@ export default function NewPostModal({ onClose }) {
   const handleNextBack = async () => {
     if (step === 1) {
       if (!file) return;
-      const croppedImage = await getCroppedImg(
-        URL.createObjectURL(file),
-        croppedAreaPixels.current
-      );
+      const croppedImage = await cropperRef.current.getCroppedImage();
       setCroppedFile(croppedImage);
       setStep(2);
     } else {
@@ -104,9 +100,9 @@ export default function NewPostModal({ onClose }) {
             <div className={styles.imageWrapper}>
               <ImageCropper
                 image={URL.createObjectURL(file)}
-                croppedAreaPixels={croppedAreaPixels}
                 onDiscard={() => setFile(null)}
                 hidden={step !== 1}
+                cropperRef={cropperRef}
               />
               {step === 2 && (
                 <img src={URL.createObjectURL(croppedFile)} className={styles.image}></img>
@@ -140,69 +136,22 @@ export default function NewPostModal({ onClose }) {
   );
 }
 
-function ImageCropper({ hidden, image, croppedAreaPixels, onDiscard }) {
-  const [crop, setCrop] = useState({
-    x: 0,
-    y: 0,
-  });
+function ImageCropper({ hidden, image, cropperRef, onDiscard }) {
   const [zoom, setZoom] = useState(1);
-  const cropperRef = useRef();
   const [aspectRatio, setAspectRation] = useState(1 / 1);
-  const [objectFit, setObjectFit] = useState(null);
-  const [isInteracting, setIsInteracting] = useState(false);
-  const onCropComplete = useCallback((_, newCroppedAreaPixels) => {
-    croppedAreaPixels.current = newCroppedAreaPixels;
-  }, []);
-
-  const handleAspectRatioChange = (newAspectRatio) => {
-    if (newAspectRatio === 2) setAspectRation(4 / 5);
-    else if (newAspectRatio === 3) setAspectRation(16 / 9);
-    else setAspectRation(1);
-  };
-
-  useLayoutEffect(() => {
-    const img = cropperRef.current?.imageRef;
-    if (img) {
-      img.onload = (e) => {
-        cropperRef.current.containerRef.style.visibility = 'hidden';
-        setObjectFit(img.naturalWidth > img.naturalHeight ? 'vertical-cover' : 'horizontal-cover');
-        cropperRef.current.imageRef.onload = null;
-        cropperRef.current.computeSizes();
-        setTimeout(() => (cropperRef.current.containerRef.style.visibility = null), 200);
-      };
-    }
-  }, [cropperRef]);
-
+  const positionRef = useRef();
   if (!hidden)
     return (
       <>
         <Cropper
-          image={image}
-          crop={crop}
+          src={image}
           zoom={zoom}
-          aspect={aspectRatio}
-          zoomWithScroll={false}
-          onCropChange={setCrop}
-          onCropComplete={onCropComplete}
-          onZoomChange={setZoom}
-          onInteractionStart={() => setIsInteracting(true)}
-          onInteractionEnd={() => setIsInteracting(false)}
-          objectFit={objectFit}
-          ref={cropperRef}
-          style={{
-            mediaStyle: {
-              transition: 'transform .15s, opacity 1s',
-              opacity: objectFit ? '1' : '0.5',
-            },
-            cropAreaStyle: {
-              borderWidth: isInteracting ? '1px' : 0,
-              transition: 'width .2s, height .2s',
-            },
-          }}
-          showGrid={isInteracting}
+          aspectRatio={aspectRatio}
+          cropperRef={cropperRef}
+          positionRef={positionRef}
         ></Cropper>
         <div className={styles.cropTools}>
-          <AspectRatioTool onChange={handleAspectRatioChange} />
+          <AspectRatioTool onChange={(aspectRatio) => setAspectRation(aspectRatio)} />
           <ZoomTool onChange={(e) => setZoom(e.target.value)} value={zoom}></ZoomTool>
           <button className={styles.discardBtn} onClick={onDiscard}>
             Discard photo
@@ -253,7 +202,7 @@ function AspectRatioTool({ onChange }) {
           <li>
             <button
               className={classNames({ [styles.selected]: aspectRatio === 2 })}
-              onClick={() => changeAspectRatio(2)}
+              onClick={() => changeAspectRatio(4 / 5)}
             >
               4:5
               <svg
@@ -271,7 +220,7 @@ function AspectRatioTool({ onChange }) {
           <li>
             <button
               className={classNames({ [styles.selected]: aspectRatio === 3 })}
-              onClick={() => changeAspectRatio(3)}
+              onClick={() => changeAspectRatio(16 / 9)}
             >
               16:9
               <svg
@@ -320,7 +269,7 @@ function ZoomTool({ onChange, value }) {
     <div className={styles.zoomToolWrapper}>
       {isOpen && (
         <div className={styles.zoomTool} ref={toolRef}>
-          <input type="range" onChange={onChange} min={1} max={3} step={0.1} value={value} />
+          <input type="range" onChange={onChange} min={1} max={2} step={0.1} value={value} />
         </div>
       )}
       <button
