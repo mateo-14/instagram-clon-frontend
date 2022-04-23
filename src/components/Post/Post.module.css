@@ -60,6 +60,7 @@ div.userImage {
   border: 0;
   cursor: pointer;
   padding: 0.5rem;
+  color: var(--primary-icon-color);
 }
 
 .actions > :first-child {
@@ -75,7 +76,7 @@ div.userImage {
   opacity: 0.5;
 }
 
-.action.liked svg {
+.action.liked {
   color: #ed4956;
 }
 
@@ -199,11 +200,14 @@ div.userImage {
 }
 
 .loadMoreBtn {
+  margin: 0 auto;
   background: 0;
   border: 0;
   outline: 0;
   padding: 0;
   cursor: pointer;
+  width: 1.5rem;
+  color: var(--primary-icon-color);
 }
 
 @media (min-width: 768px) {

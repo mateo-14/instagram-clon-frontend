@@ -108,6 +108,10 @@
   color: black;
 }
 
+.toolsButton svg {
+  width: 1rem;
+}
+
 .discardBtn {
   padding: 0.2rem 0.7rem;
   border-radius: 0.6rem;
@@ -155,6 +159,10 @@
   padding: 0.7rem 0.8rem;
 }
 
+.aspectRatioMenu svg {
+  width: 1.5rem;
+}
+
 .aspectRatioMenu .selected {
   color: #fff;
 }
@@ -190,4 +198,9 @@
 .errorText {
   font-size: 1.5rem;
   font-weight: 300;
+}
+
+:is(.mediaIcon, .errorIcon) {
+  width: 6rem;
+  color: var(--primary-icon-color);
 }

@@ -90,9 +90,6 @@
 .postInfo svg {
   height: 1.4rem;
   width: 1.4rem;
-}
-
-.postInfo path {
   fill: white;
 }
 

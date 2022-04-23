@@ -172,7 +172,7 @@ function PostComments({ postId }) {
       {/* Load more commments Button */}
       {hasNextPage && (
         <button onClick={fetchNextPage} className={styles.loadMoreBtn}>
-          <LoadMore />
+          <LoadMore  />
         </button>
       )}
     </>

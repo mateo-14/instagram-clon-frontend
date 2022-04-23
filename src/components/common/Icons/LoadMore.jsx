@@ -1,18 +1,15 @@
-const LoadMore = () => (
-  <svg color="#262626" fill="#262626" height="24" role="img" viewBox="0 0 24 24" width="24">
+const LoadMore = ({className}) => (
+  <svg stroke="currentColor" role="img" viewBox="0 0 24 24" className={className}>
     <circle
       cx="12.001"
       cy="12.005"
       fill="none"
       r="10.5"
-      stroke="currentColor"
       strokeLinecap="round"
       strokeLinejoin="round"
       strokeWidth="2"
     ></circle>
     <line
-      fill="none"
-      stroke="currentColor"
       strokeLinecap="round"
       strokeLinejoin="round"
       strokeWidth="2"
@@ -22,8 +19,6 @@ const LoadMore = () => (
       y2="12.005"
     ></line>
     <line
-      fill="none"
-      stroke="currentColor"
       strokeLinecap="round"
       strokeLinejoin="round"
       strokeWidth="2"
