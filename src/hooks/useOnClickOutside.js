@@ -1,14 +1,14 @@
 import { useEffect } from 'react';
 
-export default function useOnClickOutside(ref, handler, exclude = []) {
+export default function useOnClickOutside(ref, handler, enabled, exclude = []) {
   useEffect(() => {
-    if (typeof handler !== 'function') return;
+    if (typeof handler !== 'function' || !enabled) return;
 
     const listener = (event) => {
       if (
         !ref.current ||
         ref.current.contains(event.target) ||
-        exclude.some((el) => el.current && el.current.contains(event.target))
+        exclude?.some((el) => el.current && el.current.contains(event.target))
       ) {
         return;
       }

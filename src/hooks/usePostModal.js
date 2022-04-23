@@ -1,30 +1,32 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useLocation } from 'react-router-dom';
 
 export default function usePostModal(posts) {
-  const [selectedPostId, setSelectedPostId] = useState(null);
+  const [selectetId, setSelectedId] = useState(null);
   const { pathname } = useLocation();
+  const outsideRef = useRef();
 
-  const handleRequestOpenModal = (post) => {
+  const open = (post) => {
     window.history.pushState({ postId: post.id }, null, `/posts/${post.id}`);
-    setSelectedPostId(post.id);
+    setSelectedId(post.id);
   };
 
-  const handlePostClose = () => {
-    setSelectedPostId(null);
+  const close = () => {
+    setSelectedId(null);
     window.history.pushState(null, null, pathname);
   };
 
   useEffect(() => {
     window.onpopstate = (event) => {
-      if (event.state?.postId) setSelectedPostId(event.state?.postId);
-      else setSelectedPostId(null);
+      if (event.state?.postId) setSelectedId(event.state?.postId);
+      else setSelectedId(null);
     };
   }, [posts]);
 
   return {
-    selectedPost: posts?.find((post) => post.id === selectedPostId),
-    handleRequestOpenModal,
-    handlePostClose,
+    openPost: posts?.find((post) => post.id === selectetId),
+    open,
+    close,
+    outsideRef,
   };
 }

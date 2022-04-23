@@ -13,7 +13,7 @@ import { Link } from 'react-router-dom';
 import classNames from 'classnames';
 
 export default function Header() {
-  const [isModalVisible, setIsModalVisible] = useState(false);
+  const [isModalOpen, setIsModalOpen] = useState(false);
 
   return (
     <header className={styles.header}>
@@ -30,13 +30,13 @@ export default function Header() {
           </button>
           <button
             className={styles.rightMenuButton}
-            onClick={() => setIsModalVisible(true)}
+            onClick={() => setIsModalOpen(true)}
             type="button"
           >
             <CreatePostIcon className={styles.rightMenuIcon} />
           </button>
           <NavbarProfile />
-          {isModalVisible && <NewPostModal onClose={() => setIsModalVisible(false)} />}
+          {isModalOpen && <NewPostModal onClose={() => setIsModalOpen(false)} />}
         </div>
       </nav>
     </header>
@@ -73,7 +73,7 @@ function NavbarProfile() {
 
 function ProfileMenu({ isOpen, onClose, user, exclude }) {
   const ref = useRef();
-  useOnClickOutside(ref, onClose, [exclude]);
+  useOnClickOutside(ref, onClose, isOpen, [exclude]);
 
   return (
     isOpen && (

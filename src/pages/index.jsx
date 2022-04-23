@@ -52,10 +52,11 @@ export default function Home() {
   const { posts, intersectionRef } = useFeedPosts();
   const { data: loggedUser } = useAuth();
   const { handleCommentSuccess, handleLikeSuccess } = usePostsQuerySetters(['posts', 'feed']);
-  const { selectedPost, handleRequestOpenModal, handlePostClose } = usePostModal(posts);
+  const { openPost, close: closePost, open: openPostFunc, outsideRef } = usePostModal(posts);
+
   useTitle(
-    selectedPost
-      ? `${selectedPost?.author?.username} on InstagramClon: "${selectedPost?.text}" `
+    openPost
+      ? `${openPost?.author?.username} on InstagramClon: "${openPost?.text}" `
       : 'InstagramClon'
   );
 
@@ -67,7 +68,7 @@ export default function Home() {
             <Post
               data={post}
               key={post.id}
-              onRequestOpenModal={handleRequestOpenModal}
+              onRequestOpenModal={openPostFunc}
               onLikeSuccess={handleLikeSuccess}
               onCommentSuccess={handleCommentSuccess}
             />
@@ -76,10 +77,12 @@ export default function Home() {
         </section>
 
         <PostModal
-          post={selectedPost}
-          onClose={handlePostClose}
+          post={openPost}
+          onCloseButtonClick={closePost}
+          onClickOutside={closePost}
           onCommentSuccess={handleCommentSuccess}
           onLikeSuccess={handleLikeSuccess}
+          ref={outsideRef}
         />
         <aside className={styles.aside}>
           <div className={styles.userCard}>

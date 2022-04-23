@@ -62,7 +62,13 @@ export default function NewPostModal({ onClose }) {
   };
 
   return (
-    <Modal className={styles.modal} show={true} showCloseButton={true} onClose={onClose}>
+    <Modal
+      className={styles.modal}
+      isOpen={true}
+      showCloseButton={true}
+      onCloseButtonClick={onClose}
+      onClickOutside={onClose}
+    >
       <div className={styles.header}>
         <h1 className={styles.title}>Create new post</h1>
         <Button style="text" className={styles.nextButton} onClick={handleNextBack}>
@@ -168,7 +174,7 @@ function AspectRatioTool({ onChange }) {
   const [isOpen, setIsOpen] = useState(false);
   const menuRef = useRef();
   const buttonRef = useRef();
-  useOnClickOutside(menuRef, () => setIsOpen(false), [buttonRef]);
+  useOnClickOutside(menuRef, () => setIsOpen(false), isOpen, [buttonRef]);
 
   const changeAspectRatio = (newAspectRatio) => {
     if (aspectRatio !== newAspectRatio) {
@@ -263,7 +269,7 @@ function ZoomTool({ onChange, value }) {
   const [isOpen, setIsOpen] = useState(false);
   const toolRef = useRef();
   const buttonRef = useRef();
-  useOnClickOutside(toolRef, () => setIsOpen(false), [buttonRef]);
+  useOnClickOutside(toolRef, () => setIsOpen(false), isOpen, [buttonRef]);
 
   return (
     <div className={styles.zoomToolWrapper}>

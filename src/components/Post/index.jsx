@@ -6,7 +6,7 @@ import LoadMore from 'components/common/Icons/LoadMore';
 import OutlineHeartIcon from 'components/common/Icons/OutlineHeartIcon';
 import ProfileImage from 'components/common/ProfileImage';
 import TextArea from 'components/common/TextArea';
-import { useState } from 'react';
+import { useState, forwardRef } from 'react';
 import { useInfiniteQuery, useMutation, useQueryClient } from 'react-query';
 import { Link } from 'react-router-dom';
 import * as commentsService from 'services/commentsService';
@@ -39,105 +39,107 @@ function usePostLikeAction(post) {
   };
 }
 
-export default function Post({
-  data,
-  isFullPost = false,
-  onRequestOpenModal,
-  onLikeSuccess,
-  onCommentSuccess,
-}) {
-  const date = data && new Date(data.createdAt);
-  const likeAction = usePostLikeAction(data);
+const Post = forwardRef(
+  ({ data, isFullPost = false, onRequestOpenModal, onLikeSuccess, onCommentSuccess }, ref) => {
+    const date = data && new Date(data.createdAt);
+    const likeAction = usePostLikeAction(data);
 
-  const handleLikeAction = () => likeAction(onLikeSuccess);
+    const handleLikeAction = () => likeAction(onLikeSuccess);
 
-  const requestOpenModal = () => {
-    if (onRequestOpenModal) onRequestOpenModal(data);
-  };
+    const requestOpenModal = () => {
+      if (onRequestOpenModal) onRequestOpenModal(data);
+    };
 
-  return (
-    <article className={classNames(styles.container, { [styles.fullPost]: isFullPost })}>
-      <header className={styles.header}>
-        <div className={styles.userInfo}>
-          <Link to={`/${data.author.username}`}>
-            <ProfileImage src={data.author.profileImage} className={styles.userImage} />
-          </Link>
-          <Link to={`/${data.author.username}`} className={styles.userName}>
-            {data.author.username}
-          </Link>
+    return (
+      <article
+        className={classNames(styles.container, { [styles.fullPost]: isFullPost })}
+        ref={ref}
+      >
+        <header className={styles.header}>
+          <div className={styles.userInfo}>
+            <Link to={`/${data.author.username}`}>
+              <ProfileImage src={data.author.profileImage} className={styles.userImage} />
+            </Link>
+            <Link to={`/${data.author.username}`} className={styles.userName}>
+              {data.author.username}
+            </Link>
+          </div>
+        </header>
+
+        <div className={styles.imageContainer}>
+          <img
+            className={styles.image}
+            src={data.images[0]}
+            onDoubleClick={() => !data.hasClientLike && handleLikeAction()}
+            alt={`${data.author.username}'s post (${data.text})`}
+          />
         </div>
-      </header>
-
-      <div className={styles.imageContainer}>
-        <img
-          className={styles.image}
-          src={data.images[0]}
-          onDoubleClick={() => !data.hasClientLike && handleLikeAction()}
-          alt={`${data.author.username}'s post (${data.text})`}
-        />
-      </div>
-      <section className={styles.actions}>
-        <button
-          className={classNames(styles.action, {
-            [styles.liked]: data.hasClientLike,
-          })}
-          onClick={handleLikeAction}
-        >
-          {data.hasClientLike ? <HeartIcon /> : <OutlineHeartIcon />}
-        </button>
-        <button className={styles.action} onClick={requestOpenModal}>
-          <CommentIcon />
-        </button>
-      </section>
-
-      <section className={styles.likesSection}>
-        <button className={styles.likes}>{data._count.likes} likes</button>
-      </section>
-
-      {/* Only feed data */}
-      <section className={styles.comments}>
-        {isFullPost ? (
-          <>
-            {data.text && (
-              <PostComment
-                comment={{ author: data.author, text: data.text, createdAt: data.createdAt }}
-                isPostCaption={true}
-              />
-            )}
-            <PostComments postId={data.id} />
-          </>
-        ) : (
-          <>
-            {data.text && (
-              <PostText author={data.author.username} text={data.text} showLess={true} />
-            )}
-
-            {data._count.comments > 0 && (
-              <button className={styles.viewAllCommentsBtn} onClick={requestOpenModal}>
-                View all {data._count.comments} comments
-              </button>
-            )}
-          </>
-        )}
-      </section>
-      {/* Only feed data */}
-
-      <section className={styles.dateSection}>
-        <Link to={`/posts/${data.id}`}>
-          <time
-            dateTime={date.toLocaleString()}
-            title={date.toLocaleString()}
-            className={styles.date}
+        <section className={styles.actions}>
+          <button
+            className={classNames(styles.action, {
+              [styles.liked]: data.hasClientLike,
+            })}
+            onClick={handleLikeAction}
           >
-            {getTimeAgo(date.getTime()).toUpperCase()}
-          </time>
-        </Link>
-      </section>
+            {data.hasClientLike ? <HeartIcon /> : <OutlineHeartIcon />}
+          </button>
+          <button className={styles.action} onClick={requestOpenModal}>
+            <CommentIcon />
+          </button>
+        </section>
 
-      <CommentForm post={data} onCommentSuccess={onCommentSuccess} />
-    </article>
-  );
-}
+        <section className={styles.likesSection}>
+          <button className={styles.likes}>{data._count.likes} likes</button>
+        </section>
+
+        {/* Only feed data */}
+        <section className={styles.comments}>
+          {isFullPost ? (
+            <>
+              {data.text && (
+                <PostComment
+                  comment={{ author: data.author, text: data.text, createdAt: data.createdAt }}
+                  isPostCaption={true}
+                />
+              )}
+              <PostComments postId={data.id} />
+            </>
+          ) : (
+            <>
+              {data.text && (
+                <PostText author={data.author.username} text={data.text} showLess={true} />
+              )}
+
+              {data._count.comments > 0 && (
+                <button className={styles.viewAllCommentsBtn} onClick={requestOpenModal}>
+                  View all {data._count.comments} comments
+                </button>
+              )}
+            </>
+          )}
+        </section>
+        {/* Only feed data */}
+
+        <section className={styles.dateSection}>
+          <Link to={`/posts/${data.id}`}>
+            <time
+              dateTime={date.toLocaleString()}
+              title={date.toLocaleString()}
+              className={styles.date}
+            >
+              {getTimeAgo(date.getTime()).toUpperCase()}
+            </time>
+          </Link>
+        </section>
+
+        <CommentForm post={data} onCommentSuccess={onCommentSuccess} />
+      </article>
+    );
+  }
+);
+
+Post.name = 'Post';
+export default Post;
 
 const PostText = ({ author, text }) => (
   <p className={styles.text}>

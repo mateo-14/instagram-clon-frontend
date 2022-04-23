@@ -33,15 +33,16 @@ div.userImage {
 
 /* Image */
 .imageContainer {
+  width: 100%;
   grid-area: image;
   background: black;
   display: flex;
 }
 
 .image {
+  max-height: 100%;
   width: 100%;
   display: block;
-  max-height: 100%;
   object-fit: contain;
 }
 
@@ -212,7 +213,7 @@ div.userImage {
 
   .fullPost {
     display: grid;
-    grid-template-columns: auto minmax(max-content, 350px);
+    grid-template-columns: minmax(min-content, max-content) minmax(350px, auto);
     grid-template-rows: auto 10fr repeat(4, auto);
     grid-template-areas:
       'image header'

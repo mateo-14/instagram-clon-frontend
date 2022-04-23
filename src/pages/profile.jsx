@@ -92,16 +92,16 @@ export default function Profile() {
   const { title, error, data, followMutation } = useProfile(username);
   useTitle(title);
   const { posts, intersectionRef } = useProfilePosts(data?.id);
-  const { selectedPost, handleRequestOpenModal, handlePostClose } = usePostModal(posts);
   const { handleCommentSuccess, handleLikeSuccess } = usePostsQuerySetters([
     'users',
     data?.id,
     'posts',
   ]);
+  const { close: closePost, open: openPostFunc, openPost, outsideRef } = usePostModal(posts);
 
   const handlePostClick = (e, post) => {
     e.preventDefault();
-    handleRequestOpenModal(post);
+    openPostFunc(post);
   };
 
   const handleFollowClick = () => {
@@ -179,10 +179,12 @@ export default function Profile() {
         </div>
       )}
       <PostModal
-        post={selectedPost}
-        onClose={handlePostClose}
+        post={openPost}
+        onCloseButtonClick={closePost}
         onCommentSuccess={handleCommentSuccess}
         onLikeSuccess={handleLikeSuccess}
+        onClickOutside={closePost}
+        ref={outsideRef}
       />
     </Layout>
   );

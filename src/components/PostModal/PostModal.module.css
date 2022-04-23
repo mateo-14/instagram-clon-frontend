@@ -1,32 +1,22 @@
 .modalContainer {
-  max-width: 1200px;
-  max-height: 90%;
+  height: 90%;
   display: flex;
-  width: 80%;
+  justify-content: center;
+  align-items: center;
+  width: 70%;
+  max-width: 1200px;
 }
 
 .modalContainer > :first-child {
   border: 0;
   border-radius: 0.3rem;
-  margin: auto;
-  height: 100%;
 }
 
 @media (min-width: 768px) {
   .modalContainer {
-    width: 85%;
-    min-height: 90%;
+    width: 90%;
   }
-}
-
-@media (min-width: 600px) and (max-width: 768px) {
-  .modalContainer {
-    width: 55%;
-  }
-}
-
-@media (min-width: 500px) and (max-width: 600px) {
-  .modalContainer {
-    width: 70%;
+  .modalContainer > :first-child {
+    height: 100%;
   }
 }
