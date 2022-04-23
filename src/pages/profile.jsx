@@ -52,19 +52,18 @@ function useProfilePosts(id) {
 }
 
 function useProfile(username) {
-  const refError = useRef();
+  const refetchOn = ({ state }) => !state.error?.status === 404;
 
   const { data, error, refetch } = useQuery(
     ['users', username],
     () => getUserByUsername(username),
     {
-      enabled: !!username && !(refError.current?.status === 404),
-      retryOnMount: false,
+      enabled: !!username,
       retry: false,
+      refetchOnMount: refetchOn,
+      refetchOnReconnect: refetchOn,
     }
   );
-
-  refError.current = error;
 
   const displayName = data?.displayName || data?.username;
   const title = data
@@ -97,7 +96,7 @@ export default function Profile() {
     data?.id,
     'posts',
   ]);
-  const { close: closePost, open: openPostFunc, openPost, outsideRef } = usePostModal(posts);
+  const { close: closePost, open: openPostFunc, openPost } = usePostModal(posts);
 
   const handlePostClick = (e, post) => {
     e.preventDefault();
@@ -184,7 +183,6 @@ export default function Profile() {
         onCommentSuccess={handleCommentSuccess}
         onLikeSuccess={handleLikeSuccess}
         onClickOutside={closePost}
-        ref={outsideRef}
       />
     </Layout>
   );
