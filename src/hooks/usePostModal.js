@@ -4,7 +4,6 @@ import { useLocation } from 'react-router-dom';
 export default function usePostModal(posts) {
   const [selectetId, setSelectedId] = useState(null);
   const { pathname } = useLocation();
-  const outsideRef = useRef();
 
   const open = (post) => {
     window.history.pushState({ postId: post.id }, null, `/posts/${post.id}`);
@@ -27,6 +26,5 @@ export default function usePostModal(posts) {
     openPost: posts?.find((post) => post.id === selectetId),
     open,
     close,
-    outsideRef,
   };
 }

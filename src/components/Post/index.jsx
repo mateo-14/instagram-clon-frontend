@@ -159,6 +159,7 @@ function PostComments({ postId }) {
         if (lastPage.length < 5) return;
         return lastPage[lastPage.length - 1].id;
       },
+      refetchOnMount: false,
     }
   );
 

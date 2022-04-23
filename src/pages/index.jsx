@@ -52,7 +52,7 @@ export default function Home() {
   const { posts, intersectionRef } = useFeedPosts();
   const { data: loggedUser } = useAuth();
   const { handleCommentSuccess, handleLikeSuccess } = usePostsQuerySetters(['posts', 'feed']);
-  const { openPost, close: closePost, open: openPostFunc, outsideRef } = usePostModal(posts);
+  const { openPost, close: closePost, open: openPostFunc } = usePostModal(posts);
 
   useTitle(
     openPost
@@ -82,7 +82,6 @@ export default function Home() {
           onClickOutside={closePost}
           onCommentSuccess={handleCommentSuccess}
           onLikeSuccess={handleLikeSuccess}
-          ref={outsideRef}
         />
         <aside className={styles.aside}>
           <div className={styles.userCard}>
