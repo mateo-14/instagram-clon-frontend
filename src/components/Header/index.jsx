@@ -9,11 +9,12 @@ import useOnClickOutside from 'hooks/useOnClickOutside';
 import { useRef, useState } from 'react';
 import instagramLogo from '/instagram-logo.svg';
 import styles from './Header.module.css';
-import { Link } from 'react-router-dom';
+import { Link, useMatch } from 'react-router-dom';
 import classNames from 'classnames';
 
 export default function Header() {
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const isHomeActive = useMatch({ path: '', end: true });
 
   return (
     <header className={styles.header}>
@@ -25,17 +26,21 @@ export default function Header() {
         </Link>
 
         <div className={styles.rightMenu}>
-          <button className={styles.rightMenuButton} type="button">
-            <OutlineHomeIcon className={styles.rightMenuIcon} />
-          </button>
+          <Link
+            className={classNames(styles.rightMenuButton, { [styles.active]: isHomeActive })}
+            to="/"
+          >
+            <OutlineHomeIcon />
+          </Link>
+
           <button
             className={styles.rightMenuButton}
             onClick={() => setIsModalOpen(true)}
             type="button"
           >
-            <CreatePostIcon className={styles.rightMenuIcon} />
+            <CreatePostIcon />
           </button>
-          <NavbarProfile />
+          <NavbarProfileButton />
           {isModalOpen && <NewPostModal onClose={() => setIsModalOpen(false)} />}
         </div>
       </nav>
@@ -43,7 +48,7 @@ export default function Header() {
   );
 }
 
-function NavbarProfile() {
+function NavbarProfileButton() {
   const { data } = useAuth();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const profileRef = useRef();
@@ -51,9 +56,9 @@ function NavbarProfile() {
   return (
     <>
       <button
-        className={`${styles.navbarButton} ${styles.profileButton} ${
-          isMenuOpen ? styles.active : ''
-        }`}
+        className={classNames(styles.profileButton, {
+          [styles.active]: isMenuOpen,
+        })}
         onClick={() => setIsMenuOpen(!isMenuOpen)}
         ref={profileRef}
         type="button"

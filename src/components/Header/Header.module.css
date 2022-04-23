@@ -26,22 +26,26 @@
   display: flex;
   gap: 1.3rem;
   position: relative;
-}
-
-.rightMenuIcon {
-  height: 1.5rem;
-  width: 1.5rem;
-  color: var(--primary-icon-color);
+  align-items: center;
 }
 
 .rightMenuButton {
   padding: 0;
   border: 0;
-  display: inline-flex;
   cursor: pointer;
-  align-items: center;
-  justify-content: center;
+
   background: 0;
+  height: 1.5rem;
+  width: 1.5rem;
+  color: var(--primary-icon-color);
+}
+
+.rightMenuButton.active svg {
+  fill: var(--primary-icon-color);
+}
+
+.rightMenuButton:active {
+  opacity: 0.6;
 }
 
 /* Profile menu */
