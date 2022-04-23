@@ -29,10 +29,6 @@ export default function NewPostModal({ onClose }) {
     if (validateImageFile(file)) setFile(file);
   };
 
-  const handleFileClick = () => {
-    fileInputRef.current.click();
-  };
-
   const handleFileChange = (e) => {
     const [file] = e.target.files;
     if (validateImageFile(file)) setFile(file);
@@ -99,7 +95,7 @@ export default function NewPostModal({ onClose }) {
                 ref={fileInputRef}
                 onChange={handleFileChange}
               ></input>
-              <Button onClick={handleFileClick}>Select from computer</Button>
+              <Button onClick={() => fileInputRef.current.click()}>Select from computer</Button>
             </div>
           )}
           {file && !createPostMutation.error && (

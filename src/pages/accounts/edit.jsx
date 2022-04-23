@@ -61,10 +61,6 @@ export default function Edit() {
     }
   };
 
-  const handleChangePhoto = (e) => {
-    fileRef.current?.click();
-  };
-
   const handleFileChange = (e) => {
     const [file] = e.target.files;
     if (validateImageFile(file)) {
@@ -89,7 +85,7 @@ export default function Edit() {
             <Button
               style="text"
               type="button"
-              onClick={handleChangePhoto}
+              onClick={() => fileRef.current?.click()}
               disabled={updatePhotoMutation.isLoading}
             >
               Change Profile Photo

@@ -104,10 +104,6 @@ export default function Profile() {
     openPostFunc(post);
   };
 
-  const handleFollowClick = () => {
-    followMutation.mutate();
-  };
-
   return (
     <Layout>
       {error?.status === 404 && (
@@ -134,7 +130,11 @@ export default function Profile() {
                     Edit Profile
                   </Button>
                 ) : (
-                  <Button onClick={handleFollowClick} disabled={followMutation.isLoading}>
+                  /* Follow button */
+                  <Button
+                    onClick={() => followMutation.mutate()}
+                    disabled={followMutation.isLoading}
+                  >
                     {data.followedByClient ? 'Unfollow' : 'Follow'}
                   </Button>
                 )}

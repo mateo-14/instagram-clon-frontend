@@ -167,6 +167,8 @@ function PostComments({ postId }) {
       {data?.pages.flat().map((comment) => (
         <PostComment comment={comment} key={comment.id} />
       ))}
+
+      {/* Load more commments Button */}
       {hasNextPage && (
         <button onClick={fetchNextPage} className={styles.loadMoreBtn}>
           <LoadMore />
@@ -227,6 +229,7 @@ function PostComment({ comment, isPostCaption = false }) {
           )}
         </div>
       </div>
+      {/* Like Heart Button */}
       {!isPostCaption && (
         <button
           className={classNames(styles.action, styles.commentLikeBtn, {
