@@ -199,6 +199,10 @@ div.userImage {
   text-align: left;
 }
 
+.viewAllCommentsBtn:active {
+  opacity: 0.6;
+}
+
 .loadMoreBtn {
   margin: 0 auto;
   background: 0;
