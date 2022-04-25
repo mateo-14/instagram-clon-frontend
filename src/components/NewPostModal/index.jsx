@@ -3,7 +3,7 @@ import Button from 'components/common/Button';
 import ErrorIcon from 'components/common/Icons/ErrorIcon';
 import MediaIcon from 'components/common/Icons/MediaIcon';
 import Loader from 'components/common/Loader';
-import Modal from 'components/common/Modal';
+import Modal, { ModalBody, ModalContent, ModalFooter, ModalHeader } from 'components/common/Modal';
 import TextArea from 'components/common/TextArea';
 import { show } from 'components/Toast';
 import useOnClickOutside from 'hooks/useOnClickOutside';
@@ -63,22 +63,15 @@ export default function NewPostModal({ onClose }) {
   };
 
   return (
-    <Modal
-      className={styles.modal}
-      isOpen={true}
-      showCloseButton={true}
-      onCloseButtonClick={onClose}
-      onClickOutside={onClose}
-    >
-      <div className={styles.header}>
-        <h1 className={styles.title}>Create new post</h1>
-        <Button style="text" className={styles.nextButton} onClick={handleNextBack}>
-          {step === 1 ? 'Next' : 'Back'}
-        </Button>
-      </div>
-
-      <div className={styles.content}>
-        <div className={styles.imageSection}>
+    <Modal isOpen={true} showCloseButton={true} onClose={onClose}>
+      <ModalContent className={styles.modal}>
+        <ModalHeader>
+          <h1 className={styles.title}>Create new post</h1>
+          <Button style="text" className={styles.nextButton} onClick={handleNextBack}>
+            {step === 1 ? 'Next' : 'Back'}
+          </Button>
+        </ModalHeader>
+        <ModalBody className={styles.body}>
           {createPostMutation.error && (
             <div className={styles.error}>
               <ErrorIcon className={styles.errorIcon} />
@@ -122,23 +115,24 @@ export default function NewPostModal({ onClose }) {
               )}
             </div>
           )}
-        </div>
-
+        </ModalBody>
         {step === 2 && (
-          <form className={styles.captionSection} onSubmit={handleSubmit}>
-            <TextArea
-              placeholder="Write a caption..."
-              className={styles.captionTextarea}
-              maxRows={4}
-              disabled={createPostMutation.isLoading}
-              onChange={(e) => setCaption(e.target.value)}
-            />
-            <Button style="text" type="submit" disabled={!file || createPostMutation.isLoading}>
-              Share
-            </Button>
-          </form>
+          <ModalFooter>
+            <form className={styles.form} onSubmit={handleSubmit}>
+              <TextArea
+                placeholder="Write a caption..."
+                className={styles.captionTextarea}
+                maxRows={4}
+                disabled={createPostMutation.isLoading}
+                onChange={(e) => setCaption(e.target.value)}
+              />
+              <Button style="text" type="submit" disabled={!file || createPostMutation.isLoading}>
+                Share
+              </Button>
+            </form>
+          </ModalFooter>
         )}
-      </div>
+      </ModalContent>
     </Modal>
   );
 }

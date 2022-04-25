@@ -1,6 +1,7 @@
-import useOnClickOutside from 'hooks/useOnClickOutside';
-import { useRef, useEffect, useId, useState } from 'react';
+import classNames from 'classnames';
+import { useEffect, useId, useState } from 'react';
 import { createPortal } from 'react-dom';
+import CloseIcon from '../Icons/CloseIcon';
 import styles from './Modal.module.css';
 
 function createWrapper(id) {
@@ -10,24 +11,14 @@ function createWrapper(id) {
   return wrapper;
 }
 
-export default function Modal({
-  isOpen,
-  showCloseButton,
-  onCloseButtonClick,
-  className,
-  children,
-  onClickOutside,
-}) {
+export default function Modal({ isOpen, showCloseButton, onClose, children }) {
   const wrapperId = useId();
   const [wrapper, setWrapper] = useState();
-  const ref = useRef();
-  useOnClickOutside(ref, onClickOutside, isOpen);
 
   useEffect(() => {
     document.body.style.overflow = isOpen ? 'hidden' : 'auto';
     return () => (document.body.style.overflow = 'auto');
   }, [isOpen]);
-
 
   useEffect(() => {
     let element = document.getElementById(`modal-${wrapperId}`);
@@ -38,37 +29,37 @@ export default function Modal({
 
   return isOpen && wrapper
     ? createPortal(
-        <div className={styles.background}>
-          <div className={className} ref={typeof children !== 'function' ? ref : null}>
-            {typeof children === 'function' ? children(ref) : children}
-          </div>
-          {showCloseButton && (
-            <button className={styles.closeButton} onClick={onCloseButtonClick}>
-              <svg aria-label="Close" viewBox="0 0 24 24" color="currentColor">
-                <polyline
-                  fill="none"
-                  points="20.643 3.357 12 12 3.353 20.647"
-                  stroke="currentColor"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth="3"
-                ></polyline>
-                <line
-                  fill="none"
-                  stroke="currentColor"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth="3"
-                  x1="20.649"
-                  x2="3.354"
-                  y1="20.649"
-                  y2="3.354"
-                ></line>
-              </svg>
-            </button>
-          )}
+        <div
+          className={styles.background}
+          onClick={(e) => (e.target === e.currentTarget ? onClose() : null)}
+        >
+          {children}
+          {showCloseButton && <CloseButton onClick={onClose} />}
         </div>,
         wrapper
       )
     : null;
 }
+
+export const ModalContent = ({ children, className, showCloseButton, onClose }) => (
+  <section className={classNames(styles.content, className)} role="dialog">
+    {children}
+    {showCloseButton && <CloseButton onClick={onClose} />}
+  </section>
+);
+
+export const ModalHeader = ({ children }) => <header className={styles.header}>{children}</header>;
+
+export const ModalBody = ({ children, className }) => (
+  <div className={classNames(styles.body, className)}>{children}</div>
+);
+
+export const ModalFooter = ({ children, className }) => (
+  <footer className={classNames(styles.footer, className)}>{children}</footer>
+);
+
+const CloseButton = ({ onClick }) => (
+  <button className={styles.closeButton} onClick={onClick}>
+    <CloseIcon />
+  </button>
+);

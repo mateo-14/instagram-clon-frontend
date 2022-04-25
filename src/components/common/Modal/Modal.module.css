@@ -14,12 +14,51 @@
 
 .closeButton {
   position: absolute;
-  background: 0;
   border: 0;
+  cursor: pointer;
+  background: 0;
+}
+
+.background > .closeButton {
   color: rgb(207, 207, 207);
   height: 2.4rem;
   width: 2.4rem;
-  cursor: pointer;
   top: 0.6rem;
   right: 0.6rem;
+}
+
+.content > .closeButton {
+  height: 2rem;
+  width: 2rem;
+  top: 8px;
+  right: 0.6rem;
+}
+
+.content {
+  background: white;
+  border-radius: 0.8rem;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  position: relative;
+}
+
+.header {
+  padding: 0.6rem 1.2rem;
+  border-bottom: 1px solid rgb(var(--border-color));
+  display: flex;
+  justify-content: center;
+}
+
+.body {
+  padding: 1.2rem;
+  flex: 1;
+  display: flex;
+  justify-content: center;
+}
+
+.footer {
+  display: flex;
+  padding: 0 1.2rem;
+  border-top: 1px solid rgb(var(--border-color));
 }

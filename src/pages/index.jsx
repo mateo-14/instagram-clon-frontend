@@ -78,8 +78,7 @@ export default function Home() {
 
         <PostModal
           post={openPost}
-          onCloseButtonClick={closePost}
-          onClickOutside={closePost}
+          onClose={closePost}
           onCommentSuccess={handleCommentSuccess}
           onLikeSuccess={handleLikeSuccess}
         />

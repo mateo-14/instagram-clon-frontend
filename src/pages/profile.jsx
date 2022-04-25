@@ -179,10 +179,9 @@ export default function Profile() {
       )}
       <PostModal
         post={openPost}
-        onCloseButtonClick={closePost}
         onCommentSuccess={handleCommentSuccess}
         onLikeSuccess={handleLikeSuccess}
-        onClickOutside={closePost}
+        onClose={closePost}
       />
     </Layout>
   );

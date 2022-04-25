@@ -1,4 +1,4 @@
-.modalContainer {
+.modal {
   height: 90%;
   display: flex;
   justify-content: center;
@@ -7,16 +7,16 @@
   max-width: 1200px;
 }
 
-.modalContainer > :first-child {
+.modal > :first-child {
   border: 0;
   border-radius: 0.3rem;
 }
 
 @media (min-width: 768px) {
-  .modalContainer {
+  .modal {
     width: 90%;
   }
-  .modalContainer > :first-child {
+  .modal > :first-child {
     height: 100%;
   }
 }
