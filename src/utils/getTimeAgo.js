@@ -9,7 +9,7 @@ const getSecondsDiff = (timestamp) => (Date.now() - timestamp) / 1000;
 const getUnitAndValueDate = (secondsElapsed) => {
   for (const [unit, secondsInUnit] of Object.entries(DATE_UNITS)) {
     if (secondsElapsed >= secondsInUnit || unit === 'second') {
-      const value = Math.floor(secondsElapsed / secondsInUnit) * -1;
+      const value = Math.min(0, Math.floor(secondsElapsed / secondsInUnit) * -1);
       return { value, unit };
     }
   }
@@ -26,7 +26,7 @@ const getTimeAgo = (timestamp) => {
 const getShortTimeAgo = (timestamp) => {
   const secondsElapsed = getSecondsDiff(timestamp);
   const { value, unit } = getUnitAndValueDate(secondsElapsed);
-  return `${Math.max(0, value * -1)}${unit[0]}`;
+  return `${value * -1}${unit[0]}`;
 };
 
 export { getTimeAgo, getShortTimeAgo };
