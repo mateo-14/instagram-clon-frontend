@@ -31,7 +31,7 @@ export default function Modal({ isOpen, showCloseButton, onClose, children }) {
     ? createPortal(
         <div
           className={styles.background}
-          onClick={(e) => (e.target === e.currentTarget ? onClose() : null)}
+          onMouseDown={(e) => (e.target === e.currentTarget ? onClose() : null)}
         >
           {children}
           {showCloseButton && <CloseButton onClick={onClose} />}

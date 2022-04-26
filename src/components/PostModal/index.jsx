@@ -6,7 +6,7 @@ const PostModal = ({ post, onLikeSuccess, onClose, onCommentSuccess }) => (
   <Modal showCloseButton={true} isOpen={!!post} onClose={onClose}>
     <div
       className={styles.modal}
-      onClick={(e) => (e.target === e.currentTarget ? onClose() : null)}
+      onMouseDown={(e) => (e.target === e.currentTarget ? onClose() : null)}
       role="dialog"
     >
       <Post
