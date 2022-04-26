@@ -79,7 +79,7 @@ export default function Edit() {
         <h1>Edit Profile</h1>
 
         <form className={styles.form} onSubmit={handleSubmit(onSubmit)}>
-          {user.isTestAccount &&<p className={styles.testAccountMsg}>You cannot edit this account. This is a public test account!</p>}
+          {user?.isTestAccount &&<p className={styles.testAccountMsg}>You cannot edit this account. This is a public test account!</p>}
           <ProfileImage src={user?.profileImage} className={styles.changePhotoImg}></ProfileImage>
           <div className={styles.changePhotoRight}>
             <h2 className={styles.changePhotoName}>{user?.username}</h2>
@@ -87,7 +87,7 @@ export default function Edit() {
               style="text"
               type="button"
               onClick={() => fileRef.current?.click()}
-              disabled={user.isTestAccount || updatePhotoMutation.isLoading}
+              disabled={user?.isTestAccount || updatePhotoMutation.isLoading}
             >
               Change Profile Photo
             </Button>
@@ -108,7 +108,7 @@ export default function Edit() {
               id="displayName"
               className={styles.input}
               placeholder="Name"
-              disabled={user.isTestAccount || formState.isSubmitting}
+              disabled={user?.isTestAccount || formState.isSubmitting}
               {...register('displayName')}
             />
             <p className={sharedStyles.errorText}>{errors?.displayName?.message}</p>
@@ -124,7 +124,7 @@ export default function Edit() {
               id="username"
               className={styles.input}
               placeholder="Username"
-              disabled={user.isTestAccount || formState.isSubmitting}
+              disabled={user?.isTestAccount || formState.isSubmitting}
               {...register('username')}
             />
             <p className={sharedStyles.errorText}>{errors?.username?.message}</p>
@@ -141,7 +141,7 @@ export default function Edit() {
               rows={6}
               maxRows={10}
               className={styles.textarea}
-              disabled={user.isTestAccount || formState.isSubmitting}
+              disabled={user?.isTestAccount || formState.isSubmitting}
               {...register('bio')}
             />
             <p className={sharedStyles.errorText}>{errors?.bio?.message}</p>
