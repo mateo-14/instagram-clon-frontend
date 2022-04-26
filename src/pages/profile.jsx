@@ -52,7 +52,7 @@ function useProfilePosts(id) {
 }
 
 function useProfile(username) {
-  const refetchOn = ({ state }) => !state.error?.status === 404;
+  const refetchOn = ({ state }) => !(state.error?.status === 404);
 
   const { data, error, refetch } = useQuery(
     ['users', username],

@@ -114,3 +114,8 @@
   align-items: flex-end;
   gap: 2rem;
 }
+
+.bio {
+  margin: 0;
+  white-space: pre;
+}
