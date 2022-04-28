@@ -6,15 +6,13 @@ import useAuth from 'hooks/useAuth';
 import usePostModal from 'hooks/usePostModal';
 import usePostsQuerySetters from 'hooks/usePostsQuerySetters';
 import useTitle from 'hooks/useTitle';
-import { useEffect, useRef } from 'react';
 import { useInfiniteQuery } from 'react-query';
 import { Link } from 'react-router-dom';
 import { getFeed } from 'services/postsServices';
+import useInfinityScroll from "services/useInfinityScroll";
 import styles from 'styles/index.module.css';
 
 function useFeedPosts() {
-  const intersectionRef = useRef();
-
   const { data, status, isFetchingNextPage, hasNextPage, fetchNextPage } = useInfiniteQuery(
     ['posts', 'feed'],
     ({ pageParam }) => getFeed(pageParam),
@@ -26,30 +24,16 @@ function useFeedPosts() {
     }
   );
 
-  useEffect(() => {
-    if (status !== 'success' || !hasNextPage || isFetchingNextPage) return;
+  const { targetRef } = useInfinityScroll({
+    disabled: !hasNextPage || status !== 'success' || isFetchingNextPage,
+    onIntersect: fetchNextPage,
+  });
 
-    const observer = new IntersectionObserver(
-      (entries) => {
-        if (entries[0].isIntersecting) {
-          fetchNextPage();
-        }
-      },
-      {
-        rootMargin: '0px',
-        threshold: 1.0,
-      }
-    );
-
-    observer.observe(intersectionRef.current);
-    return () => observer.disconnect();
-  }, [status, fetchNextPage, isFetchingNextPage, hasNextPage]);
-
-  return { posts: data?.pages?.flat(), status, isFetchingNextPage, intersectionRef };
+  return { posts: data?.pages?.flat(), status, isFetchingNextPage, targetRef };
 }
 
 export default function Home() {
-  const { posts, intersectionRef } = useFeedPosts();
+  const { posts, targetRef } = useFeedPosts();
   const { data: loggedUser } = useAuth();
   const { handleCommentSuccess, handleLikeSuccess } = usePostsQuerySetters(['posts', 'feed']);
   const { openPost, close: closePost, open: openPostFunc } = usePostModal(posts);
@@ -73,7 +57,7 @@ export default function Home() {
               onCommentSuccess={handleCommentSuccess}
             />
           ))}
-          <div ref={intersectionRef}></div>
+          <div ref={targetRef}></div>
         </section>
 
         <PostModal

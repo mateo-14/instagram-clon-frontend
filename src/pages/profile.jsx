@@ -8,15 +8,13 @@ import useAuth from 'hooks/useAuth';
 import usePostModal from 'hooks/usePostModal';
 import usePostsQuerySetters from 'hooks/usePostsQuerySetters';
 import useTitle from 'hooks/useTitle';
-import { useRef, useEffect } from 'react';
 import { useInfiniteQuery, useMutation, useQuery } from 'react-query';
 import { useParams } from 'react-router';
+import useInfinityScroll from 'services/useInfinityScroll';
 import { followUser, getUserByUsername, getUserPosts, unfollowUser } from 'services/usersService';
 import styles from 'styles/profile.module.css';
 
 function useProfilePosts(id) {
-  const intersectionRef = useRef();
-
   const { data, status, isFetchingNextPage, hasNextPage, fetchNextPage } = useInfiniteQuery(
     ['users', id, 'posts'],
     ({ pageParam }) => getUserPosts(id, pageParam),
@@ -29,26 +27,12 @@ function useProfilePosts(id) {
     }
   );
 
-  useEffect(() => {
-    if (status !== 'success' || !hasNextPage || isFetchingNextPage) return;
+  const { targetRef } = useInfinityScroll({
+    disabled: !hasNextPage || status !== 'success' || isFetchingNextPage,
+    onIntersect: fetchNextPage,
+  });
 
-    const observer = new IntersectionObserver(
-      (entries) => {
-        if (entries[0].isIntersecting) {
-          fetchNextPage();
-        }
-      },
-      {
-        rootMargin: '0px',
-        threshold: 1.0,
-      }
-    );
-
-    observer.observe(intersectionRef.current);
-    return () => observer.disconnect();
-  }, [status, fetchNextPage, isFetchingNextPage, hasNextPage]);
-
-  return { posts: data?.pages?.flat(), status, isFetchingNextPage, intersectionRef };
+  return { posts: data?.pages?.flat(), status, isFetchingNextPage, targetRef };
 }
 
 function useProfile(username) {
@@ -90,7 +74,7 @@ export default function Profile() {
   const { username } = useParams();
   const { title, error, data, followMutation } = useProfile(username);
   useTitle(title);
-  const { posts, intersectionRef } = useProfilePosts(data?.id);
+  const { posts, targetRef } = useProfilePosts(data?.id);
   const { handleCommentSuccess, handleLikeSuccess } = usePostsQuerySetters([
     'users',
     data?.id,
@@ -174,7 +158,7 @@ export default function Profile() {
               </a>
             ))}
           </section>
-          <div ref={intersectionRef}></div>
+          <div ref={targetRef}></div>
         </div>
       )}
       <PostModal
