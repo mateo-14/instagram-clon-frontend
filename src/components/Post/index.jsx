@@ -7,6 +7,7 @@ import OutlineHeartIcon from 'components/common/Icons/OutlineHeartIcon';
 import Modal, { ModalBody, ModalContent, ModalHeader } from 'components/common/Modal';
 import ProfileImage from 'components/common/ProfileImage';
 import TextArea from 'components/common/TextArea';
+import { show } from 'components/Toast';
 import { useState, forwardRef } from 'react';
 import { useInfiniteQuery, useMutation, useQueryClient } from 'react-query';
 import { Link } from 'react-router-dom';
@@ -16,28 +17,26 @@ import useInfinityScroll from 'services/useInfinityScroll';
 import { getShortTimeAgo, getTimeAgo } from 'src/utils/getTimeAgo';
 import styles from './Post.module.css';
 
-function usePostLikeAction(post) {
+function usePostLikeAction(post, onSuccess) {
   const queryClient = useQueryClient();
 
-  return (onSuccess) => {
-    try {
-      if (post.hasClientLike) removeLike(post.id);
-      else addLike(post.id);
+  return () => {
+    if (post.hasClientLike) removeLike(post.id);
+    else addLike(post.id);
 
-      const likesCount = post._count.likes + (post.hasClientLike ? -1 : 1);
+    const likesCount = post._count.likes + (post.hasClientLike ? -1 : 1);
 
-      queryClient.setQueryData(['posts', post.id], (cachedPost) => {
-        cachedPost = cachedPost || post;
-        return {
-          ...cachedPost,
-          _count: { ...cachedPost._count, likes: likesCount },
-          hasClientLike: !post.hasClientLike,
-        };
-      });
+    queryClient.setQueryData(['posts', post.id], (cachedPost) => {
+      cachedPost = cachedPost || post;
+      return {
+        ...cachedPost,
+        _count: { ...cachedPost._count, likes: likesCount },
+        hasClientLike: !post.hasClientLike,
+      };
+    });
 
-      if (typeof onSuccess === 'function')
-        onSuccess({ postId: post.id, likesCount, hasClientLike: !post.hasClientLike });
-    } catch {}
+    if (typeof onSuccess === 'function')
+      onSuccess({ postId: post.id, likesCount, hasClientLike: !post.hasClientLike });
   };
 }
 
@@ -54,10 +53,8 @@ const Post = forwardRef(
     ref
   ) => {
     const date = data && new Date(data.createdAt);
-    const likeAction = usePostLikeAction(data);
+    const likeAction = usePostLikeAction(data, onLikeSuccess);
     const [showLikes, setShowLikes] = useState(false);
-
-    const handleLikeAction = () => likeAction(onLikeSuccess);
 
     const requestOpenModal = () => {
       if (onRequestOpenModal) onRequestOpenModal(data);
@@ -83,7 +80,7 @@ const Post = forwardRef(
           <img
             className={styles.image}
             src={data.images[0]}
-            onDoubleClick={() => !data.hasClientLike && handleLikeAction()}
+            onDoubleClick={() => !data.hasClientLike && likeAction()}
             alt={`${data.author.username}'s post (${data.text})`}
           />
         </div>
@@ -92,7 +89,7 @@ const Post = forwardRef(
             className={classNames(styles.action, {
               [styles.liked]: data.hasClientLike,
             })}
-            onClick={handleLikeAction}
+            onClick={likeAction}
           >
             {data.hasClientLike ? <HeartIcon /> : <OutlineHeartIcon />}
           </button>
@@ -203,25 +200,23 @@ function useCommentLikeAction(comment) {
   const queryClient = useQueryClient();
 
   return () => {
-    try {
-      if (comment.hasClientLike) commentsService.removeLike(comment.id);
-      else commentsService.addLike(comment.id);
+    if (comment.hasClientLike) commentsService.removeLike(comment.id);
+    else commentsService.addLike(comment.id);
 
-      queryClient.setQueryData(['posts', comment.postId, 'comments'], (comments) => ({
-        ...comments,
-        pages: comments.pages.map((page) =>
-          page.map((c) =>
-            c.id === comment.id
-              ? {
-                  ...c,
-                  hasClientLike: !c.hasClientLike,
-                  _count: { ...c, likes: c._count.likes + (c.hasClientLike ? -1 : 1) },
-                }
-              : c
-          )
-        ),
-      }));
-    } catch (err) {}
+    queryClient.setQueryData(['posts', comment.postId, 'comments'], (comments) => ({
+      ...comments,
+      pages: comments.pages.map((page) =>
+        page.map((c) =>
+          c.id === comment.id
+            ? {
+                ...c,
+                hasClientLike: !c.hasClientLike,
+                _count: { ...c, likes: c._count.likes + (c.hasClientLike ? -1 : 1) },
+              }
+            : c
+        )
+      ),
+    }));
   };
 }
 
@@ -265,7 +260,7 @@ function PostComment({ comment, isPostCaption = false }) {
   );
 }
 
-function useAddCommentMutation(post) {
+function useAddCommentMutation(post, onSuccess) {
   const queryClient = useQueryClient();
   return useMutation(
     async ({ text, commentRepliedId }) => {
@@ -274,14 +269,15 @@ function useAddCommentMutation(post) {
     },
     {
       onSuccess: (data) => {
-        if (!queryClient.getQueryData(['posts', data.postId, 'comments'])) return;
+        if (queryClient.getQueryData(['posts', data.postId, 'comments']))
+          queryClient.setQueryData(['posts', data.postId, 'comments'], ({ pages, pageParams }) => {
+            return {
+              pageParams,
+              pages: pages.map((page, i) => (i === 0 ? [data.comment, ...page] : page)),
+            };
+          });
 
-        queryClient.setQueryData(['posts', data.postId, 'comments'], ({ pages, pageParams }) => {
-          return {
-            pageParams,
-            pages: pages.map((page, i) => (i === 0 ? [data.comment, ...page] : page)),
-          };
-        });
+        if (typeof onSuccess === 'function') onSuccess(data);
       },
     }
   );
@@ -290,21 +286,18 @@ function useAddCommentMutation(post) {
 function CommentForm({ onCommentSuccess, post, className }) {
   const [value, setValue] = useState('');
   const isValid = value.trim().length > 0;
-  const addCommentMutation = useAddCommentMutation(post);
+  const addCommentMutation = useAddCommentMutation(post, onCommentSuccess);
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
 
-    if (isValid && !addCommentMutation.isLoading)
-      addCommentMutation.mutate(
-        { text: value.trim() },
-        {
-          onSuccess: (data) => {
-            if (typeof onCommentSuccess === 'function') onCommentSuccess(data);
-            setValue('');
-          },
-        }
-      );
+    if (isValid && !addCommentMutation.isLoading) {
+      try {
+        await addCommentMutation.mutateAsync({ text: value.trim() });
+        show('Comment added.');
+        setValue('');
+      } catch {}
+    }
   };
 
   return (
