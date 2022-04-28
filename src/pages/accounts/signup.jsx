@@ -1,8 +1,8 @@
-import sharedStyles from 'styles/accounts/shared.module.css';
+import accountsStyles from './accounts.module.css';
 import Input from 'components/common/Input';
 import Button from 'components/common/Button';
 import AuthPage from 'components/AuthPage';
-import styles from 'styles/accounts/Signup.module.css';
+import styles from './Signup.module.css';
 import { useForm } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
 import * as yup from 'yup';
@@ -63,23 +63,23 @@ export default function Signup() {
     <AuthPage.Layout>
       <AuthPage.MainSection>
         <p className={styles.infoText}>Sign up to see photos and videos from your friends.</p>
-        <form className={sharedStyles.form} onSubmit={handleSubmit(onSubmit)}>
-          <div className={sharedStyles.inputWrapper}>
+        <form className={accountsStyles.form} onSubmit={handleSubmit(onSubmit)}>
+          <div className={accountsStyles.inputWrapper}>
             <Input placeholder="Username" {...register('username')}></Input>
-            <p className={sharedStyles.errorText}>{errors?.username?.message}</p>
+            <p className={accountsStyles.errorText}>{errors?.username?.message}</p>
           </div>
-          <div className={sharedStyles.inputWrapper}>
+          <div className={accountsStyles.inputWrapper}>
             <Input placeholder={'Full name'} {...register('displayName')}></Input>
-            <p className={sharedStyles.errorText}>{errors?.displayName?.message}</p>
+            <p className={accountsStyles.errorText}>{errors?.displayName?.message}</p>
           </div>
-          <div className={sharedStyles.inputWrapper}>
+          <div className={accountsStyles.inputWrapper}>
             <Input placeholder="Password" {...register('password')} masked={true}></Input>
-            <p className={sharedStyles.errorText}>{errors?.password?.message}</p>
+            <p className={accountsStyles.errorText}>{errors?.password?.message}</p>
           </div>
-          <p className={sharedStyles.errorText}>{errors?.error?.message}</p>
+          <p className={accountsStyles.errorText}>{errors?.error?.message}</p>
 
           <Button
-            className={sharedStyles.button}
+            className={accountsStyles.button}
             disabled={!formState.isValid || formState.isSubmitting}
             type="submit"
           >
@@ -88,9 +88,9 @@ export default function Signup() {
         </form>
       </AuthPage.MainSection>
       <AuthPage.ExtraSection>
-        <p className={sharedStyles.text}>
+        <p className={accountsStyles.text}>
           {`Have an account? `}
-          <Link to={'/accounts/login'} className={sharedStyles.link}>
+          <Link to={'/accounts/login'} className={accountsStyles.link}>
             Log in
           </Link>
         </p>

@@ -4,7 +4,7 @@ import useTitle from 'hooks/useTitle';
 import { useQuery } from 'react-query';
 import { useParams } from 'react-router';
 import { getPost } from 'services/postsServices';
-import styles from 'styles/posts.module.css';
+import styles from './posts.module.css';
 
 export default function Posts() {
   let { id } = useParams();

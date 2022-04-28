@@ -3,7 +3,7 @@ import { yupResolver } from '@hookform/resolvers/yup';
 import * as yup from 'yup';
 import useAuth from 'hooks/useAuth';
 import Layout from 'components/Layout';
-import styles from 'styles/accounts/edit.module.css';
+import styles from './edit.module.css';
 import Input from 'components/common/Input';
 import InputTextArea from 'components/common/InputTextArea';
 import Button from 'components/common/Button';
@@ -15,7 +15,7 @@ import ProfileImage from 'components/common/ProfileImage';
 import { useRef } from 'react';
 import validateImageFile from 'src/utils/validateImageFile';
 import useFormErrorHandling from 'hooks/useFormErrorHandling';
-import sharedStyles from 'styles/accounts/shared.module.css';
+import accountsStyles from './accounts.module.css';
 import { show } from 'components/Toast';
 
 const schema = yup
@@ -111,7 +111,7 @@ export default function Edit() {
               disabled={user?.isTestAccount || formState.isSubmitting}
               {...register('displayName')}
             />
-            <p className={sharedStyles.errorText}>{errors?.displayName?.message}</p>
+            <p className={accountsStyles.errorText}>{errors?.displayName?.message}</p>
           </div>
 
           {/* Username */}
@@ -127,7 +127,7 @@ export default function Edit() {
               disabled={user?.isTestAccount || formState.isSubmitting}
               {...register('username')}
             />
-            <p className={sharedStyles.errorText}>{errors?.username?.message}</p>
+            <p className={accountsStyles.errorText}>{errors?.username?.message}</p>
           </div>
           {/* Bio */}
 
@@ -144,7 +144,7 @@ export default function Edit() {
               disabled={user?.isTestAccount || formState.isSubmitting}
               {...register('bio')}
             />
-            <p className={sharedStyles.errorText}>{errors?.bio?.message}</p>
+            <p className={accountsStyles.errorText}>{errors?.bio?.message}</p>
           </div>
 
           <Button

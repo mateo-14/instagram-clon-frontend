@@ -1,5 +1,5 @@
 import classNames from 'classnames';
-import { useEffect, useId, useState, forwardRef } from 'react';
+import { forwardRef, useEffect, useId, useState } from "react";
 import { createPortal } from 'react-dom';
 import CloseIcon from '../Icons/CloseIcon';
 import styles from './Modal.module.css';
@@ -14,6 +14,7 @@ function createWrapper(id) {
 export default function Modal({ isOpen, showCloseButton, onClose, children }) {
   const wrapperId = useId();
   const [wrapper, setWrapper] = useState();
+  
 
   useEffect(() => {
     document.body.style.overflow = isOpen ? 'hidden' : 'auto';

@@ -12,7 +12,7 @@ import { useInfiniteQuery, useMutation, useQuery } from 'react-query';
 import { useParams } from 'react-router';
 import useInfinityScroll from 'services/useInfinityScroll';
 import { followUser, getUserByUsername, getUserPosts, unfollowUser } from 'services/usersService';
-import styles from 'styles/profile.module.css';
+import styles from './profile.module.css';
 
 function useProfilePosts(id) {
   const { data, status, isFetchingNextPage, hasNextPage, fetchNextPage } = useInfiniteQuery(
@@ -102,42 +102,37 @@ export default function Profile() {
       {data && (
         <div>
           <section className={styles.profileInfo}>
-            <div className={styles.imageContainer}>
-              <ProfileImage src={data.profileImage} className={styles.image}></ProfileImage>
+            {/* <div className={styles.imageContainer}> */}
+            <ProfileImage src={data.profileImage} className={styles.image}></ProfileImage>
+            {/* </div> */}
+            <div className={styles.mainInfo}>
+              <h2 className={styles.username}>{data.username}</h2>
+              {client?.id === data?.id ? (
+                <Button asLink={true} to={'/accounts/edit'}>
+                  Edit Profile
+                </Button>
+              ) : (
+                /* Follow button */
+                <Button onClick={() => followMutation.mutate()} disabled={followMutation.isLoading}>
+                  {data.followedByClient ? 'Unfollow' : 'Follow'}
+                </Button>
+              )}
             </div>
-            <div className={styles.userInfo}>
-              <div className={styles.infoHeader}>
-                <h2 className={styles.username}>{data.username}</h2>
-                {client?.id === data?.id ? (
-                  <Button asLink={true} to={'/accounts/edit'}>
-                    Edit Profile
-                  </Button>
-                ) : (
-                  /* Follow button */
-                  <Button
-                    onClick={() => followMutation.mutate()}
-                    disabled={followMutation.isLoading}
-                  >
-                    {data.followedByClient ? 'Unfollow' : 'Follow'}
-                  </Button>
-                )}
-              </div>
-              <ul className={styles.userInfoCount}>
-                <li>
-                  <span className={styles.infoNumber}>{data._count.posts}</span> posts
-                </li>
-                <li>
-                  <span className={styles.infoNumber}>{data._count.followedBy}</span> followers
-                </li>
-                <li>
-                  <span className={styles.infoNumber}>{data._count.following}</span> following
-                </li>
-              </ul>
-              <div>
-                <p className={styles.displayName}>{data.displayName}</p>
-                {data.bio && <p className={styles.bio}>{data.bio}</p>}
-              </div>
+            <div className={styles.displayNameBio}>
+              <p className={styles.displayName}>{data.displayName}</p>
+              {data.bio && <p className={styles.bio}>{data.bio}</p>}
             </div>
+            <ul className={styles.userInfoCount}>
+              <li>
+                <span className={styles.infoNumber}>{data._count.posts}</span> posts
+              </li>
+              <li>
+                <span className={styles.infoNumber}>{data._count.followedBy}</span> followers
+              </li>
+              <li>
+                <span className={styles.infoNumber}>{data._count.following}</span> following
+              </li>
+            </ul>
           </section>
           <section className={styles.posts}>
             {posts?.map((post) => (

@@ -1,4 +1,4 @@
-import sharedStyles from 'styles/accounts/shared.module.css';
+import accountsStyles from './accounts.module.css';
 import Input from 'components/common/Input';
 import Button from 'components/common/Button';
 import AuthPage from 'components/AuthPage';
@@ -64,19 +64,19 @@ export default function Login() {
   return (
     <AuthPage.Layout>
       <AuthPage.MainSection>
-        <form className={sharedStyles.form} onSubmit={handleSubmit(onSubmit)}>
-          <div className={sharedStyles.inputWrapper}>
+        <form className={accountsStyles.form} onSubmit={handleSubmit(onSubmit)}>
+          <div className={accountsStyles.inputWrapper}>
             <Input placeholder="Username" {...register('username')}></Input>
-            <p className={sharedStyles.errorText}>{errors?.username?.message}</p>
+            <p className={accountsStyles.errorText}>{errors?.username?.message}</p>
           </div>
-          <div className={sharedStyles.inputWrapper}>
+          <div className={accountsStyles.inputWrapper}>
             <Input placeholder="Password" {...register('password')} masked={true}></Input>
-            <p className={sharedStyles.errorText}>{errors?.password?.message}</p>
+            <p className={accountsStyles.errorText}>{errors?.password?.message}</p>
           </div>
 
-          <p className={sharedStyles.errorText}>{errors?.error?.message}</p>
+          <p className={accountsStyles.errorText}>{errors?.error?.message}</p>
           <Button
-            className={sharedStyles.button}
+            className={accountsStyles.button}
             disabled={!formState.isValid || formState.isSubmitting || isTestLoginLoading}
             type='submit'
           >
@@ -92,9 +92,9 @@ export default function Login() {
         </form>
       </AuthPage.MainSection>
       <AuthPage.ExtraSection>
-        <p className={sharedStyles.text}>
+        <p className={accountsStyles.text}>
           {`Don't have an account? `}
-          <Link to={'/accounts/signup'} className={sharedStyles.link}>
+          <Link to={'/accounts/signup'} className={accountsStyles.link}>
             Sign up
           </Link>
         </p>

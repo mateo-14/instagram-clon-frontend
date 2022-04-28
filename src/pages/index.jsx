@@ -10,7 +10,7 @@ import { useInfiniteQuery } from 'react-query';
 import { Link } from 'react-router-dom';
 import { getFeed } from 'services/postsServices';
 import useInfinityScroll from "services/useInfinityScroll";
-import styles from 'styles/index.module.css';
+import styles from './index.module.css';
 
 function useFeedPosts() {
   const { data, status, isFetchingNextPage, hasNextPage, fetchNextPage } = useInfiniteQuery(
