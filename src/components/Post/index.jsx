@@ -4,13 +4,15 @@ import CommentIcon from 'components/common/Icons/CommentIcon';
 import HeartIcon from 'components/common/Icons/HeartIcon';
 import LoadMore from 'components/common/Icons/LoadMore';
 import OutlineHeartIcon from 'components/common/Icons/OutlineHeartIcon';
+import Modal, { ModalBody, ModalContent, ModalHeader } from 'components/common/Modal';
 import ProfileImage from 'components/common/ProfileImage';
 import TextArea from 'components/common/TextArea';
 import { useState, forwardRef } from 'react';
 import { useInfiniteQuery, useMutation, useQueryClient } from 'react-query';
 import { Link } from 'react-router-dom';
 import * as commentsService from 'services/commentsService';
-import { removeLike, addLike } from 'services/postsServices';
+import { removeLike, addLike, getLikes } from 'services/postsServices';
+import useInfinityScroll from 'services/useInfinityScroll';
 import { getShortTimeAgo, getTimeAgo } from 'src/utils/getTimeAgo';
 import styles from './Post.module.css';
 
@@ -43,6 +45,7 @@ const Post = forwardRef(
   ({ data, isFullPost = false, onRequestOpenModal, onLikeSuccess, onCommentSuccess }, ref) => {
     const date = data && new Date(data.createdAt);
     const likeAction = usePostLikeAction(data);
+    const [showLikes, setShowLikes] = useState(false);
 
     const handleLikeAction = () => likeAction(onLikeSuccess);
 
@@ -89,7 +92,10 @@ const Post = forwardRef(
         </section>
 
         <section className={styles.likesSection}>
-          <button className={styles.likes}>{data._count.likes} likes</button>
+          <button className={styles.likes} onClick={() => setShowLikes(!showLikes)}>
+            {data._count.likes} likes
+          </button>
+          {showLikes && <LikesModal postId={data.id} onClose={() => setShowLikes(false)} />}
         </section>
 
         {/* Only feed data */}
@@ -172,7 +178,7 @@ function PostComments({ postId }) {
       {/* Load more commments Button */}
       {hasNextPage && (
         <button onClick={fetchNextPage} className={styles.loadMoreBtn}>
-          <LoadMore  />
+          <LoadMore />
         </button>
       )}
     </>
@@ -298,5 +304,60 @@ function CommentForm({ onCommentSuccess, post }) {
         Post
       </Button>
     </form>
+  );
+}
+
+function LikesModal({ onClose, postId }) {
+  const { data, hasNextPage, fetchNextPage, status, isFetchingNextPage } = useInfiniteQuery(
+    ['posts', postId, 'likes'],
+    ({ pageParam }) => getLikes(postId, pageParam),
+    {
+      getNextPageParam: (lastPage) => {
+        if (lastPage.length < 14) return;
+        return lastPage[lastPage.length - 1].id;
+      },
+    }
+  );
+
+  const { rootRef, targetRef } = useInfinityScroll({
+    disabled: !hasNextPage || status !== 'success' || isFetchingNextPage,
+    onIntersect: fetchNextPage,
+  });
+
+  return (
+    <Modal isOpen={true} onClose={onClose}>
+      <ModalContent showCloseButton={true} onClose={onClose} className={styles.likesModal}>
+        <ModalHeader>
+          <h1>Likes</h1>
+        </ModalHeader>
+        <ModalBody className={styles.likesModalBody} ref={rootRef}>
+          <ul className={styles.likesModalList}>
+            {data?.pages?.flat().map((user) => (
+              <li className={styles.likesModalUser} key={user.id}>
+                <Link to={`/${user.username}`}>
+                  <ProfileImage src={user.profileImage} className={styles.likesModalImg} />
+                </Link>
+                <div>
+                  <Link
+                    to={`/${user.username}`}
+                    className={classNames(styles.likesModalText, styles.likesModalUsername)}
+                  >
+                    {user.username}
+                  </Link>
+                  {user.displayName && (
+                    <span
+                      className={classNames(styles.likesModalText, styles.likesModalDisplayName)}
+                    >
+                      {user.displayName}
+                    </span>
+                  )}
+                </div>
+              </li>
+            ))}
+            <div ref={targetRef}></div>
+          </ul>
+        </ModalBody>
+      </ModalContent>
+    </Modal>
   );
 }

@@ -1,5 +1,5 @@
 import classNames from 'classnames';
-import { useEffect, useId, useState } from 'react';
+import { useEffect, useId, useState, forwardRef } from 'react';
 import { createPortal } from 'react-dom';
 import CloseIcon from '../Icons/CloseIcon';
 import styles from './Modal.module.css';
@@ -50,9 +50,13 @@ export const ModalContent = ({ children, className, showCloseButton, onClose }) 
 
 export const ModalHeader = ({ children }) => <header className={styles.header}>{children}</header>;
 
-export const ModalBody = ({ children, className }) => (
-  <div className={classNames(styles.body, className)}>{children}</div>
-);
+export const ModalBody = forwardRef(({ children, className }, ref) => (
+  <div className={classNames(styles.body, className)} ref={ref}>
+    {children}
+  </div>
+));
+
+ModalBody.name = 'ModalBody';
 
 export const ModalFooter = ({ children, className }) => (
   <footer className={classNames(styles.footer, className)}>{children}</footer>

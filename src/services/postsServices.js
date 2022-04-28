@@ -44,3 +44,11 @@ export async function removeLike(id) {
     headers: { authorization: `Bearer ${token}` },
   });
 }
+
+export async function getLikes(id, last) {
+  const token = await getTokenWithReject();
+
+  return restService.get(`posts/${id}/likes${last ? '?last=' + last : ''}`, {
+    headers: { authorization: `Bearer ${token}` },
+  });
+}

@@ -66,7 +66,7 @@ export default function NewPostModal({ onClose }) {
     <Modal isOpen={true} showCloseButton={true} onClose={onClose}>
       <ModalContent className={styles.modal}>
         <ModalHeader>
-          <h1 className={styles.title}>Create new post</h1>
+          <h1>Create new post</h1>
           <Button style="text" className={styles.nextButton} onClick={handleNextBack}>
             {step === 1 ? 'Next' : 'Back'}
           </Button>

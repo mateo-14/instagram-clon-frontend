@@ -242,3 +242,50 @@ div.userImage {
     padding-bottom: 1rem;
   }
 }
+
+.likesModal {
+  max-width: 400px;
+  height: 400px;
+  width: 90%;
+}
+
+.likesModalBody {
+  padding: 0;
+  overflow: auto;
+}
+
+.likesModalList {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  width: 100%;
+}
+
+.likesModalUser {
+  display: flex;
+  gap: 1rem;
+  align-items: center;
+  padding: 0.4rem 0.8rem;
+}
+
+.likesModalImg {
+  width: 3rem;
+  height: 3rem;
+}
+
+.likesModalText{
+  display: block;
+  font-size: 0.9rem;
+}
+
+.likesModalUsername{
+  font-weight: 500;
+}
+
+.likesModalUsername:hover {
+  text-decoration: underline;
+}
+
+.likesModalDisplayName {
+  color: rgb(var(--light-text-color));
+}
