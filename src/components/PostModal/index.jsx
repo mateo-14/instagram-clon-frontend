@@ -14,6 +14,7 @@ const PostModal = ({ post, onLikeSuccess, onClose, onCommentSuccess }) => (
         isFullPost={true}
         onLikeSuccess={onLikeSuccess}
         onCommentSuccess={onCommentSuccess}
+        customCSSClasses={{ comments: styles.comments, commentForm: styles.commentForm }}
       />
     </div>
   </Modal>

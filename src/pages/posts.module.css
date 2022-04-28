@@ -11,8 +11,7 @@
   .container {
     flex: 0;
   }
-}
-
-.container > :first-child {
- height: 600px;
+  .container > :first-child {
+    height: 600px;
+  }
 }

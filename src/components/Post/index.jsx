@@ -42,7 +42,17 @@ function usePostLikeAction(post) {
 }
 
 const Post = forwardRef(
-  ({ data, isFullPost = false, onRequestOpenModal, onLikeSuccess, onCommentSuccess }, ref) => {
+  (
+    {
+      data,
+      isFullPost = false,
+      onRequestOpenModal,
+      onLikeSuccess,
+      onCommentSuccess,
+      customCSSClasses = {},
+    },
+    ref
+  ) => {
     const date = data && new Date(data.createdAt);
     const likeAction = usePostLikeAction(data);
     const [showLikes, setShowLikes] = useState(false);
@@ -99,7 +109,7 @@ const Post = forwardRef(
         </section>
 
         {/* Only feed data */}
-        <section className={styles.comments}>
+        <section className={classNames(styles.comments, customCSSClasses.comments)}>
           {isFullPost ? (
             <>
               {data.text && (
@@ -138,7 +148,11 @@ const Post = forwardRef(
           </Link>
         </section>
 
-        <CommentForm post={data} onCommentSuccess={onCommentSuccess} />
+        <CommentForm
+          post={data}
+          onCommentSuccess={onCommentSuccess}
+          className={customCSSClasses.commentForm}
+        />
       </article>
     );
   }
@@ -273,7 +287,7 @@ function useAddCommentMutation(post) {
   );
 }
 
-function CommentForm({ onCommentSuccess, post }) {
+function CommentForm({ onCommentSuccess, post, className }) {
   const [value, setValue] = useState('');
   const isValid = value.trim().length > 0;
   const addCommentMutation = useAddCommentMutation(post);
@@ -294,7 +308,7 @@ function CommentForm({ onCommentSuccess, post }) {
   };
 
   return (
-    <form className={styles.commentForm} onSubmit={handleSubmit}>
+    <form className={classNames(styles.commentForm, className)} onSubmit={handleSubmit}>
       <TextArea
         placeholder="Add a comment..."
         onChange={(e) => setValue(e.currentTarget.value)}

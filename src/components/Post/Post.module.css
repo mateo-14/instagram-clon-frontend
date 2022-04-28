@@ -235,9 +235,6 @@ div.userImage {
 }
 
 @media (max-width: 768px) {
-  .fullPost :is(.comments, .commentForm) {
-    display: none;
-  }
   .fullPost.container {
     padding-bottom: 1rem;
   }
@@ -273,12 +270,12 @@ div.userImage {
   height: 3rem;
 }
 
-.likesModalText{
+.likesModalText {
   display: block;
   font-size: 0.9rem;
 }
 
-.likesModalUsername{
+.likesModalUsername {
   font-weight: 500;
 }
 
