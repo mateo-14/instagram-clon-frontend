@@ -9,14 +9,6 @@ export async function getUserByUsername(username) {
   });
 }
 
-export async function getUserPosts(id, last) {
-  const token = await getTokenWithReject();
-
-  return restService.get(`users/${id}/posts${last ? '?last=' + last : ''}`, {
-    headers: { Authorization: `Bearer ${token}` },
-  });
-}
-
 export async function getUserById(id) {
   const token = await getTokenWithReject();
 

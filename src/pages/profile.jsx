@@ -10,8 +10,9 @@ import usePostsQuerySetters from 'hooks/usePostsQuerySetters';
 import useTitle from 'hooks/useTitle';
 import { useInfiniteQuery, useMutation, useQuery } from 'react-query';
 import { useParams } from 'react-router';
+import { getUserPosts } from "services/postsServices";
 import useInfinityScroll from 'services/useInfinityScroll';
-import { followUser, getUserByUsername, getUserPosts, unfollowUser } from 'services/usersService';
+import { followUser, getUserByUsername, unfollowUser } from 'services/usersService';
 import styles from './profile.module.css';
 
 function useProfilePosts(id) {

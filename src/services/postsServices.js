@@ -52,3 +52,11 @@ export async function getLikes(id, last) {
     headers: { authorization: `Bearer ${token}` },
   });
 }
+
+export async function getUserPosts(id, last) {
+  const token = await getTokenWithReject();
+
+  return restService.get(`posts?user=${id}${last ? '&last=' + last : ''}`, {
+    headers: { Authorization: `Bearer ${token}` },
+  });
+}
