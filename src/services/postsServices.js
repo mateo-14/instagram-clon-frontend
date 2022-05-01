@@ -53,10 +53,10 @@ export async function getLikes(id, last) {
   });
 }
 
-export async function getUserPosts(authorId, last) {
+export async function getUserPosts(userId, last) {
   const token = await getTokenWithReject();
 
-  return restService.get(`posts?author=${authorId}${last ? '&last=' + last : ''}`, {
+  return restService.get(`users/${userId}/posts${last ? '?last=' + last : ''}`, {
     headers: { Authorization: `Bearer ${token}` },
   });
 }

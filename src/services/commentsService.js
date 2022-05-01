@@ -1,25 +1,21 @@
 import restService from './restService';
 import { getTokenWithReject } from './authService';
 
-export async function getComments(post, last, replied) {
+export async function getComments(postId, last) {
   const token = await getTokenWithReject();
-
-  const query = new URLSearchParams();
-  query.set('post', post);
   if (last) query.set('last', last);
-  if (replied) query.set('replied', replied);
 
-  return restService.get(`comments?${query.toString()}`, {
+  return restService.get(`posts/${postId}/comments${last ? '?last=' + last : ''}`, {
     headers: { authorization: `Bearer ${token}` },
   });
 }
 
-export async function addComment(postId, text, commentRepliedId) {
+export async function addComment(postId, text) {
   const token = await getTokenWithReject();
 
   return restService.post(
-    `comments`,
-    { postId, text, commentRepliedId },
+    `posts/${postId}/comments`,
+    { text },
     { headers: { authorization: `Bearer ${token}` } }
   );
 }
