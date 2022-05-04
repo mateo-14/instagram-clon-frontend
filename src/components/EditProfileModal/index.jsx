@@ -89,7 +89,7 @@ export default function EditProfileModal() {
             <form className={styles.form} onSubmit={handleSubmit(onSubmit)}>
               {user?.isTestAccount && (
                 <p className={styles.testAccountMsg}>
-                  You cannot edit this account. It is a public test account!
+                  You cannot edit the public test account!
                 </p>
               )}
               <ProfileImage
