@@ -9,7 +9,7 @@ import useOnClickOutside from 'hooks/useOnClickOutside';
 import { useRef, useState } from 'react';
 import instagramLogo from '/instagram-logo.svg';
 import styles from './Header.module.css';
-import { Link, useMatch } from 'react-router-dom';
+import { Link, useLocation, useMatch } from 'react-router-dom';
 import classNames from 'classnames';
 
 export default function Header() {
@@ -78,6 +78,7 @@ function NavbarProfileButton() {
 
 function ProfileMenu({ isOpen, onClose, user, exclude }) {
   const ref = useRef();
+  const location = useLocation();
   useOnClickOutside(ref, onClose, isOpen, [exclude]);
 
   return (
@@ -87,7 +88,7 @@ function ProfileMenu({ isOpen, onClose, user, exclude }) {
           <ProfileIcon />
           Profile
         </Link>
-        <Link to="/accounts/edit" className={styles.menuButton}>
+        <Link to="/accounts/edit" className={styles.menuButton} state={{modalLocation: location}}>
           <SettingsIcon />
           Settings
         </Link>

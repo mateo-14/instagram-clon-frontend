@@ -9,8 +9,8 @@ import usePostModal from 'hooks/usePostModal';
 import usePostsQuerySetters from 'hooks/usePostsQuerySetters';
 import useTitle from 'hooks/useTitle';
 import { useInfiniteQuery, useMutation, useQuery } from 'react-query';
-import { useParams } from 'react-router';
-import { getUserPosts } from "services/postsServices";
+import { useParams, useLocation } from 'react-router';
+import { getUserPosts } from 'services/postsServices';
 import useInfinityScroll from 'services/useInfinityScroll';
 import { followUser, getUserByUsername, unfollowUser } from 'services/usersService';
 import styles from './profile.module.css';
@@ -73,6 +73,7 @@ function useProfile(username) {
 export default function Profile() {
   const { data: client } = useAuth(false);
   const { username } = useParams();
+  const location = useLocation();
   const { title, error, data, followMutation } = useProfile(username);
   useTitle(title);
   const { posts, targetRef } = useProfilePosts(data?.id);
@@ -109,7 +110,7 @@ export default function Profile() {
             <div className={styles.mainInfo}>
               <h2 className={styles.username}>{data.username}</h2>
               {client?.id === data?.id ? (
-                <Button asLink={true} to={'/accounts/edit'}>
+                <Button asLink={true} to={'/accounts/edit'} linkState={{ modalLocation: location }}>
                   Edit Profile
                 </Button>
               ) : (

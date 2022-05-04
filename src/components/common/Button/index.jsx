@@ -9,6 +9,7 @@ function Button({
   type = 'button',
   style = 'solid',
   asLink = false,
+  linkState,
   to,
 }) {
   const commonProps = {
@@ -19,7 +20,7 @@ function Button({
 
   if (asLink)
     return (
-      <Link {...commonProps} to={to}>
+      <Link {...commonProps} to={to} state={linkState}>
         {children}
       </Link>
     );
