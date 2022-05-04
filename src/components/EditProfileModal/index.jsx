@@ -7,7 +7,6 @@ import ProfileImage from 'components/common/ProfileImage';
 import { show } from 'components/Toast';
 import useAuth from 'hooks/useAuth';
 import useFormErrorHandling from 'hooks/useFormErrorHandling';
-import useTitle from 'hooks/useTitle';
 import { useEffect, useRef } from 'react';
 import { useForm } from 'react-hook-form';
 import { useMutation, useQueryClient } from 'react-query';
@@ -31,7 +30,6 @@ export default function EditProfileModal() {
   const navigate = useNavigate();
   const { data: user } = useAuth(true);
   const fileRef = useRef();
-  useTitle('Edit Profile - InstagramClon');
 
   const { register, handleSubmit, formState, setError, setValue, reset } = useForm({
     resolver: yupResolver(schema),
