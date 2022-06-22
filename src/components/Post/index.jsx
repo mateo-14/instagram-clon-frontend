@@ -160,7 +160,7 @@ export default Post;
 
 const PostText = ({ author, text }) => (
   <p className={styles.text}>
-    <Link to={author} className={styles.author}>
+    <Link to={`/${author}`} className={styles.author}>
       {`${author} `}
     </Link>
     {text}
