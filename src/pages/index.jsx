@@ -1,15 +1,20 @@
+import classNames from 'classnames';
+import Button from 'components/common/Button';
 import ProfileImage from 'components/common/ProfileImage';
 import Layout from 'components/Layout';
 import Post from 'components/Post';
 import PostModal from 'components/PostModal';
 import useAuth from 'hooks/useAuth';
+import useFollowMutation from 'hooks/useFollowMutation';
 import usePostModal from 'hooks/usePostModal';
 import usePostsQuerySetters from 'hooks/usePostsQuerySetters';
 import useTitle from 'hooks/useTitle';
-import { useInfiniteQuery } from 'react-query';
+import { useState } from 'react';
+import { useInfiniteQuery, useQuery } from 'react-query';
 import { Link } from 'react-router-dom';
 import { getFeed } from 'services/postsServices';
-import useInfinityScroll from "services/useInfinityScroll";
+import useInfinityScroll from 'services/useInfinityScroll';
+import { getSuggestedUsers } from 'services/usersService';
 import styles from './index.module.css';
 
 function useFeedPosts() {
@@ -17,16 +22,16 @@ function useFeedPosts() {
     ['posts', 'feed'],
     ({ pageParam }) => getFeed(pageParam),
     {
-      getNextPageParam: (lastPage) => {
+      getNextPageParam: lastPage => {
         if (lastPage.length < 5) return;
         return lastPage[lastPage.length - 1].id;
-      },
+      }
     }
   );
 
   const { targetRef } = useInfinityScroll({
     disabled: !hasNextPage || status !== 'success' || isFetchingNextPage,
-    onIntersect: fetchNextPage,
+    onIntersect: fetchNextPage
   });
 
   return { posts: data?.pages?.flat(), status, isFetchingNextPage, targetRef };
@@ -37,6 +42,7 @@ export default function Home() {
   const { data: loggedUser } = useAuth();
   const { handleCommentSuccess, handleLikeSuccess } = usePostsQuerySetters(['posts', 'feed']);
   const { openPost, close: closePost, open: openPostFunc } = usePostModal(posts);
+  const { data: suggested } = useQuery(['users', 'suggested'], getSuggestedUsers);
 
   useTitle(
     openPost
@@ -48,7 +54,7 @@ export default function Home() {
     <Layout>
       <div className={styles.content}>
         <section className={styles.posts}>
-          {posts?.map((post) => (
+          {posts?.map(post => (
             <Post
               data={post}
               key={post.id}
@@ -67,7 +73,7 @@ export default function Home() {
           onLikeSuccess={handleLikeSuccess}
         />
         <aside className={styles.aside}>
-          <div className={styles.userCard}>
+          <section className={styles.userCard}>
             <Link to={`/${loggedUser?.username}`}>
               <ProfileImage
                 src={loggedUser?.profileImage}
@@ -82,9 +88,55 @@ export default function Home() {
                 <span className={styles.displayName}>{loggedUser?.displayName}</span>
               )}
             </div>
-          </div>
+          </section>
+          <section className={styles.suggestedUsers}>
+            <h2 className={styles.suggestedUsersText}>Suggestions For You</h2>
+            <ul className={styles.suggestedUsers}>
+              {suggested?.map(user => (
+                <SuggestedUser user={user} />
+              ))}
+            </ul>
+          </section>
         </aside>
       </div>
     </Layout>
+  );
+}
+
+function SuggestedUser({ user }) {
+  const [isFollowing, setIsFollowing] = useState(false);
+  const followMutation = useFollowMutation({
+    onSuccess: () => {
+      setIsFollowing(!isFollowing);
+    }
+  });
+
+  return (
+    <li className={classNames(styles.userCard, styles.suggestedUserCard)} key={user.id}>
+      <Link to={`/${user.username}`}>
+        <ProfileImage
+          src={user.profileImage}
+          className={styles.suggestedUserProfileImage}
+        ></ProfileImage>
+      </Link>
+      <div>
+        <Link to={`/${user.username}`} className={styles.username}>
+          {user.username}
+        </Link>
+        {user.displayName && <span className={styles.displayName}>{user.displayName}</span>}
+      </div>
+      <Button
+        style="text"
+        className={styles.suggestedFollowBtn}
+        disabled={followMutation.isLoading}
+        onClick={() =>
+          followMutation.mutate({
+            userId: user.id
+          })
+        }
+      >
+        {isFollowing ? 'Unfollow' : 'Follow'}
+      </Button>
+    </li>
   );
 }

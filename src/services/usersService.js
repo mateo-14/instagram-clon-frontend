@@ -48,3 +48,12 @@ export async function editProfile(data) {
     headers: { Authorization: `Bearer ${token}` },
   });
 }
+
+
+export async function getSuggestedUsers() {
+  const token = await getTokenWithReject();
+
+  return restService.get(`users/suggestions`, {
+    headers: { Authorization: `Bearer ${token}` },
+  });
+}

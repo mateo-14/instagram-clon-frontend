@@ -41,6 +41,29 @@
 }
 
 .suggestedUsers {
+  padding: 0;
+}
+
+.suggestedUsersText {
+  font-size: 0.9rem;
+  color: rgb(var(--light-text-color));
+  font-weight: 500;
+}
+
+.suggestedUserCard {
+  margin-bottom: 1rem;
+  font-size: 0.9rem;
+  gap: 1rem;
+}
+
+.suggestedUserProfileImage {
+  height: 2rem;
+  width: 2rem;
+}
+
+.suggestedFollowBtn {
+  font-size: 0.8rem;
+  margin-left: auto;
 }
 
 @media (min-width: 768px) {
