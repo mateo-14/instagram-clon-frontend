@@ -5,14 +5,15 @@ import ProfileImage from 'components/common/ProfileImage';
 import Layout from 'components/Layout';
 import PostModal from 'components/PostModal';
 import useAuth from 'hooks/useAuth';
+import useFollowMutation from 'hooks/useFollowMutation';
 import usePostModal from 'hooks/usePostModal';
 import usePostsQuerySetters from 'hooks/usePostsQuerySetters';
 import useTitle from 'hooks/useTitle';
-import { useInfiniteQuery, useMutation, useQuery } from 'react-query';
+import { useInfiniteQuery, useQuery } from 'react-query';
 import { useParams, useLocation } from 'react-router';
 import { getUserPosts } from 'services/postsServices';
 import useInfinityScroll from 'services/useInfinityScroll';
-import { followUser, getUserByUsername, unfollowUser } from 'services/usersService';
+import { getUserByUsername } from 'services/usersService';
 import styles from './profile.module.css';
 
 function useProfilePosts(id) {
@@ -21,16 +22,16 @@ function useProfilePosts(id) {
     ({ pageParam }) => getUserPosts(id, pageParam),
     {
       enabled: !!id,
-      getNextPageParam: (lastPage) => {
+      getNextPageParam: lastPage => {
         if (lastPage.length < 5) return;
         return lastPage[lastPage.length - 1].id;
-      },
+      }
     }
   );
 
   const { targetRef } = useInfinityScroll({
     disabled: !hasNextPage || status !== 'success' || isFetchingNextPage,
-    onIntersect: fetchNextPage,
+    onIntersect: fetchNextPage
   });
 
   return { posts: data?.pages?.flat(), status, isFetchingNextPage, targetRef };
@@ -46,7 +47,7 @@ function useProfile(username) {
       enabled: !!username,
       retry: false,
       refetchOnMount: refetchOn,
-      refetchOnReconnect: refetchOn,
+      refetchOnReconnect: refetchOn
     }
   );
 
@@ -59,13 +60,7 @@ function useProfile(username) {
       : 'An error has ocurred - InstagramClon'
     : 'Loading... - InstagramClon';
 
-  const followMutation = useMutation(
-    async () => {
-      if (data.followedByClient) await unfollowUser(data.id);
-      else await followUser(data.id);
-    },
-    { onSuccess: refetch }
-  );
+  const followMutation = useFollowMutation({ onSuccess: refetch });
 
   return { error, title, followMutation, data: data ? { ...data, displayName } : null };
 }
@@ -80,7 +75,7 @@ export default function Profile() {
   const { handleCommentSuccess, handleLikeSuccess } = usePostsQuerySetters([
     'users',
     data?.id,
-    'posts',
+    'posts'
   ]);
   const { close: closePost, open: openPostFunc, openPost } = usePostModal(posts);
 
@@ -115,7 +110,15 @@ export default function Profile() {
                 </Button>
               ) : (
                 /* Follow button */
-                <Button onClick={() => followMutation.mutate()} disabled={followMutation.isLoading}>
+                <Button
+                  onClick={() =>
+                    followMutation.mutate({
+                      userId: data.id,
+                      followedByClient: data.followedByClient
+                    })
+                  }
+                  disabled={followMutation.isLoading}
+                >
                   {data.followedByClient ? 'Unfollow' : 'Follow'}
                 </Button>
               )}
@@ -137,8 +140,8 @@ export default function Profile() {
             </ul>
           </section>
           <section className={styles.posts}>
-            {posts?.map((post) => (
-              <a href={`/posts/${post.id}`} key={post.id} onClick={(e) => handlePostClick(e, post)}>
+            {posts?.map(post => (
+              <a href={`/posts/${post.id}`} key={post.id} onClick={e => handlePostClick(e, post)}>
                 <div key={post.id} className={styles.post}>
                   <div className={styles.postImage}>
                     <img src={post.images[0]} alt="Post image" />
