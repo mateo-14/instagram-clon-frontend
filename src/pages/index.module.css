@@ -71,3 +71,13 @@
     display: initial;
   }
 }
+
+.infoText {
+  margin-top: 2rem;
+  color: rgba(var(--light-text-color), 0.6);
+  font-size: 0.8rem;
+}
+
+.authorLink {
+  text-decoration: underline;
+}

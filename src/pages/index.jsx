@@ -97,6 +97,16 @@ export default function Home() {
               ))}
             </ul>
           </section>
+          <section className={styles.infoText}>
+            <p>
+              <a href="https://app.swaggerhub.com/apis-docs/mateo-14/instagram-clone_api/1.0" target="_blank">API</a> .{' '}
+              <a href="https://github.com/mateo-14/instagram-clon-frontend" target="_blank">Frontend Repo</a> .{' '}
+              <a href="https://github.com/mateo-14/instagram-clon-backend" target="_blank">Backend Repo</a>
+            </p>
+            <p>
+              Made by <a href="https://mateoledesma.vercel.app" target="_blank" className={styles.authorLink}>Mateo Ledesma</a>
+            </p>
+          </section>
         </aside>
       </div>
     </Layout>
