@@ -11,7 +11,7 @@ import usePostsQuerySetters from 'hooks/usePostsQuerySetters';
 import useTitle from 'hooks/useTitle';
 import { useInfiniteQuery, useQuery } from 'react-query';
 import { useParams, useLocation } from 'react-router';
-import { getUserPosts } from 'services/postsServices';
+import { getUserPosts } from 'services/postsService';
 import useInfinityScroll from 'services/useInfinityScroll';
 import { getUserByUsername } from 'services/usersService';
 import styles from './profile.module.css';

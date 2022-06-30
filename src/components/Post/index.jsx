@@ -12,7 +12,7 @@ import { useState, forwardRef } from 'react';
 import { useInfiniteQuery, useMutation, useQueryClient } from 'react-query';
 import { Link } from 'react-router-dom';
 import * as commentsService from 'services/commentsService';
-import { removeLike, addLike, getLikes } from 'services/postsServices';
+import { removeLike, addLike, getLikes } from 'services/postsService';
 import useInfinityScroll from 'services/useInfinityScroll';
 import { getShortTimeAgo, getTimeAgo } from 'src/utils/getTimeAgo';
 import styles from './Post.module.css';

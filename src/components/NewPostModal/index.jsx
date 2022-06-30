@@ -9,7 +9,7 @@ import { show } from 'components/Toast';
 import useOnClickOutside from 'hooks/useOnClickOutside';
 import { useRef, useState } from 'react';
 import { useMutation } from 'react-query';
-import { createPost } from 'services/postsServices';
+import { createPost } from 'services/postsService';
 import validateImageFile from 'src/utils/validateImageFile';
 import styles from './NewPostModal.module.css';
 import Cropper from 'components/common/ImageCropper';

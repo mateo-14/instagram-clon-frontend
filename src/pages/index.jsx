@@ -12,7 +12,7 @@ import useTitle from 'hooks/useTitle';
 import { useState } from 'react';
 import { useInfiniteQuery, useQuery } from 'react-query';
 import { Link } from 'react-router-dom';
-import { getFeed } from 'services/postsServices';
+import { getFeed } from 'services/postsService';
 import useInfinityScroll from 'services/useInfinityScroll';
 import { getSuggestedUsers } from 'services/usersService';
 import styles from './index.module.css';
