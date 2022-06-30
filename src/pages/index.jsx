@@ -55,7 +55,6 @@ export default function Home() {
 
   useEffect(() => {
     const onCreatePost = post => {
-      console.log(post)
       queryClient.setQueryData(['posts', 'feed'], ({ pages, pageParams }) => {
         return {
           pageParams,
