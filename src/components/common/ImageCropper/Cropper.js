@@ -82,7 +82,7 @@ export class Cropper {
   }
   destroy() {
     // Clear listeners
-    removeEventListener('mousedown', this.#boundHandleMouseDown);
+    this.#cropper.removeEventListener('mousedown', this.#boundHandleMouseDown);
     this.#cropper.removeEventListener('mousemove', this.#boundHandleMouseMove);
     document.removeEventListener('mouseup', this.#boundHandleMouseUp);
   }
