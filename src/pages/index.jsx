@@ -1,21 +1,23 @@
-import classNames from 'classnames';
-import Button from 'components/common/Button';
-import ProfileImage from 'components/common/ProfileImage';
-import Layout from 'components/Layout';
-import Post from 'components/Post';
-import PostModal from 'components/PostModal';
-import useAuth from 'hooks/useAuth';
-import useFollowMutation from 'hooks/useFollowMutation';
-import usePostModal from 'hooks/usePostModal';
-import usePostsQuerySetters from 'hooks/usePostsQuerySetters';
-import useTitle from 'hooks/useTitle';
-import { useState } from 'react';
-import { useInfiniteQuery, useQuery } from 'react-query';
-import { Link } from 'react-router-dom';
-import { getFeed } from 'services/postsServices';
-import useInfinityScroll from 'services/useInfinityScroll';
-import { getSuggestedUsers } from 'services/usersService';
-import styles from './index.module.css';
+import classNames from 'classnames'
+import Button from 'components/common/Button'
+import ProfileImage from 'components/common/ProfileImage'
+import Layout from 'components/Layout'
+import Post from 'components/Post'
+import PostModal from 'components/PostModal'
+import useAuth from 'hooks/useAuth'
+import useFollowMutation from 'hooks/useFollowMutation'
+import usePostModal from 'hooks/usePostModal'
+import usePostsChangesListeners from 'hooks/usePostsChangesListeners'
+import useTitle from 'hooks/useTitle'
+import { useEffect, useState } from 'react'
+import { useInfiniteQuery, useQuery } from 'react-query'
+import { Link } from 'react-router-dom'
+import { getFeed } from 'services/postsService'
+import useInfinityScroll from 'services/useInfinityScroll'
+import { getSuggestedUsers } from 'services/usersService'
+import { ON_CREATE_POST } from 'src/events/Events'
+import { eventEmitter, queryClient } from 'src/main'
+import styles from './index.module.css'
 
 function useFeedPosts() {
   const { data, status, isFetchingNextPage, hasNextPage, fetchNextPage } = useInfiniteQuery(
@@ -23,55 +25,57 @@ function useFeedPosts() {
     ({ pageParam }) => getFeed(pageParam),
     {
       getNextPageParam: lastPage => {
-        if (lastPage.length < 5) return;
-        return lastPage[lastPage.length - 1].id;
+        if (lastPage.length < 5) return
+        return lastPage[lastPage.length - 1].id
       }
     }
-  );
+  )
 
   const { targetRef } = useInfinityScroll({
     disabled: !hasNextPage || status !== 'success' || isFetchingNextPage,
     onIntersect: fetchNextPage
-  });
+  })
 
-  return { posts: data?.pages?.flat(), status, isFetchingNextPage, targetRef };
+  return { posts: data?.pages?.flat(), status, isFetchingNextPage, targetRef }
 }
 
 export default function Home() {
-  const { posts, targetRef } = useFeedPosts();
-  const { data: loggedUser } = useAuth();
-  const { handleCommentSuccess, handleLikeSuccess } = usePostsQuerySetters(['posts', 'feed']);
-  const { openPost, close: closePost, open: openPostFunc } = usePostModal(posts);
-  const { data: suggested } = useQuery(['users', 'suggested'], getSuggestedUsers);
+  const { posts, targetRef } = useFeedPosts()
+  const { data: loggedUser } = useAuth()
+  const { openPost, close: closePost, open: openPostFunc } = usePostModal(posts)
+  const { data: suggested } = useQuery(['users', 'suggested'], getSuggestedUsers)
+  usePostsChangesListeners(['posts', 'feed'])
 
   useTitle(
     openPost
       ? `${openPost?.author?.username} on InstagramClon: "${openPost?.text}" `
       : 'InstagramClon'
-  );
+  )
 
+  useEffect(() => {
+    const onCreatePost = post => {
+      console.log(post)
+      queryClient.setQueryData(['posts', 'feed'], ({ pages, pageParams }) => {
+        return {
+          pageParams,
+          pages: pages.map((page, i) => (i === 0 ? [post, ...page] : page))
+        }
+      })
+    }
+    eventEmitter.on(ON_CREATE_POST, onCreatePost)
+    return () => eventEmitter.off(ON_CREATE_POST, onCreatePost)
+  }, [])
   return (
     <Layout>
       <div className={styles.content}>
         <section className={styles.posts}>
           {posts?.map(post => (
-            <Post
-              data={post}
-              key={post.id}
-              onRequestOpenModal={openPostFunc}
-              onLikeSuccess={handleLikeSuccess}
-              onCommentSuccess={handleCommentSuccess}
-            />
+            <Post data={post} key={post.id} onRequestOpenModal={openPostFunc} />
           ))}
           <div ref={targetRef}></div>
         </section>
 
-        <PostModal
-          post={openPost}
-          onClose={closePost}
-          onCommentSuccess={handleCommentSuccess}
-          onLikeSuccess={handleLikeSuccess}
-        />
+        <PostModal post={openPost} onClose={closePost} />
         <aside className={styles.aside}>
           <section className={styles.userCard}>
             <Link to={`/${loggedUser?.username}`}>
@@ -99,27 +103,45 @@ export default function Home() {
           </section>
           <section className={styles.infoText}>
             <p>
-              <a href="https://app.swaggerhub.com/apis-docs/mateo-14/instagram-clone_api/1.0" target="_blank">API</a> .{' '}
-              <a href="https://github.com/mateo-14/instagram-clon-frontend" target="_blank">Frontend Repo</a> .{' '}
-              <a href="https://github.com/mateo-14/instagram-clon-backend" target="_blank">Backend Repo</a>
+              <a
+                href="https://app.swaggerhub.com/apis-docs/mateo-14/instagram-clone_api/1.0"
+                target="_blank"
+              >
+                API
+              </a>{' '}
+              .{' '}
+              <a href="https://github.com/mateo-14/instagram-clon-frontend" target="_blank">
+                Frontend Repo
+              </a>{' '}
+              .{' '}
+              <a href="https://github.com/mateo-14/instagram-clon-backend" target="_blank">
+                Backend Repo
+              </a>
             </p>
             <p>
-              Made by <a href="https://mateoledesma.vercel.app" target="_blank" className={styles.authorLink}>Mateo Ledesma</a>
+              Made by{' '}
+              <a
+                href="https://mateoledesma.vercel.app"
+                target="_blank"
+                className={styles.authorLink}
+              >
+                Mateo Ledesma
+              </a>
             </p>
           </section>
         </aside>
       </div>
     </Layout>
-  );
+  )
 }
 
 function SuggestedUser({ user }) {
-  const [isFollowing, setIsFollowing] = useState(false);
+  const [isFollowing, setIsFollowing] = useState(false)
   const followMutation = useFollowMutation({
     onSuccess: () => {
-      setIsFollowing(!isFollowing);
+      setIsFollowing(!isFollowing)
     }
-  });
+  })
 
   return (
     <li className={classNames(styles.userCard, styles.suggestedUserCard)} key={user.id}>
@@ -148,5 +170,5 @@ function SuggestedUser({ user }) {
         {isFollowing ? 'Unfollow' : 'Follow'}
       </Button>
     </li>
-  );
+  )
 }

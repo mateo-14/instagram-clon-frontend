@@ -1,64 +1,42 @@
-import classNames from 'classnames';
-import Button from 'components/common/Button';
-import CommentIcon from 'components/common/Icons/CommentIcon';
-import HeartIcon from 'components/common/Icons/HeartIcon';
-import LoadMore from 'components/common/Icons/LoadMore';
-import OutlineHeartIcon from 'components/common/Icons/OutlineHeartIcon';
-import Modal, { ModalBody, ModalContent, ModalHeader } from 'components/common/Modal';
-import ProfileImage from 'components/common/ProfileImage';
-import TextArea from 'components/common/TextArea';
-import { show } from 'components/Toast';
-import { useState, forwardRef } from 'react';
-import { useInfiniteQuery, useMutation, useQueryClient } from 'react-query';
-import { Link } from 'react-router-dom';
-import * as commentsService from 'services/commentsService';
-import { removeLike, addLike, getLikes } from 'services/postsServices';
-import useInfinityScroll from 'services/useInfinityScroll';
-import { getShortTimeAgo, getTimeAgo } from 'src/utils/getTimeAgo';
-import styles from './Post.module.css';
-
-function usePostLikeAction(post, onSuccess) {
-  const queryClient = useQueryClient();
-
-  return () => {
-    if (post.hasClientLike) removeLike(post.id);
-    else addLike(post.id);
-
-    const likesCount = post._count.likes + (post.hasClientLike ? -1 : 1);
-
-    queryClient.setQueryData(['posts', post.id], (cachedPost) => {
-      cachedPost = cachedPost || post;
-      return {
-        ...cachedPost,
-        _count: { ...cachedPost._count, likes: likesCount },
-        hasClientLike: !post.hasClientLike,
-      };
-    });
-
-    if (typeof onSuccess === 'function')
-      onSuccess({ postId: post.id, likesCount, hasClientLike: !post.hasClientLike });
-  };
-}
+import classNames from 'classnames'
+import Button from 'components/common/Button'
+import CommentIcon from 'components/common/Icons/CommentIcon'
+import HeartIcon from 'components/common/Icons/HeartIcon'
+import LoadMore from 'components/common/Icons/LoadMore'
+import OutlineHeartIcon from 'components/common/Icons/OutlineHeartIcon'
+import Modal, { ModalBody, ModalContent, ModalHeader } from 'components/common/Modal'
+import ProfileImage from 'components/common/ProfileImage'
+import TextArea from 'components/common/TextArea'
+import { forwardRef, useState } from 'react'
+import { useInfiniteQuery, useMutation } from 'react-query'
+import { Link } from 'react-router-dom'
+import * as commentsService from 'services/commentsService'
+import { addLike, getLikes, removeLike } from 'services/postsService'
+import useInfinityScroll from 'services/useInfinityScroll'
+import { ON_ADD_COMMENT, ON_COMMENT_LIKE_ACTION, ON_POST_LIKE_ACTION } from 'src/events/Events'
+import { eventEmitter } from 'src/main'
+import { getShortTimeAgo, getTimeAgo } from 'src/utils/getTimeAgo'
+import styles from './Post.module.css'
 
 const Post = forwardRef(
-  (
-    {
-      data,
-      isFullPost = false,
-      onRequestOpenModal,
-      onLikeSuccess,
-      onCommentSuccess,
-      customCSSClasses = {},
-    },
-    ref
-  ) => {
-    const date = data && new Date(data.createdAt);
-    const likeAction = usePostLikeAction(data, onLikeSuccess);
-    const [showLikes, setShowLikes] = useState(false);
+  ({ data, isFullPost = false, onRequestOpenModal, customCSSClasses = {} }, ref) => {
+    const date = data && new Date(data.createdAt)
+    const [showLikes, setShowLikes] = useState(false)
+
+    const handleLike = () => {
+      if (data.hasClientLike) removeLike(data.id)
+      else addLike(data.id)
+
+      eventEmitter.emit(ON_POST_LIKE_ACTION, {
+        postId: data.id,
+        updatedLikesCount: data._count.likes + (data.hasClientLike ? -1 : 1),
+        hasClientLike: !data.hasClientLike
+      })
+    }
 
     const requestOpenModal = () => {
-      if (onRequestOpenModal) onRequestOpenModal(data);
-    };
+      if (onRequestOpenModal) onRequestOpenModal(data)
+    }
 
     return (
       <article
@@ -80,16 +58,16 @@ const Post = forwardRef(
           <img
             className={styles.image}
             src={data.images[0]}
-            onDoubleClick={() => !data.hasClientLike && likeAction()}
+            onDoubleClick={() => !data.hasClientLike && handleLike()}
             alt={`${data.author.username}'s post (${data.text})`}
           />
         </div>
         <section className={styles.actions}>
           <button
             className={classNames(styles.action, {
-              [styles.liked]: data.hasClientLike,
+              [styles.liked]: data.hasClientLike
             })}
-            onClick={likeAction}
+            onClick={handleLike}
           >
             {data.hasClientLike ? <HeartIcon /> : <OutlineHeartIcon />}
           </button>
@@ -145,18 +123,14 @@ const Post = forwardRef(
           </Link>
         </section>
 
-        <CommentForm
-          post={data}
-          onCommentSuccess={onCommentSuccess}
-          className={customCSSClasses.commentForm}
-        />
+        <CommentForm post={data} className={customCSSClasses.commentForm} />
       </article>
-    );
+    )
   }
-);
+)
 
-Post.name = 'Post';
-export default Post;
+Post.name = 'Post'
+export default Post
 
 const PostText = ({ author, text }) => (
   <p className={styles.text}>
@@ -165,24 +139,24 @@ const PostText = ({ author, text }) => (
     </Link>
     {text}
   </p>
-);
+)
 
 function PostComments({ postId }) {
   const { data, hasNextPage, fetchNextPage } = useInfiniteQuery(
     ['posts', postId, 'comments'],
     ({ pageParam }) => commentsService.getComments(postId, pageParam),
     {
-      getNextPageParam: (lastPage) => {
-        if (lastPage.length < 5) return;
-        return lastPage[lastPage.length - 1].id;
+      getNextPageParam: lastPage => {
+        if (lastPage.length < 5) return
+        return lastPage[lastPage.length - 1].id
       },
-      refetchOnMount: false,
+      refetchOnMount: false
     }
-  );
+  )
 
   return (
     <>
-      {data?.pages.flat().map((comment) => (
+      {data?.pages.flat().map(comment => (
         <PostComment comment={comment} key={comment.id} />
       ))}
 
@@ -193,42 +167,26 @@ function PostComments({ postId }) {
         </button>
       )}
     </>
-  );
-}
-
-function useCommentLikeAction(comment) {
-  const queryClient = useQueryClient();
-
-  return () => {
-    if (comment.hasClientLike) commentsService.removeLike(comment.id);
-    else commentsService.addLike(comment.id);
-
-    queryClient.setQueryData(['posts', comment.postId, 'comments'], (comments) => ({
-      ...comments,
-      pages: comments.pages.map((page) =>
-        page.map((c) =>
-          c.id === comment.id
-            ? {
-                ...c,
-                hasClientLike: !c.hasClientLike,
-                _count: { ...c, likes: c._count.likes + (c.hasClientLike ? -1 : 1) },
-              }
-            : c
-        )
-      ),
-    }));
-  };
+  )
 }
 
 function PostComment({ comment, isPostCaption = false }) {
-  const commentLikeAction = useCommentLikeAction(comment);
-  const date = new Date(comment.createdAt);
+  const date = new Date(comment.createdAt)
+
+  const handleLike = () => {
+    if (comment.hasClientLike) commentsService.removeLike(comment.id)
+    else commentsService.addLike(comment.id)
+
+    eventEmitter.emit(ON_COMMENT_LIKE_ACTION, {
+      postId: comment.postId,
+      hasClientLike: !comment.hasClientLike,
+      updatedLikesCount: comment._count.likes + (comment.hasClientLike ? -1 : 1),
+      commentId: comment.id
+    })
+  }
 
   return (
-    <div
-      className={styles.comment}
-      onDoubleClick={() => !comment.hasClientLike && commentLikeAction()}
-    >
+    <div className={styles.comment} onDoubleClick={() => !comment.hasClientLike && handleLike()}>
       <ProfileImage src={comment.author.profileImage} className={styles.commentAvatar} />
       <div>
         <PostText author={comment.author.username} text={comment.text} />
@@ -249,69 +207,52 @@ function PostComment({ comment, isPostCaption = false }) {
       {!isPostCaption && (
         <button
           className={classNames(styles.action, styles.commentLikeBtn, {
-            [styles.liked]: comment.hasClientLike,
+            [styles.liked]: comment.hasClientLike
           })}
-          onClick={commentLikeAction}
+          onClick={handleLike}
         >
           {comment.hasClientLike ? <HeartIcon /> : <OutlineHeartIcon />}
         </button>
       )}
     </div>
-  );
-}
-
-function useAddCommentMutation(post, onSuccess) {
-  const queryClient = useQueryClient();
-  return useMutation(
-    async ({ text, commentRepliedId }) => {
-      const comment = await commentsService.addComment(post.id, text, commentRepliedId);
-      return { postId: post.id, commentsCount: post._count.comments + 1, comment };
-    },
-    {
-      onSuccess: (data) => {
-        if (queryClient.getQueryData(['posts', data.postId, 'comments']))
-          queryClient.setQueryData(['posts', data.postId, 'comments'], ({ pages, pageParams }) => {
-            return {
-              pageParams,
-              pages: pages.map((page, i) => (i === 0 ? [data.comment, ...page] : page)),
-            };
-          });
-
-        if (typeof onSuccess === 'function') onSuccess(data);
-      },
-    }
-  );
+  )
 }
 
 function CommentForm({ onCommentSuccess, post, className }) {
-  const [value, setValue] = useState('');
-  const isValid = value.trim().length > 0;
-  const addCommentMutation = useAddCommentMutation(post, onCommentSuccess);
+  const [value, setValue] = useState('')
+  const isValid = value.trim().length > 0
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
+  const addCommentMutation = useMutation(
+    async ({ text }) => {
+      const comment = await commentsService.addComment(post.id, text)
+      return { postId: post.id, commentsCount: post._count.comments + 1, comment }
+    },
+    { onSuccess: data => eventEmitter.emit(ON_ADD_COMMENT, data) }
+  )
+
+  const handleSubmit = async e => {
+    e.preventDefault()
 
     if (isValid && !addCommentMutation.isLoading) {
       try {
-        await addCommentMutation.mutateAsync({ text: value.trim() });
-        show('Comment added.');
-        setValue('');
+        await addCommentMutation.mutateAsync({ text: value.trim() })
+        setValue('')
       } catch {}
     }
-  };
+  }
 
   return (
     <form className={classNames(styles.commentForm, className)} onSubmit={handleSubmit}>
       <TextArea
         placeholder="Add a comment..."
-        onChange={(e) => setValue(e.currentTarget.value)}
+        onChange={e => setValue(e.currentTarget.value)}
         value={value}
       />
       <Button disabled={!isValid || addCommentMutation.isLoading} style="text" type="submit">
         Post
       </Button>
     </form>
-  );
+  )
 }
 
 function LikesModal({ onClose, postId }) {
@@ -319,17 +260,17 @@ function LikesModal({ onClose, postId }) {
     ['posts', postId, 'likes'],
     ({ pageParam }) => getLikes(postId, pageParam),
     {
-      getNextPageParam: (lastPage) => {
-        if (lastPage.length < 14) return;
-        return lastPage[lastPage.length - 1].id;
-      },
+      getNextPageParam: lastPage => {
+        if (lastPage.length < 14) return
+        return lastPage[lastPage.length - 1].id
+      }
     }
-  );
+  )
 
   const { rootRef, targetRef } = useInfinityScroll({
     disabled: !hasNextPage || status !== 'success' || isFetchingNextPage,
-    onIntersect: fetchNextPage,
-  });
+    onIntersect: fetchNextPage
+  })
 
   return (
     <Modal isOpen={true} onClose={onClose}>
@@ -339,7 +280,7 @@ function LikesModal({ onClose, postId }) {
         </ModalHeader>
         <ModalBody className={styles.likesModalBody} ref={rootRef}>
           <ul className={styles.likesModalList}>
-            {data?.pages?.flat().map((user) => (
+            {data?.pages?.flat().map(user => (
               <li className={styles.likesModalUser} key={user.id}>
                 <Link to={`/${user.username}`}>
                   <ProfileImage src={user.profileImage} className={styles.likesModalImg} />
@@ -366,5 +307,5 @@ function LikesModal({ onClose, postId }) {
         </ModalBody>
       </ModalContent>
     </Modal>
-  );
+  )
 }

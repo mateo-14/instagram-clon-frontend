@@ -1,20 +1,20 @@
-import Button from 'components/common/Button';
-import CommentIcon from 'components/common/Icons/CommentIcon';
-import HeartIcon from 'components/common/Icons/HeartIcon';
-import ProfileImage from 'components/common/ProfileImage';
-import Layout from 'components/Layout';
-import PostModal from 'components/PostModal';
-import useAuth from 'hooks/useAuth';
-import useFollowMutation from 'hooks/useFollowMutation';
-import usePostModal from 'hooks/usePostModal';
-import usePostsQuerySetters from 'hooks/usePostsQuerySetters';
-import useTitle from 'hooks/useTitle';
-import { useInfiniteQuery, useQuery } from 'react-query';
-import { useParams, useLocation } from 'react-router';
-import { getUserPosts } from 'services/postsServices';
-import useInfinityScroll from 'services/useInfinityScroll';
-import { getUserByUsername } from 'services/usersService';
-import styles from './profile.module.css';
+import Button from 'components/common/Button'
+import CommentIcon from 'components/common/Icons/CommentIcon'
+import HeartIcon from 'components/common/Icons/HeartIcon'
+import ProfileImage from 'components/common/ProfileImage'
+import Layout from 'components/Layout'
+import PostModal from 'components/PostModal'
+import useAuth from 'hooks/useAuth'
+import useFollowMutation from 'hooks/useFollowMutation'
+import usePostModal from 'hooks/usePostModal'
+import usePostsChangesListeners from 'hooks/usePostsChangesListeners'
+import useTitle from 'hooks/useTitle'
+import { useInfiniteQuery, useQuery } from 'react-query'
+import { useParams, useLocation } from 'react-router'
+import { getUserPosts } from 'services/postsService'
+import useInfinityScroll from 'services/useInfinityScroll'
+import { getUserByUsername } from 'services/usersService'
+import styles from './profile.module.css'
 
 function useProfilePosts(id) {
   const { data, status, isFetchingNextPage, hasNextPage, fetchNextPage } = useInfiniteQuery(
@@ -23,22 +23,22 @@ function useProfilePosts(id) {
     {
       enabled: !!id,
       getNextPageParam: lastPage => {
-        if (lastPage.length < 5) return;
-        return lastPage[lastPage.length - 1].id;
+        if (lastPage.length < 5) return
+        return lastPage[lastPage.length - 1].id
       }
     }
-  );
+  )
 
   const { targetRef } = useInfinityScroll({
     disabled: !hasNextPage || status !== 'success' || isFetchingNextPage,
     onIntersect: fetchNextPage
-  });
+  })
 
-  return { posts: data?.pages?.flat(), status, isFetchingNextPage, targetRef };
+  return { posts: data?.pages?.flat(), status, isFetchingNextPage, targetRef }
 }
 
 function useProfile(username) {
-  const refetchOn = ({ state }) => !(state.error?.status === 404);
+  const refetchOn = ({ state }) => !(state.error?.status === 404)
 
   const { data, error, refetch } = useQuery(
     ['users', username],
@@ -49,40 +49,36 @@ function useProfile(username) {
       refetchOnMount: refetchOn,
       refetchOnReconnect: refetchOn
     }
-  );
+  )
 
-  const displayName = data?.displayName || data?.username;
+  const displayName = data?.displayName || data?.username
   const title = data
     ? `${displayName} (@${data.username}) - InstagramClon photos`
     : error
     ? error.status === 404
       ? 'Page Not Found - InstagramClon'
       : 'An error has ocurred - InstagramClon'
-    : 'Loading... - InstagramClon';
+    : 'Loading... - InstagramClon'
 
-  const followMutation = useFollowMutation({ onSuccess: refetch });
+  const followMutation = useFollowMutation({ onSuccess: refetch })
 
-  return { error, title, followMutation, data: data ? { ...data, displayName } : null };
+  return { error, title, followMutation, data: data ? { ...data, displayName } : null }
 }
 
 export default function Profile() {
-  const { data: client } = useAuth(false);
-  const { username } = useParams();
-  const location = useLocation();
-  const { title, error, data, followMutation } = useProfile(username);
-  useTitle(title);
-  const { posts, targetRef } = useProfilePosts(data?.id);
-  const { handleCommentSuccess, handleLikeSuccess } = usePostsQuerySetters([
-    'users',
-    data?.id,
-    'posts'
-  ]);
-  const { close: closePost, open: openPostFunc, openPost } = usePostModal(posts);
+  const { data: client } = useAuth(false)
+  const { username } = useParams()
+  const location = useLocation()
+  const { title, error, data, followMutation } = useProfile(username)
+  useTitle(title)
+  const { posts, targetRef } = useProfilePosts(data?.id)
+  usePostsChangesListeners(['users', data?.id, 'posts'])
+  const { close: closePost, open: openPostFunc, openPost } = usePostModal(posts)
 
   const handlePostClick = (e, post) => {
-    e.preventDefault();
-    openPostFunc(post);
-  };
+    e.preventDefault()
+    openPostFunc(post)
+  }
 
   return (
     <Layout>
@@ -161,12 +157,7 @@ export default function Profile() {
           <div ref={targetRef}></div>
         </div>
       )}
-      <PostModal
-        post={openPost}
-        onCommentSuccess={handleCommentSuccess}
-        onLikeSuccess={handleLikeSuccess}
-        onClose={closePost}
-      />
+      <PostModal post={openPost} onClose={closePost} />
     </Layout>
-  );
+  )
 }

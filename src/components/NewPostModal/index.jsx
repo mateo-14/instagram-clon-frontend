@@ -1,66 +1,67 @@
-import classNames from 'classnames';
-import Button from 'components/common/Button';
-import ErrorIcon from 'components/common/Icons/ErrorIcon';
-import MediaIcon from 'components/common/Icons/MediaIcon';
-import Loader from 'components/common/Loader';
-import Modal, { ModalBody, ModalContent, ModalFooter, ModalHeader } from 'components/common/Modal';
-import TextArea from 'components/common/TextArea';
-import { show } from 'components/Toast';
-import useOnClickOutside from 'hooks/useOnClickOutside';
-import { useRef, useState } from 'react';
-import { useMutation } from 'react-query';
-import { createPost } from 'services/postsServices';
-import validateImageFile from 'src/utils/validateImageFile';
-import styles from './NewPostModal.module.css';
-import Cropper from 'components/common/ImageCropper';
-import CropSquareIcon from 'components/common/Icons/CropSquareIcon';
-import CropPortraitIcon from 'components/common/Icons/CropPortraitIcon';
-import CropLandscapeIcon from 'components/common/Icons/CropLandscapeIcon';
-import CropIcon from 'components/common/Icons/CropIcon';
-import ZoomIcon from 'components/common/Icons/ZoomIcon';
+import classNames from 'classnames'
+import Button from 'components/common/Button'
+import ErrorIcon from 'components/common/Icons/ErrorIcon'
+import MediaIcon from 'components/common/Icons/MediaIcon'
+import Loader from 'components/common/Loader'
+import Modal, { ModalBody, ModalContent, ModalFooter, ModalHeader } from 'components/common/Modal'
+import TextArea from 'components/common/TextArea'
+import useOnClickOutside from 'hooks/useOnClickOutside'
+import { useRef, useState } from 'react'
+import { useMutation } from 'react-query'
+import { createPost } from 'services/postsService'
+import validateImageFile from 'src/utils/validateImageFile'
+import styles from './NewPostModal.module.css'
+import Cropper from 'components/common/ImageCropper'
+import CropSquareIcon from 'components/common/Icons/CropSquareIcon'
+import CropPortraitIcon from 'components/common/Icons/CropPortraitIcon'
+import CropLandscapeIcon from 'components/common/Icons/CropLandscapeIcon'
+import CropIcon from 'components/common/Icons/CropIcon'
+import ZoomIcon from 'components/common/Icons/ZoomIcon'
+import { eventEmitter } from 'src/main'
+import { ON_CREATE_POST } from 'src/events/Events'
 
 export default function NewPostModal({ onClose }) {
-  const fileInputRef = useRef();
-  const [file, setFile] = useState(null);
-  const [croppedFile, setCroppedFile] = useState(null);
-  const createPostMutation = useMutation(() => createPost(croppedFile, caption));
-  const [caption, setCaption] = useState('');
-  const [step, setStep] = useState(1);
-  const cropperRef = useRef(null);
+  const fileInputRef = useRef()
+  const [file, setFile] = useState(null)
+  const [croppedFile, setCroppedFile] = useState(null)
+  const createPostMutation = useMutation(() => createPost(croppedFile, caption))
+  const [caption, setCaption] = useState('')
+  const [step, setStep] = useState(1)
+  const cropperRef = useRef(null)
 
-  const handleDrop = (e) => {
-    e.preventDefault();
-    const [file] = e.dataTransfer.files;
-    if (validateImageFile(file)) setFile(file);
-  };
+  const handleDrop = e => {
+    e.preventDefault()
+    const [file] = e.dataTransfer.files
+    if (validateImageFile(file)) setFile(file)
+  }
 
-  const handleFileChange = (e) => {
-    const [file] = e.target.files;
-    if (validateImageFile(file)) setFile(file);
-  };
+  const handleFileChange = e => {
+    const [file] = e.target.files
+    if (validateImageFile(file)) setFile(file)
+  }
 
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    if (!croppedFile || createPostMutation.isLoading) return;
+  const handleSubmit = e => {
+    e.preventDefault()
+    if (!croppedFile || createPostMutation.isLoading) return
 
     createPostMutation.mutate(null, {
-      onSuccess: () => {
-        onClose();
-        show('Post uploaded successfully.');
-      },
-    });
-  };
+      onSuccess: post => {
+        onClose()
+        eventEmitter.emit(ON_CREATE_POST, post)
+      }
+    })
+  }
 
   const handleNextBack = async () => {
     if (step === 1) {
-      if (!file) return;
-      const croppedImage = await cropperRef.current.getCroppedImage();
-      setCroppedFile(croppedImage);
-      setStep(2);
+      if (!file) return
+      const croppedImage = await cropperRef.current.getCroppedImage()
+      setCroppedFile(croppedImage)
+      setStep(2)
     } else {
-      setStep(1);
+      setStep(1)
     }
-  };
+  }
 
   return (
     <Modal isOpen={true} showCloseButton={true} onClose={onClose}>
@@ -79,11 +80,7 @@ export default function NewPostModal({ onClose }) {
             </div>
           )}
           {!file && !createPostMutation.error && (
-            <div
-              className={styles.upload}
-              onDrop={handleDrop}
-              onDragOver={(e) => e.preventDefault()}
-            >
+            <div className={styles.upload} onDrop={handleDrop} onDragOver={e => e.preventDefault()}>
               <MediaIcon className={styles.mediaIcon} />
               <h2 className={styles.uploadText}>Drag a photo here</h2>
               <input
@@ -124,7 +121,7 @@ export default function NewPostModal({ onClose }) {
                 className={styles.captionTextarea}
                 maxRows={4}
                 disabled={createPostMutation.isLoading}
-                onChange={(e) => setCaption(e.target.value)}
+                onChange={e => setCaption(e.target.value)}
               />
               <Button style="text" type="submit" disabled={!file || createPostMutation.isLoading}>
                 Share
@@ -134,13 +131,13 @@ export default function NewPostModal({ onClose }) {
         )}
       </ModalContent>
     </Modal>
-  );
+  )
 }
 
 function ImageCropper({ hidden, image, cropperRef, onDiscard }) {
-  const [zoom, setZoom] = useState(1);
-  const [aspectRatio, setAspectRation] = useState(1 / 1);
-  const positionRef = useRef();
+  const [zoom, setZoom] = useState(1)
+  const [aspectRatio, setAspectRation] = useState(1 / 1)
+  const positionRef = useRef()
   if (!hidden)
     return (
       <>
@@ -152,31 +149,31 @@ function ImageCropper({ hidden, image, cropperRef, onDiscard }) {
           positionRef={positionRef}
         ></Cropper>
         <div className={styles.cropTools}>
-          <AspectRatioTool onChange={(aspectRatio) => setAspectRation(aspectRatio)} />
-          <ZoomTool onChange={(e) => setZoom(e.target.value)} value={zoom}></ZoomTool>
+          <AspectRatioTool onChange={aspectRatio => setAspectRation(aspectRatio)} />
+          <ZoomTool onChange={e => setZoom(e.target.value)} value={zoom}></ZoomTool>
           <button className={styles.discardBtn} onClick={onDiscard}>
             Discard photo
           </button>
         </div>
       </>
-    );
+    )
 
-  return null;
+  return null
 }
 
 function AspectRatioTool({ onChange }) {
-  const [aspectRatio, setAspectRatio] = useState(1);
-  const [isOpen, setIsOpen] = useState(false);
-  const menuRef = useRef();
-  const buttonRef = useRef();
-  useOnClickOutside(menuRef, () => setIsOpen(false), isOpen, [buttonRef]);
+  const [aspectRatio, setAspectRatio] = useState(1)
+  const [isOpen, setIsOpen] = useState(false)
+  const menuRef = useRef()
+  const buttonRef = useRef()
+  useOnClickOutside(menuRef, () => setIsOpen(false), isOpen, [buttonRef])
 
-  const changeAspectRatio = (newAspectRatio) => {
+  const changeAspectRatio = newAspectRatio => {
     if (aspectRatio !== newAspectRatio) {
-      setAspectRatio(newAspectRatio);
-      onChange(newAspectRatio);
+      setAspectRatio(newAspectRatio)
+      onChange(newAspectRatio)
     }
-  };
+  }
 
   return (
     <div className={styles.aspectRatioToolWrapper}>
@@ -220,14 +217,14 @@ function AspectRatioTool({ onChange }) {
         <CropIcon />
       </button>
     </div>
-  );
+  )
 }
 
 function ZoomTool({ onChange, value }) {
-  const [isOpen, setIsOpen] = useState(false);
-  const toolRef = useRef();
-  const buttonRef = useRef();
-  useOnClickOutside(toolRef, () => setIsOpen(false), isOpen, [buttonRef]);
+  const [isOpen, setIsOpen] = useState(false)
+  const toolRef = useRef()
+  const buttonRef = useRef()
+  useOnClickOutside(toolRef, () => setIsOpen(false), isOpen, [buttonRef])
 
   return (
     <div className={styles.zoomToolWrapper}>
@@ -244,5 +241,5 @@ function ZoomTool({ onChange, value }) {
         <ZoomIcon />
       </button>
     </div>
-  );
+  )
 }

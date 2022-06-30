@@ -6,7 +6,8 @@
       "components/*": ["./src/components/*"],
       "hooks/*": ["./src/hooks/*"],
       "context/*": ["./src/context/*"],
-      "services/*": ["./src/services/*"]
+      "services/*": ["./src/services/*"],
+      "events/*": ["./src/events/*"]
     }
   },
   "include": ["src/**/*"]
