@@ -97,7 +97,7 @@ export default function Home() {
             <h2 className={styles.suggestedUsersText}>Suggestions For You</h2>
             <ul className={styles.suggestedUsers}>
               {suggested?.map(user => (
-                <SuggestedUser user={user} />
+                <SuggestedUser user={user} key={user.id} />
               ))}
             </ul>
           </section>
