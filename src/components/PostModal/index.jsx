@@ -12,7 +12,11 @@ const PostModal = ({ post, onClose }) => (
       <Post
         data={post}
         isFullPost={true}
-        customCSSClasses={{ comments: styles.comments, commentForm: styles.commentForm }}
+        classes={{
+          container: styles.postContainer,
+          comments: styles.comments,
+          commentForm: styles.commentForm
+        }}
       />
     </div>
   </Modal>

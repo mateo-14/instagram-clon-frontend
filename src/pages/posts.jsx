@@ -1,5 +1,5 @@
 import Layout from 'components/Layout'
-import PostComponent from 'components/Post'
+import Post from 'components/Post'
 import usePostsChangesListeners from 'hooks/usePostsChangesListeners'
 import useTitle from 'hooks/useTitle'
 import { useQuery } from 'react-query'
@@ -24,7 +24,9 @@ export default function Posts() {
   return (
     <Layout>
       <div className={styles.container}>
-        {status === 'success' && <PostComponent data={data} isFullPost={true}></PostComponent>}
+        {status === 'success' && (
+          <Post data={data} isFullPost={true} classes={{ container: styles.postContainer }}></Post>
+        )}
       </div>
     </Layout>
   )

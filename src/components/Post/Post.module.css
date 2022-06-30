@@ -33,17 +33,23 @@ div.userImage {
 
 /* Image */
 .imageContainer {
-  width: 100%;
   grid-area: image;
   background: black;
   display: flex;
 }
 
 .image {
-  max-height: 100%;
-  width: 100%;
   display: block;
   object-fit: contain;
+  width: 100%;
+}
+
+.fullPost .imageContainer {
+  height: 100%;
+}
+
+.fullPost .image {
+  height: 100%;
 }
 
 /* Actions */
@@ -221,7 +227,7 @@ div.userImage {
 
   .fullPost {
     display: grid;
-    grid-template-columns: minmax(min-content, max-content) minmax(350px, auto);
+    grid-template-columns: 1fr 400px;
     grid-template-rows: auto 10fr repeat(4, auto);
     grid-template-areas:
       'image header'
@@ -231,12 +237,6 @@ div.userImage {
       'image date'
       'image comment-form';
     max-width: 100%;
-  }
-}
-
-@media (max-width: 768px) {
-  .fullPost.container {
-    padding-bottom: 1rem;
   }
 }
 

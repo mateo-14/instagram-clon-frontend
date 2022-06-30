@@ -19,7 +19,7 @@ import { getShortTimeAgo, getTimeAgo } from 'src/utils/getTimeAgo'
 import styles from './Post.module.css'
 
 const Post = forwardRef(
-  ({ data, isFullPost = false, onRequestOpenModal, customCSSClasses = {} }, ref) => {
+  ({ data, isFullPost = false, onRequestOpenModal,  classes = {} }, ref) => {
     const date = data && new Date(data.createdAt)
     const [showLikes, setShowLikes] = useState(false)
 
@@ -40,7 +40,9 @@ const Post = forwardRef(
 
     return (
       <article
-        className={classNames(styles.container, { [styles.fullPost]: isFullPost })}
+        className={classNames(styles.container, classes.container, {
+          [styles.fullPost]: isFullPost
+        })}
         ref={ref}
       >
         <header className={styles.header}>
@@ -84,7 +86,7 @@ const Post = forwardRef(
         </section>
 
         {/* Only feed data */}
-        <section className={classNames(styles.comments, customCSSClasses.comments)}>
+        <section className={classNames(styles.comments, classes.comments)}>
           {isFullPost ? (
             <>
               {data.text && (
@@ -123,7 +125,7 @@ const Post = forwardRef(
           </Link>
         </section>
 
-        <CommentForm post={data} className={customCSSClasses.commentForm} />
+        <CommentForm post={data} className={classes.commentForm} />
       </article>
     )
   }
@@ -147,6 +149,7 @@ function PostComments({ postId }) {
     ({ pageParam }) => commentsService.getComments(postId, pageParam),
     {
       getNextPageParam: lastPage => {
+        console.log(lastPage)
         if (lastPage.length < 5) return
         return lastPage[lastPage.length - 1].id
       },

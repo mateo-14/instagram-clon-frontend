@@ -7,7 +7,7 @@
   max-width: 1200px;
 }
 
-.modal > :first-child {
+.postContainer {
   border: 0;
   border-radius: 0.3rem;
 }
@@ -17,7 +17,7 @@
     width: 90%;
   }
 
-  .modal > :first-child {
+  .postContainer {
     height: 100%;
   }
 }
@@ -25,5 +25,9 @@
 @media (max-width: 768px) {
   :is(.comments, .commentForm) {
     display: none;
+  }
+
+  .postContainer {
+    padding-bottom: 1rem;
   }
 }

@@ -7,11 +7,14 @@
   width: 100%;
 }
 
+.postContainer {
+  min-height: 300px;
+  grid-template-columns: 1fr 320px;
+}
+
 @media (min-width: 768px) {
   .container {
     flex: 0;
   }
-  .container > :first-child {
-    height: 600px;
-  }
 }
+
