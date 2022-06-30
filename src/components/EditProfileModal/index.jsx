@@ -1,94 +1,92 @@
-import { yupResolver } from '@hookform/resolvers/yup';
-import Button from 'components/common/Button';
-import Input from 'components/common/Input';
-import InputTextArea from 'components/common/InputTextArea';
-import Modal, { ModalBody, ModalContent, ModalHeader } from 'components/common/Modal';
-import ProfileImage from 'components/common/ProfileImage';
-import { show } from 'components/Toast';
-import useAuth from 'hooks/useAuth';
-import useFormErrorHandling from 'hooks/useFormErrorHandling';
-import { useEffect, useRef } from 'react';
-import { useForm } from 'react-hook-form';
-import { useMutation, useQueryClient } from 'react-query';
-import { useLocation, useNavigate } from 'react-router-dom';
-import { editProfile, uploadPhoto } from 'services/usersService';
-import validateImageFile from 'src/utils/validateImageFile';
-import * as yup from 'yup';
-import styles from './EditProfileModal.module.css';
+import { yupResolver } from '@hookform/resolvers/yup'
+import Button from 'components/common/Button'
+import Input from 'components/common/Input'
+import InputTextArea from 'components/common/InputTextArea'
+import Modal, { ModalBody, ModalContent, ModalHeader } from 'components/common/Modal'
+import ProfileImage from 'components/common/ProfileImage'
+import useAuth from 'hooks/useAuth'
+import useFormErrorHandling from 'hooks/useFormErrorHandling'
+import { useEffect, useRef } from 'react'
+import { useForm } from 'react-hook-form'
+import { useMutation } from 'react-query'
+import { useLocation, useNavigate } from 'react-router-dom'
+import { editProfile, uploadPhoto } from 'services/usersService'
+import { ON_SHOW_TOAST } from 'src/events/Events'
+import { eventEmitter, queryClient } from 'src/main'
+import validateImageFile from 'src/utils/validateImageFile'
+import * as yup from 'yup'
+import styles from './EditProfileModal.module.css'
 
 const schema = yup
   .object({
     username: yup.string().required('Username is required').trim(),
     bio: yup.string().trim().max(150),
-    displayName: yup.string().trim().max(60),
+    displayName: yup.string().trim().max(60)
   })
-  .required();
+  .required()
 
 export default function EditProfileModal() {
-  const location = useLocation();
-  const modalLocation = location.state?.modalLocation;
-  const navigate = useNavigate();
-  const { data: user } = useAuth(true);
-  const fileRef = useRef();
+  const location = useLocation()
+  const modalLocation = location.state?.modalLocation
+  const navigate = useNavigate()
+  const { data: user } = useAuth(true)
+  const fileRef = useRef()
 
   const { register, handleSubmit, formState, setError, setValue, reset } = useForm({
     resolver: yupResolver(schema),
-    mode: 'onChange',
-  });
-  const { errors } = formState;
-  const handleErrorr = useFormErrorHandling(setError);
-  const queryClient = useQueryClient();
-  const updatePhotoMutation = useMutation((file) => uploadPhoto(file));
-  const editProfileMutation = useMutation((data) => editProfile(data));
+    mode: 'onChange'
+  })
+  const { errors } = formState
+  const handleErrorr = useFormErrorHandling(setError)
+  const updatePhotoMutation = useMutation(file => uploadPhoto(file))
+  const editProfileMutation = useMutation(data => editProfile(data))
 
   useEffect(() => {
-    if (!user) return;
+    if (!user) return
 
-    reset();
+    reset()
 
-    setValue('username', user.username);
-    setValue('displayName', user.displayName);
-    setValue('bio', user.bio);
-  }, [user]);
+    setValue('username', user.username)
+    setValue('displayName', user.displayName)
+    setValue('bio', user.bio)
+  }, [user])
 
-  const onSubmit = async (data) => {
+  const onSubmit = async data => {
     try {
-      const updated = await editProfileMutation.mutateAsync(data);
-      queryClient.setQueryData(['users', user.id], updated);
-      show('Profile updated successfully.');
+      const updated = await editProfileMutation.mutateAsync(data)
+      queryClient.setQueryData(['users', user.id], updated)
+      eventEmitter.emit(ON_SHOW_TOAST, 'Profile updated successfully.')
     } catch (err) {
-      handleErrorr(err);
+      handleErrorr(err)
     }
-  };
+  }
 
-  const handleFileChange = (e) => {
-    const [file] = e.target.files;
+  const handleFileChange = e => {
+    const [file] = e.target.files
     if (validateImageFile(file)) {
       updatePhotoMutation.mutate(file, {
         onSuccess: () => {
-          queryClient.refetchQueries(['users', user.id]);
-          show('Photo updated successfully.');
-        },
-      });
+          queryClient.refetchQueries(['users', user.id])
+          eventEmitter.emit(ON_SHOW_TOAST, 'Photo updated successfully.')
+        }
+      })
     }
-  };
+  }
 
   const handleClose = () => {
-    navigate(modalLocation ? modalLocation.pathname : '/');
-  };
+    navigate(modalLocation ? modalLocation.pathname : '/')
+  }
   return (
     <>
-      <Modal isOpen={true} onClose={handleClose} >
+      <Modal isOpen={true} onClose={handleClose}>
         <ModalContent showCloseButton={true} onClose={handleClose} className={styles.modal}>
           <ModalHeader>
             <h1>Edit profile</h1>
           </ModalHeader>
-          <ModalBody >
+          <ModalBody>
             <form className={styles.form} onSubmit={handleSubmit(onSubmit)}>
               {user?.isTestAccount && (
-                <p className={styles.testAccountMsg}>
-                  You cannot edit the public test account!
-                </p>
+                <p className={styles.testAccountMsg}>You cannot edit the public test account!</p>
               )}
               <ProfileImage
                 src={user?.profileImage}
@@ -172,5 +170,5 @@ export default function EditProfileModal() {
         </ModalContent>
       </Modal>
     </>
-  );
+  )
 }
