@@ -221,7 +221,7 @@ function PostComment({ comment, isPostCaption = false }) {
   )
 }
 
-function CommentForm({ onCommentSuccess, post, className }) {
+function CommentForm({ post, className }) {
   const [value, setValue] = useState('')
   const isValid = value.trim().length > 0
 
