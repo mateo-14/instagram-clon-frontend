@@ -1,6 +1,7 @@
 import Button from 'components/common/Button'
 import CommentIcon from 'components/common/Icons/CommentIcon'
 import HeartIcon from 'components/common/Icons/HeartIcon'
+import Loader from 'components/common/Loader'
 import ProfileImage from 'components/common/ProfileImage'
 import Layout from 'components/Layout'
 import PostModal from 'components/PostModal'
@@ -71,7 +72,7 @@ export default function Profile() {
   const location = useLocation()
   const { title, error, data, followMutation } = useProfile(username)
   useTitle(title)
-  const { posts, targetRef } = useProfilePosts(data?.id)
+  const { posts, targetRef, isFetchingNextPage } = useProfilePosts(data?.id)
   usePostsChangesListeners(['users', data?.id, 'posts'])
   const { close: closePost, open: openPostFunc, openPost } = usePostModal(posts)
 
@@ -154,6 +155,7 @@ export default function Profile() {
               </a>
             ))}
           </section>
+          {isFetchingNextPage && <Loader className={styles.loader} />}
           <div ref={targetRef}></div>
         </div>
       )}
