@@ -3,7 +3,6 @@ import { getTokenWithReject } from './authService';
 
 export async function getComments(postId, last) {
   const token = await getTokenWithReject();
-  if (last) query.set('last', last);
 
   return restService.get(`posts/${postId}/comments${last ? '?last=' + last : ''}`, {
     headers: { authorization: `Bearer ${token}` },
