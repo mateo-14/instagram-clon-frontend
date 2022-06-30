@@ -1,5 +1,6 @@
 import classNames from 'classnames'
 import Button from 'components/common/Button'
+import Loader from "components/common/Loader"
 import ProfileImage from 'components/common/ProfileImage'
 import Layout from 'components/Layout'
 import Post from 'components/Post'
@@ -40,7 +41,7 @@ function useFeedPosts() {
 }
 
 export default function Home() {
-  const { posts, targetRef } = useFeedPosts()
+  const { posts, targetRef, isFetchingNextPage } = useFeedPosts()
   const { data: loggedUser } = useAuth()
   const { openPost, close: closePost, open: openPostFunc } = usePostModal(posts)
   const { data: suggested } = useQuery(['users', 'suggested'], getSuggestedUsers)
@@ -72,6 +73,7 @@ export default function Home() {
           {posts?.map(post => (
             <Post data={post} key={post.id} onRequestOpenModal={openPostFunc} />
           ))}
+          {isFetchingNextPage && <Loader className={styles.loader}/>}
           <div ref={targetRef}></div>
         </section>
 
