@@ -7,7 +7,7 @@
   max-width: 1200px;
 }
 
-.postContainer {
+article.postContainer {
   border: 0;
   border-radius: 0.3rem;
 }
