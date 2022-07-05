@@ -78,7 +78,6 @@ export default function Profile() {
 
   const handlePostClick = (e, post) => {
     if (window.matchMedia('(min-width: 768px)').matches) {
-      console.log('xd')
       e.preventDefault()
       setOpenPost(post)
     }

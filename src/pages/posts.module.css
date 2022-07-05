@@ -8,11 +8,16 @@
 }
 
 .postContainer {
-  min-height: 300px;
+  width: 100%;
+  min-height: 500px;
   grid-template-columns: 1fr 320px;
 }
 
 @media (min-width: 768px) {
+  .postContainer {
+    width: auto;
+  }
+
   .container {
     flex: 0;
   }
