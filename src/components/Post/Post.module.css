@@ -11,10 +11,6 @@
   grid-area: header;
 }
 
-.fullPost .header {
-  margin-bottom: 0.5rem;
-}
-
 .userInfo {
   display: flex;
   align-items: center;
@@ -26,7 +22,7 @@
   font-weight: 600;
 }
 
-div.userImage {
+.userImage {
   width: 2rem;
   height: 2rem;
 }
@@ -114,6 +110,7 @@ div.userImage {
 
 .fullPost .comments {
   gap: 1.5rem;
+  margin: 0.8rem 0;
 }
 
 .comment {
@@ -187,7 +184,6 @@ div.userImage {
 /* Comment section */
 .commentForm {
   padding: 1rem var(--post-horizontal-padding);
-  margin-top: 0.8rem;
   display: flex;
   align-items: center;
   grid-area: comment-form;
@@ -203,6 +199,7 @@ div.userImage {
   font-size: 0.9rem;
   padding: 0;
   text-align: left;
+  margin-top: 0.4rem;
 }
 
 .viewAllCommentsBtn:active {
@@ -238,6 +235,7 @@ div.userImage {
       'image comment-form';
     max-width: 100%;
   }
+
 }
 
 .likesModal {
