@@ -1,5 +1,4 @@
 import EditProfileModal from 'components/EditProfileModal'
-import PostModal from 'components/PostModal'
 import { Toast } from 'components/Toast'
 import { useEffect } from 'react'
 import { Route, Routes, useLocation } from 'react-router'
@@ -52,7 +51,6 @@ function App() {
       </Routes>
       <Routes>
         <Route path="/accounts/edit" element={<EditProfileModal />} />
-        <Route path="/posts/:id" element={<PostModal />} />
       </Routes>
       <Toast />
     </>

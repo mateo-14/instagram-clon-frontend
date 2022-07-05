@@ -7,9 +7,10 @@ import OutlineHeartIcon from 'components/common/Icons/OutlineHeartIcon'
 import Modal, { ModalBody, ModalContent, ModalHeader } from 'components/common/Modal'
 import ProfileImage from 'components/common/ProfileImage'
 import TextArea from 'components/common/TextArea'
+import PostModal from 'components/PostModal'
 import { forwardRef, useState } from 'react'
 import { useInfiniteQuery, useMutation } from 'react-query'
-import { Link } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
 import * as commentsService from 'services/commentsService'
 import { addLike, getLikes, removeLike } from 'services/postsService'
 import useInfinityScroll from 'services/useInfinityScroll'
@@ -18,27 +19,33 @@ import { eventEmitter } from 'src/main'
 import { getShortTimeAgo, getTimeAgo } from 'src/utils/getTimeAgo'
 import styles from './Post.module.css'
 
-const Post = forwardRef(
-  ({ data, isFullPost = false, onRequestOpenModal,  classes = {} }, ref) => {
-    const date = data && new Date(data.createdAt)
-    const [showLikes, setShowLikes] = useState(false)
+const Post = forwardRef(({ data, isFullPost = false, allowModal = false, classes = {} }, ref) => {
+  const date = data && new Date(data.createdAt)
+  const [showLikes, setShowLikes] = useState(false)
+  const [isModalOpen, setIsModalOpen] = useState(false)
+  const navigate = useNavigate()
+  const handleLike = () => {
+    if (data.hasClientLike) removeLike(data.id)
+    else addLike(data.id)
 
-    const handleLike = () => {
-      if (data.hasClientLike) removeLike(data.id)
-      else addLike(data.id)
+    eventEmitter.emit(ON_POST_LIKE_ACTION, {
+      postId: data.id,
+      updatedLikesCount: data._count.likes + (data.hasClientLike ? -1 : 1),
+      hasClientLike: !data.hasClientLike
+    })
+  }
 
-      eventEmitter.emit(ON_POST_LIKE_ACTION, {
-        postId: data.id,
-        updatedLikesCount: data._count.likes + (data.hasClientLike ? -1 : 1),
-        hasClientLike: !data.hasClientLike
-      })
+  const openPost = () => {
+    if (window.matchMedia('(min-width: 768px)').matches) {
+      if (allowModal) setIsModalOpen(true)
+    } else {
+      navigate(`/posts/${data.id}`)
     }
+  }
 
-    const requestOpenModal = () => {
-      if (onRequestOpenModal) onRequestOpenModal(data)
-    }
-
-    return (
+  return (
+    <>
+      {allowModal && isModalOpen && <PostModal post={data} onClose={() => setIsModalOpen(false)} />}
       <article
         className={classNames(styles.container, classes.container, {
           [styles.fullPost]: isFullPost
@@ -73,7 +80,7 @@ const Post = forwardRef(
           >
             {data.hasClientLike ? <HeartIcon /> : <OutlineHeartIcon />}
           </button>
-          <button className={styles.action} onClick={requestOpenModal}>
+          <button className={styles.action} onClick={openPost}>
             <CommentIcon />
           </button>
         </section>
@@ -104,7 +111,7 @@ const Post = forwardRef(
               )}
 
               {data._count.comments > 0 && (
-                <button className={styles.viewAllCommentsBtn} onClick={requestOpenModal}>
+                <button className={styles.viewAllCommentsBtn} onClick={openPost}>
                   View all {data._count.comments} comments
                 </button>
               )}
@@ -127,9 +134,9 @@ const Post = forwardRef(
 
         <CommentForm post={data} className={classes.commentForm} />
       </article>
-    )
-  }
-)
+    </>
+  )
+})
 
 Post.name = 'Post'
 export default Post
@@ -149,7 +156,6 @@ function PostComments({ postId }) {
     ({ pageParam }) => commentsService.getComments(postId, pageParam),
     {
       getNextPageParam: lastPage => {
-        console.log(lastPage)
         if (lastPage.length < 5) return
         return lastPage[lastPage.length - 1].id
       },

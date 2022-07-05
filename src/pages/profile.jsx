@@ -7,11 +7,11 @@ import Layout from 'components/Layout'
 import PostModal from 'components/PostModal'
 import useAuth from 'hooks/useAuth'
 import useFollowMutation from 'hooks/useFollowMutation'
-import usePostModal from 'hooks/usePostModal'
 import usePostsChangesListeners from 'hooks/usePostsChangesListeners'
 import useTitle from 'hooks/useTitle'
+import { useState } from 'react'
 import { useInfiniteQuery, useQuery } from 'react-query'
-import { useParams, useLocation } from 'react-router'
+import { useLocation, useParams } from 'react-router'
 import { getUserPosts } from 'services/postsService'
 import useInfinityScroll from 'services/useInfinityScroll'
 import { getUserByUsername } from 'services/usersService'
@@ -73,12 +73,15 @@ export default function Profile() {
   const { title, error, data, followMutation } = useProfile(username)
   useTitle(title)
   const { posts, targetRef, isFetchingNextPage } = useProfilePosts(data?.id)
+  const [openPost, setOpenPost] = useState()
   usePostsChangesListeners(['users', data?.id, 'posts'])
-  const { close: closePost, open: openPostFunc, openPost } = usePostModal(posts)
 
   const handlePostClick = (e, post) => {
-    e.preventDefault()
-    openPostFunc(post)
+    if (window.matchMedia('(min-width: 768px)').matches) {
+      console.log('xd')
+      e.preventDefault()
+      setOpenPost(post)
+    }
   }
 
   return (
@@ -159,7 +162,7 @@ export default function Profile() {
           <div ref={targetRef}></div>
         </div>
       )}
-      <PostModal post={openPost} onClose={closePost} />
+      {openPost && <PostModal post={openPost} onClose={() => setOpenPost(null)} />}
     </Layout>
   )
 }

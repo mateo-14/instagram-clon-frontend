@@ -1,15 +1,12 @@
 import classNames from 'classnames'
 import Button from 'components/common/Button'
-import Loader from "components/common/Loader"
+import Loader from 'components/common/Loader'
 import ProfileImage from 'components/common/ProfileImage'
 import Layout from 'components/Layout'
 import Post from 'components/Post'
-import PostModal from 'components/PostModal'
 import useAuth from 'hooks/useAuth'
 import useFollowMutation from 'hooks/useFollowMutation'
-import usePostModal from 'hooks/usePostModal'
 import usePostsChangesListeners from 'hooks/usePostsChangesListeners'
-import useTitle from 'hooks/useTitle'
 import { useEffect, useState } from 'react'
 import { useInfiniteQuery, useQuery } from 'react-query'
 import { Link } from 'react-router-dom'
@@ -43,15 +40,8 @@ function useFeedPosts() {
 export default function Home() {
   const { posts, targetRef, isFetchingNextPage } = useFeedPosts()
   const { data: loggedUser } = useAuth()
-  const { openPost, close: closePost, open: openPostFunc } = usePostModal(posts)
   const { data: suggested } = useQuery(['users', 'suggested'], getSuggestedUsers)
   usePostsChangesListeners(['posts', 'feed'])
-
-  useTitle(
-    openPost
-      ? `${openPost?.author?.username} on InstagramClon: "${openPost?.text}" `
-      : 'InstagramClon'
-  )
 
   useEffect(() => {
     const onCreatePost = post => {
@@ -70,13 +60,12 @@ export default function Home() {
       <div className={styles.content}>
         <section className={styles.posts}>
           {posts?.map(post => (
-            <Post data={post} key={post.id} onRequestOpenModal={openPostFunc} />
+            <Post data={post} key={post.id} allowModal={true} />
           ))}
-          {isFetchingNextPage && <Loader className={styles.loader}/>}
+          {isFetchingNextPage && <Loader className={styles.loader} />}
           <div ref={targetRef}></div>
         </section>
 
-        <PostModal post={openPost} onClose={closePost} />
         <aside className={styles.aside}>
           <section className={styles.userCard}>
             <Link to={`/${loggedUser?.username}`}>
