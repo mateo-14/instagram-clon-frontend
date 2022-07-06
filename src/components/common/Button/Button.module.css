@@ -28,6 +28,7 @@
   font-weight: 600;
   color: rgb(var(--primary-color));
   font-size: 0.9rem;
+  background: transparent;
 }
 
 .text:disabled {
