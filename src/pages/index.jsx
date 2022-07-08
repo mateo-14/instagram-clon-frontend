@@ -40,7 +40,10 @@ function useFeedPosts() {
 export default function Home() {
   const { posts, targetRef, isFetchingNextPage } = useFeedPosts()
   const { data: loggedUser } = useAuth()
-  const { data: suggested } = useQuery(['users', 'suggested'], getSuggestedUsers)
+  const { data: suggested } = useQuery(['users', 'suggested'], getSuggestedUsers, {
+    refetchOnWindowFocus: false,
+    refetchOnReconnect: false
+  })
   usePostsChangesListeners(['posts', 'feed'])
 
   useEffect(() => {
