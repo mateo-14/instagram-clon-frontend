@@ -4,7 +4,6 @@ import Post from '@/components/Post'
 import styles from './PostModal.module.css'
 import { useRouter } from 'next/navigation'
 import classNames from 'classnames'
-import { useEffect } from 'react'
 
 interface PostModalProps {
   id: number

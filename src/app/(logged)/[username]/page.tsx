@@ -75,19 +75,19 @@ export default function Profile ({ params }: ProfileProps): JSX.Element {
   const { postsIDs, isFetchingNextPage, targetRef } = useUserPosts(data?.username ?? null, data?.id ?? null)
 
   useEffect(() => {
-    if (error?.status === 404) {
+    if (error?.response?.status === 404) {
       document.title = 'Page Not Found • InstagramClon'
     } else if (data != null) {
       document.title = `${data.displayName ?? ''}(@${data.username}) • InstagramClon`
     }
   }, [data, error])
 
-  if (error?.status === 404) {
+  if (error?.response?.status === 404) {
     return <div>
       <h1>{'Sorry, this page isn\'t available.'}</h1>
       <p>
-        The link you followed may be broken, or the page may have been removed. Go back to
-        Instagram.
+        The link you followed may be broken, or the page may have been removed. <Link href="/" className={styles.goBackLink}>Go back to
+        Instagram.</Link>
       </p>
     </div>
   }

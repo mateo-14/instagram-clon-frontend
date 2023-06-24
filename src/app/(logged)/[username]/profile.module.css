@@ -208,3 +208,7 @@ svg.loader {
   height: 20px;
   width: 76px;
 }
+
+.goBackLink {
+  color: rgb(0, 55, 107);
+}
