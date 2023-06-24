@@ -6,11 +6,11 @@ import useSWRImmutable from 'swr/immutable'
 import styles from './profile.module.css'
 import CommentIcon from '@/components/common/Icons/CommentIcon'
 import HeartIcon from '@/components/common/Icons/HeartIcon'
-import { Button, LinkButton } from '@/components/common/Button'
+import { Button } from '@/components/common/Button'
 import ProfileImage from '@/components/common/ProfileImage'
 import useAuth from '@/hooks/useAuth'
 import classNames from 'classnames'
-import { useRef } from 'react'
+import { useEffect, useRef } from 'react'
 import useSWRInfinite from 'swr/infinite'
 import { useSWRConfig } from 'swr'
 import { getPost, getUserPosts } from '@/services/postsService'
@@ -73,6 +73,14 @@ export default function Profile ({ params }: ProfileProps): JSX.Element {
   ], async () => await getUserByUsername(params.username))
 
   const { postsIDs, isFetchingNextPage, targetRef } = useUserPosts(data?.username ?? null, data?.id ?? null)
+
+  useEffect(() => {
+    if (error?.status === 404) {
+      document.title = 'Page Not Found • InstagramClon'
+    } else if (data != null) {
+      document.title = `${data.displayName ?? ''}(@${data.username}) • InstagramClon`
+    }
+  }, [data, error])
 
   if (error?.status === 404) {
     return <div>
