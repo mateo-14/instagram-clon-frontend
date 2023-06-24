@@ -1,0 +1,24 @@
+.action:global(.liked) {
+  color: rgb(var(--heart-color));
+}
+
+.likeButtonIcon {
+  animation: likeButtonIconAnim 1s ease-in-out;
+}
+
+.action:hover:global(.liked) {
+  opacity: 1;
+}
+
+@keyframes likeButtonIconAnim {
+  0% {
+    scale: 0.7;
+  }
+  15% {
+    scale: 1.2;
+  }
+  45%, 100% {
+    scale: 1;
+  }
+}
+

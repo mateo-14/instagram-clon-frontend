@@ -12,12 +12,21 @@ article.postContainer {
   border-radius: 0.3rem;
 }
 
+section.comments {
+  height: auto;
+}
+
+div.postContainer {
+  background: white;
+  border-radius: 0.3rem;
+}
+
 @media (min-width: 768px) {
   .modal {
     width: 90%;
   }
 
-  .postContainer {
+  article.postContainer {
     height: 100%;
   }
 }
@@ -27,7 +36,18 @@ article.postContainer {
     display: none;
   }
 
-  .postContainer {
+  article.postContainer {
     padding-bottom: 1rem;
   }
+}
+
+:global(.appear) .modal {
+  transform: scale(1.1);
+  opacity: 0;
+}
+
+:global(.appear-active) .modal {
+  transform: scale(1);
+  opacity: 1;
+  transition: all 150ms ease-in-out;
 }

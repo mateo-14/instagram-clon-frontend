@@ -1,4 +1,4 @@
-const OutlineHeartIcon = ({ className }) => (
+const OutlineHeartIcon = ({ className = '' }) => (
   <svg
     aria-label="Like"
     className={className}

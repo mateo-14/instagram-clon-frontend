@@ -1,0 +1,14 @@
+.text {
+  font-size: 0.9rem;
+  white-space: pre-line;
+  margin: 0;
+  width: 100%;
+}
+
+.author {
+  font-weight: 600;
+}
+
+.author:hover {
+  text-decoration: underline;
+}

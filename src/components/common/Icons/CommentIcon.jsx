@@ -1,4 +1,4 @@
-const CommentIcon = ({ className }) => (
+const CommentIcon = ({ className = '' }) => (
   <svg
     aria-label="Comment"
     className={className}

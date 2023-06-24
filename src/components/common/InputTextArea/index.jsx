@@ -1,7 +1,7 @@
 import classNames from 'classnames';
 import { forwardRef } from 'react';
 import styles from './InputTextArea.module.css';
-
+// TODO Migrate to TypeScript
 const InputTextArea = forwardRef(
   ({ placeholder, value, onChange, className, name, id, disabled }, ref) => (
     <textarea

@@ -16,10 +16,8 @@
   align-items: center;
 }
 
-.logoWrapper {
-  height: 1.8rem;
-  position: relative;
-  aspect-ratio: 60/17;
+.logoLink {
+  line-height: 0;
 }
 
 .rightMenu {
@@ -51,9 +49,11 @@
 /* Profile menu */
 .profileButton {
   border-radius: 100%;
-  padding: 1px;
   border: 1px solid transparent;
   cursor: pointer;
+  display: flex;
+  padding: 1px;
+  background: 0;
 }
 
 .profileButton.active {
@@ -84,5 +84,16 @@
 }
 
 .logoutButton {
+  background: 0;
+  border: 0;
+  width: 100%;
   border-top: 1px solid rgb(var(--border-color));
+  cursor: pointer;
+}
+
+.profilePictureLoading {
+  height: 30px;
+  width: 30px;
+  border-radius: 100%;
+  background: rgb(var(--skeleton-color));
 }

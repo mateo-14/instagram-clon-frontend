@@ -1,4 +1,4 @@
-const ProfileIcon = ({ className }) => (
+const ProfileIcon = ({ className = '' }) => (
   <svg
     aria-label="Profile"
     className={className}

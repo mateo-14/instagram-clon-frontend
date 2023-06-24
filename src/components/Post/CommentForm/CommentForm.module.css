@@ -1,0 +1,6 @@
+.commentForm {
+  padding: 1rem var(--post-horizontal-padding);
+  display: flex;
+  align-items: center;
+  grid-area: comment-form;
+}

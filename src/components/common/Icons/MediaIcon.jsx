@@ -1,4 +1,4 @@
-const MediaIcon = ({ className }) => (
+const MediaIcon = ({ className = '' }) => (
   <svg
     aria-label="Icon to represent media such as images or videos"
     fill="currentColor"

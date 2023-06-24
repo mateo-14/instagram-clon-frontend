@@ -1,4 +1,4 @@
-const ErrorIcon = ({ className }) => (
+const ErrorIcon = ({ className = '' }) => (
   <svg
     aria-label="Something went wrong. Please try again."
     fill="currentColor"

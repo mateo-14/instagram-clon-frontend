@@ -69,3 +69,23 @@
   text-align: center;
   margin: 0 auto;
 }
+
+.background:global(.appear) {
+  opacity: 0;
+}
+
+.background:global(.appear-active) {
+  opacity: 1;
+  transition: opacity 100ms linear;
+}
+
+:global(.appear) .content {
+  transform: scale(1.1);
+  opacity: 0;
+}
+
+:global(.appear-active) .content {
+  transform: scale(1);
+  opacity: 1;
+  transition: all 150ms ease-in-out;
+}

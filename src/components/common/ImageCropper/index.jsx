@@ -2,7 +2,7 @@ import classNames from 'classnames'
 import { useEffect, useRef, useState } from 'react'
 import styles from './ImageCropper.module.css'
 import { Cropper } from './Cropper'
-
+// TODO Migrate to TypeScript
 export default function ImageCropper({
   zoom = 0,
   aspectRatio = 1,

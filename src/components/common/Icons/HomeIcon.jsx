@@ -1,4 +1,4 @@
-const HomeIcon = ({ className }) => (
+const HomeIcon = ({ className = '' }) => (
   <svg
     aria-label="Home"
     className={className}

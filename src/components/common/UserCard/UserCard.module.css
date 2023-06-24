@@ -1,0 +1,26 @@
+.userCard {
+  display: flex;
+  gap: 1.3rem;
+  align-items: center;
+  margin-bottom: 1.5rem;
+}
+
+.suggestedUserCard {
+  margin-bottom: 1rem;
+  font-size: 0.9rem;
+  gap: 1rem;
+}
+
+.suggestedUserProfileImage {
+  height: 2rem;
+  width: 2rem;
+}
+
+.suggestedFollowBtn {
+  font-size: 0.8rem;
+  margin-left: auto;
+}
+
+.userImageLink {
+  line-height: 0;
+}

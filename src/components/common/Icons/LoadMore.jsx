@@ -1,4 +1,4 @@
-const LoadMore = ({className}) => (
+const LoadMore = ({className=''}) => (
   <svg stroke="currentColor" role="img" viewBox="0 0 24 24" className={className}>
     <circle
       cx="12.001"

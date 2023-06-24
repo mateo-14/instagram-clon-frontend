@@ -1,4 +1,4 @@
-const ZoomIcon = ({ className }) => (
+const ZoomIcon = ({ className = '' }) => (
   <svg
     aria-label="Select Zoom"
     fill="currentColor"

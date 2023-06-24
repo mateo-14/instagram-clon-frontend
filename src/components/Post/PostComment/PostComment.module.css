@@ -1,0 +1,49 @@
+.comment {
+  display: flex;
+  gap: 0.8rem;
+}
+
+.commentAvatar {
+  height: 2rem;
+  width: 2rem;
+  flex-shrink: 0;
+}
+
+.commentInfo {
+  margin-top: 0.4rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  color: rgb(var(--light-text-color));
+}
+
+.commentDate {
+  font-size: 0.76rem;
+}
+
+.commentLikes {
+  font-size: 0.8rem;
+  font-weight: 500;
+}
+
+.action {
+  background: 0;
+  display: flex;
+  align-items: center;
+  border: 0;
+  cursor: pointer;
+  color: var(--primary-icon-color);
+  height: 0.75rem;
+  width: 0.75rem;
+  padding: 0;
+  align-self: center;
+  margin-left: auto;
+}
+
+.action:hover {
+  opacity: 0.5;
+}
+
+.action.liked {
+  color: rgb(var(--heart-color));
+}

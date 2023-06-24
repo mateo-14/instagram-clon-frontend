@@ -3,7 +3,7 @@
   max-width: 700px;
 }
 
-.body {
+div.body {
   padding: 0;
   min-height: 0;
   aspect-ratio: 1/1;
@@ -162,6 +162,7 @@
   backdrop-filter: blur(4px);
   background: rgba(0, 0, 0, 0.3);
   display: flex;
+  justify-content: center;
 }
 
 .error {
@@ -180,4 +181,8 @@
 :is(.mediaIcon, .errorIcon) {
   width: 6rem;
   color: var(--primary-icon-color);
+}
+
+svg.loader {
+  fill: white;
 }

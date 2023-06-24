@@ -1,4 +1,4 @@
-const CropLandscapeIcon = ({className}) => (
+const CropLandscapeIcon = ({className=''}) => (
   <svg
     aria-label="Crop Landscape Icon"
     fill="currentColor"

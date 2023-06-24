@@ -17,6 +17,8 @@ import validateImageFile from 'src/utils/validateImageFile'
 import * as yup from 'yup'
 import styles from './EditProfileModal.module.css'
 
+// TODO: Migrate to TypeScript
+
 const schema = yup
   .object({
     username: yup.string().required('Username is required').trim(),

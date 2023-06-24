@@ -1,4 +1,4 @@
-const CropSquareIcon = ({ className }) => (
+const CropSquareIcon = ({ className = '' }) => (
   <svg
     aria-label="Crop Square Icon"
     fill="currentColor"

@@ -1,7 +1,7 @@
 import classNames from 'classnames';
 import { forwardRef } from 'react';
 import styles from './Input.module.css';
-
+// TODO Migrate to TypeScript
 /**
  * @type React.ForwardRefRenderFunction<React.FunctionComponent, InputPropTypes>
  */

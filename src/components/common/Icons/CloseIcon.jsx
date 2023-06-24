@@ -1,4 +1,4 @@
-const CloseIcon = ({ className }) => (
+const CloseIcon = ({ className = '' }) => (
   <svg aria-label="Close" viewBox="0 0 24 24" stroke="currentColor" className={className}>
     <polyline
       fill="none"

@@ -6,6 +6,7 @@ import { eventEmitter } from 'src/main'
 import { useTransition } from 'transition-hook'
 import styles from './Toast.module.css'
 
+// TODO Add toast to post added and profile edited
 const TRANSITION_TIMEOUT = 400
 const TOAST_TIMEOUT = 5000
 export function Toast() {

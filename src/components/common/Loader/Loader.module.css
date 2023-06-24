@@ -1,11 +1,15 @@
+.loaderContainer {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 5px 0;
+}
+
 .loader {
-  border: 0.35rem solid rgba(0, 0, 0, 0.1);
-  width: 6rem;
-  height: 6rem;
-  border-radius: 50%;
-  border-left-color: white;
-  animation: spin 1s ease infinite;
-  margin: auto;
+  width: 2rem;
+  height: 2rem;
+  animation: spin 0.8s infinite steps(12, end);
+  opacity: 0.7;
 }
 
 @keyframes spin {
@@ -17,3 +21,4 @@
     transform: rotate(360deg);
   }
 }
+

@@ -1,4 +1,4 @@
-const CreatePostIcon = ({ className }) => (
+const CreatePostIcon = ({ className = '' }) => (
   <svg
     aria-label="New Post"
     className={className}
