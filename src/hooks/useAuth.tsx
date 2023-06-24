@@ -1,7 +1,7 @@
 import { AuthContext } from '@/context/AuthContext'
 import { useContext, useEffect } from 'react'
 import { getUserById } from '@/services/usersService'
-import useSWR from 'swr'
+import useSWR, { useSWRConfig } from 'swr'
 import { useRouter } from 'next/navigation'
 import { type User } from '@/types/user'
 
@@ -16,10 +16,10 @@ interface AuthHook {
 export default function useAuth (redirect: boolean = true): AuthHook {
   const { state, logout, login } = useContext(AuthContext)
   const router = useRouter()
-  const { data, isLoading, mutate } = useSWR(state.userId != null ? ['users', state.userId] : null, async ([,userId]) => await getUserById(userId))
-
+  const { data, isLoading } = useSWR(state.userId != null ? ['users', state.userId] : null, async ([, userId]) => await getUserById(userId))
+  const { mutate } = useSWRConfig()
   const logoutAndClear = (): void => {
-    mutate(undefined, false).then(() => {
+    mutate(key => true, undefined, { revalidate: false }).then(() => {
       logout()
     }).catch(() => {
     })
