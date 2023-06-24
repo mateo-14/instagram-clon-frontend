@@ -3,7 +3,7 @@ import './globals.css'
 import Providers from '@/Providers'
 
 export const metadata = {
-  title: 'Instagram Clon',
+  title: 'InstagramClon',
   description: 'Instagram Clon Made with Next.js 13 app Router'
 }
 
