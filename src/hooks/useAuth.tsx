@@ -4,6 +4,8 @@ import { getUserById } from '@/services/usersService'
 import useSWR, { useSWRConfig } from 'swr'
 import { useRouter } from 'next/navigation'
 import { type User } from '@/types/user'
+import { unstable_serialize } from 'swr/infinite'
+import { feedPostsGetKey } from '@/utils/swrKeys'
 
 interface AuthHook {
   isLogged: boolean
@@ -19,10 +21,9 @@ export default function useAuth (redirect: boolean = true): AuthHook {
   const { data, isLoading } = useSWR(state.userId != null ? ['users', state.userId] : null, async ([, userId]) => await getUserById(userId))
   const { mutate } = useSWRConfig()
   const logoutAndClear = (): void => {
-    mutate(key => true, undefined, { revalidate: false }).then(() => {
-      logout()
-    }).catch(() => {
-    })
+    void mutate(unstable_serialize(feedPostsGetKey), undefined, { revalidate: false })
+    void mutate(key => true, undefined, { revalidate: false })
+    logout()
   }
 
   useEffect(() => {
