@@ -4,12 +4,10 @@ import CreatePostIcon from '@/components/common/Icons/CreatePostIcon'
 import OutlineHomeIcon from '@/components/common/Icons/HomeIcon'
 import ProfileIcon from '@/components/common/Icons/ProfileIcon'
 import SettingsIcon from '@/components/common/Icons/SettingsIcon'
-// import NewPostModal from '@/components/NewPostModal'
 import ProfileImage from '@/components/common/ProfileImage'
 import useOnClickOutside from '@/hooks/useOnClickOutside'
 import { useRef, useState } from 'react'
 import styles from './Header.module.css'
-// import { Link, useLocation, useMatch } from 'react-router-dom'
 import classNames from 'classnames'
 import Link from 'next/link'
 import Image from 'next/image'
@@ -17,6 +15,7 @@ import useAuth from '@/hooks/useAuth'
 import { type User } from '@/types/user'
 import NewPostModal from '../NewPostModal'
 import { usePathname } from 'next/navigation'
+import { CSSTransition } from 'react-transition-group'
 
 export default function Header (): JSX.Element {
   const [isModalOpen, setIsModalOpen] = useState(false)
@@ -47,7 +46,7 @@ export default function Header (): JSX.Element {
           </button>
           {user != null && <NavbarProfileButton data={user} onLogout={() => {
             logout()
-          }}/>}
+          }} />}
           {isLoading && <div className={styles.profilePictureLoading} />}
           {isModalOpen && <NewPostModal onClose={() => {
             if (!isLoading) {
@@ -108,19 +107,21 @@ function ProfileMenu ({ isOpen, onClose, user, exclude, onLogout }: ProfileMenuP
   return (
     isOpen
       ? (
-        <div className={styles.profileMenu} ref={ref}>
-          <Link href={`/${user.username}`} className={styles.menuButton}>
-            <ProfileIcon />
-            Profile
-          </Link>
-          {/* <Link href="/accounts/edit" className={styles.menuButton}>
+        <CSSTransition in={true} appear={true} timeout={200}>
+          <div className={styles.profileMenu} ref={ref}>
+            <Link href={`/${user.username}`} className={styles.menuButton}>
+              <ProfileIcon />
+              Profile
+            </Link>
+            {/* <Link href="/accounts/edit" className={styles.menuButton}>
             <SettingsIcon />
             Settings
           </Link> */}
-          <button onClick={onLogout} className={classNames(styles.menuButton, styles.logoutButton)}>
-            Log Out
-          </button>
-        </div>
+            <button onClick={onLogout} className={classNames(styles.menuButton, styles.logoutButton)}>
+              Log Out
+            </button>
+          </div>
+        </CSSTransition>
         )
       : null
   )

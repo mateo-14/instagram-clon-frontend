@@ -97,3 +97,13 @@
   border-radius: 100%;
   background: rgb(var(--skeleton-color));
 }
+
+.profileMenu:global(.appear) {
+  opacity: 0;
+}
+
+.profileMenu:global(.appear-active) {
+  opacity: 1;
+  transition: opacity 200ms;
+}
+
