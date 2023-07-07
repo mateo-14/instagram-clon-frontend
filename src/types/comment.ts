@@ -1,7 +1,7 @@
 import { type Post } from './post'
 import { type User } from './user'
 
-interface Comment {
+export interface Comment {
   id: number
   postId: Post['id']
   createdAt: string
