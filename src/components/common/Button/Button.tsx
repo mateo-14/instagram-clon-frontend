@@ -1,4 +1,4 @@
-import Link from 'next/link'
+import Link, { type LinkProps } from 'next/link'
 import styles from './Button.module.css'
 
 interface ButtonProps {
@@ -18,16 +18,15 @@ export function Button ({ children, className, onClick, disabled = false, type =
   )
 }
 
-interface LinkButtonProps {
+interface LinkButtonProps extends LinkProps {
   children: React.ReactNode
-  href: string
   className?: string
   style?: 'solid' | 'outline'
 }
 
-export function LinkButton ({ children, href, className, style = 'solid' }: LinkButtonProps): JSX.Element {
+export function LinkButton ({ children, href, className, style = 'solid', ...props }: LinkButtonProps): JSX.Element {
   return (
-    <Link href={href} className={`${styles.button} ${styles[style]} ${className ?? ''}`}>
+    <Link href={href} className={`${styles.button} ${styles[style]} ${className ?? ''}`} {...props}>
       {children}
     </Link>
   )

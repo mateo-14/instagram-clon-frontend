@@ -29,16 +29,10 @@ export default function Modal ({ showCloseButton, onClose, children }: ModalProp
     const container = document.body.querySelector<HTMLElement>('[data-allow-change-by-modal]')
     if (container == null) return
 
-    // Disable scrolling but keep the scroll position
-    const previousScroll = sessionStorage.getItem('previousScroll')
-    if (previousScroll != null) {
-      sessionStorage.removeItem('previousScroll')
-    }
-
     if (container.style.position === 'fixed') return
 
     const previousWinScroll = window.scrollY
-    container.style.top = `-${previousWinScroll > 0 ? previousWinScroll : (previousScroll != null ? parseInt(previousScroll) : 0)}px`
+    container.style.top = `-${previousWinScroll}px`
     container.style.position = 'fixed'
     container.style.width = '100%'
 
@@ -46,10 +40,6 @@ export default function Modal ({ showCloseButton, onClose, children }: ModalProp
       container.style.position = ''
       container.style.top = ''
       container.style.width = ''
-
-      if (previousWinScroll > 0) {
-        window.scrollTo(0, previousWinScroll)
-      }
     }
   }, [])
 

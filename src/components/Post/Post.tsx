@@ -21,6 +21,7 @@ import Modal, { ModalContent } from '../common/Modal/Modal'
 import useAuth from '@/hooks/useAuth'
 import { useSWRConfig } from 'swr'
 import { usePostListsMutation } from '@/hooks/usePostsListMutation'
+import ConditionalInterceptLink from "../common/ConditionalInterceptLink"
 
 interface PostProps {
   id: number
@@ -107,17 +108,7 @@ function Post ({ id, isInFeed = false, classes = {}, inModal = false }: PostProp
   }
 
   const date = new Date(post.createdAt)
-
-  const handleLinkClick = (e: React.MouseEvent<HTMLAnchorElement, MouseEvent>): void => {
-    const isMobile = window.matchMedia('(max-width: 767px)').matches
-    if (isMobile) {
-      e.preventDefault()
-      location.href = e.currentTarget.href // This is because next/link and router.push() intercept post route and open a modal, and I want to open the post page in mobile.
-      return
-    }
-
-    sessionStorage.setItem('previousScroll', window.scrollY.toString()) // Temp fix until Next.js fixes this issues: https://github.com/vercel/next.js/issues/49087 and https://github.com/vercel/next.js/issues/50105
-  }
+  const interceptPostRoute = !window.matchMedia('(max-width: 767px)').matches
 
   return (
     <article
@@ -147,12 +138,13 @@ function Post ({ id, isInFeed = false, classes = {}, inModal = false }: PostProp
       <section className={styles.actions}>
         <LikeButton onClick={handleLike} hasClientLike={post.hasClientLike} className={styles.action} />
         {isInFeed
-          ? <Link href={`/posts/${post.id}`} className={styles.action} onClick={handleLinkClick}>
-            <CommentIcon />
-          </Link>
+          ? <ConditionalInterceptLink href={`/posts/${post.id}`} className={styles.action} intercept={interceptPostRoute} scroll={false}>
+              <CommentIcon />
+            </ConditionalInterceptLink>
           : <button className={styles.action}>
-            <CommentIcon />
-          </button>}
+              <CommentIcon />
+            </button>
+        }
       </section>
 
       <section className={styles.likesSection}>
@@ -183,9 +175,9 @@ function Post ({ id, isInFeed = false, classes = {}, inModal = false }: PostProp
                   <PostText author={post.author.username} text={post.text} />
                 }
                 {post._count.comments > 0 && (
-                  <Link href={`/posts/${post.id}`} className={styles.viewAllCommentsBtn} onClick={handleLinkClick}>
+                  <ConditionalInterceptLink href={`/posts/${post.id}`} className={styles.viewAllCommentsBtn} intercept={interceptPostRoute} scroll={false}>
                     View all {post._count.comments} comments
-                  </Link>
+                  </ConditionalInterceptLink>
                 )}
               </>
               )}
@@ -194,7 +186,7 @@ function Post ({ id, isInFeed = false, classes = {}, inModal = false }: PostProp
       {/* Only feed data */}
 
       <section className={styles.dateSection}>
-        <Link href={`/posts/${post.id}`} onClick={handleLinkClick}>
+        <ConditionalInterceptLink href={`/posts/${post.id}`} intercept={interceptPostRoute} scroll={false}>
           <time
             dateTime={date.toLocaleString()}
             title={date.toLocaleString()}
@@ -202,7 +194,7 @@ function Post ({ id, isInFeed = false, classes = {}, inModal = false }: PostProp
           >
             {getTimeAgo(date.getTime()).toUpperCase()}
           </time>
-        </Link>
+        </ConditionalInterceptLink>
       </section>
 
       <CommentForm post={post} className={classes.commentForm} />
