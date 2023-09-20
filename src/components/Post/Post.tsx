@@ -21,7 +21,7 @@ import Modal, { ModalContent } from '../common/Modal/Modal'
 import useAuth from '@/hooks/useAuth'
 import { useSWRConfig } from 'swr'
 import { usePostListsMutation } from '@/hooks/usePostsListMutation'
-import ConditionalInterceptLink from "../common/ConditionalInterceptLink"
+import ConditionalInterceptLink from '../common/ConditionalInterceptLink'
 
 interface PostProps {
   id: number
