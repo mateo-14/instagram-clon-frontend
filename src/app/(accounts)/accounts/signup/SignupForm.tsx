@@ -61,7 +61,7 @@ export default function SignupForm (): JSX.Element {
   useEffect(() => {
     if (isLogged) {
       if (formState.isSubmitted) router.push('/')
-      else router.push('/', { replace: true })
+      else router.replace('/')
     }
   }, [isLogged])
 
