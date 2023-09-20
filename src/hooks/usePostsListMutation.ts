@@ -16,7 +16,7 @@ export function usePostListsMutation (): { mutate: CustomMutator<number[][]> } {
     if (pathname === '/') {
       key = unstable_serialize(feedPostsGetKey)
     } else if (params.username != null && ((username !== undefined && params.username === username) || (username === undefined))) {
-      key = unstable_serialize((index, previousData) => userPostsGetKey(index, previousData, params.username))
+      key = unstable_serialize((index, previousData) => userPostsGetKey(index, previousData, params.username.toString()))
     }
     if (key != null) {
       return await mutate<number[][]>(key, data, opts)
